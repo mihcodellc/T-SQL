@@ -96,6 +96,8 @@ cross apply sys.dm_exec_sql_text(s.plan_handle)p order by total_worker_time desc
 --QUERY PERFORMANCE 
 --performamce center
 --https://docs.microsoft.com/en-us/sql/relational-databases/performance/performance-center-for-sql-server-database-engine-and-azure-sql-database?view=sql-server-ver15
+--query processing
+--https://docs.microsoft.com/en-us/sql/relational-databases/query-processing-architecture-guide?view=sql-server-ver15
 --set statistics IO, TIME on
 
 
