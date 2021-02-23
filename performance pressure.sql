@@ -94,7 +94,8 @@ from sys.dm_exec_query_stats)s
 cross apply sys.dm_exec_sql_text(s.plan_handle)p order by total_worker_time desc
 
 --QUERY PERFORMANCE 
-
+--performamce center
+--https://docs.microsoft.com/en-us/sql/relational-databases/performance/performance-center-for-sql-server-database-engine-and-azure-sql-database?view=sql-server-ver15
 --set statistics IO, TIME on
 
 
@@ -102,7 +103,7 @@ cross apply sys.dm_exec_sql_text(s.plan_handle)p order by total_worker_time desc
 --SET STATISTICS XML ON
 --SET STATISTICS PROFILE ON
 ------search for operators which create the issue
---Live Query Statistics
+--Live Query Statistics for SQL 2014(12.x) and above
 ----1. execute the query once
 ----2. in Activity monitor, select the query -> right click -> show Live Execution Plan
 ------https://docs.microsoft.com/en-us/sql/relational-databases/performance/live-query-statistics?view=sql-server-ver15
@@ -111,7 +112,7 @@ cross apply sys.dm_exec_sql_text(s.plan_handle)p order by total_worker_time desc
 
 ----***see the plan before execute
 --set showplan_all On
---set showplan_text
+--set showplan_text ON Versus SET STATISTICS PROFILE ON
 --use extended events/create the session
 
 --***all tools for monitoring SQL Server
@@ -121,10 +122,9 @@ cross apply sys.dm_exec_sql_text(s.plan_handle)p order by total_worker_time desc
 
 --***all metrics for monitoring SQL Server- - use with perform if available
 --https://documentation.red-gate.com/sm5/analyzing-performance/analysis-graph/list-of-metrics#Listofmetrics-Userconnections
+--https://www.datadoghq.com/blog/sql-server-monitoring-tools/#richer-real-time-sql-server-monitoring-tools
 
-select * from sys.dm_db_file_space_usage
-USE tempdb;  
-GO  
-
-SELECT (total_log_size_in_bytes - used_log_space_in_bytes)*1.0/1024/1024 AS [free log space in MB]  
-FROM sys.dm_db_log_space_usage;  
+--***TUNING
+DBCC SHOW_STATISTICS ('atable','an_index')  
+UPDATE STATISTICS atable;
+UPDATE STATISTICS dbo.A ix1 WITH FULLSCAN, PERSIST_SAMPLE_PERCENT = ON;
