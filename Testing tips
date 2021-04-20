@@ -1,0 +1,68 @@
+https://blog.testlodge.com/positive-negative-destructive-test-cases/
+
+Test cases
+	Functionality , User Interface, Performance, Integration, 
+	Usability, Database, Security, User Acceptance 
+
+Test cases Styles
+	Positive, Negative, Destructive(what the system can handle until it breaks)
+    
+Writing test cases
+	Strong Title
+	Strong Description
+	Assumptions and Preconditions
+	Test Steps Clear and Concise
+	Expected result
+	
+	
+Tester’s mindset: 
+	If you test an app without an expectation to find any bugs, 
+	then you will not find any. No app is flawless and you are well aware of that.
+	Take the time to consider the workflow, the boundaries and 
+	the negative scenarios(not doing what it is not supposed, invalid inputs, not in requirement) 
+	and you will create test case coverage that far exceeds what you thought possible.
+
+Go beyond Requirement Testing. Test the application for what it is not supposed to do.	
+
+
+Graphical User Interface (GUI) Testing
+	The objective of this GUI Testing is to validate the GUI as per the business requirement
+	 size of the buttons and input field
+	 alignment of all text, tables, and content in the tables
+	 validates the menu of the application, after selecting different menu and menu items
+	 page does not fluctuate and the alignment remains same after hovering on the menu
+	 
+Defect sources
+	Validation fields, browser compability, Page layout on different screens
+	date control, crash caused by a click.
+		
+		
+Common errors:		
+	Functionality(confusing, impossible) 
+	Communication(need to know on screen)
+	Missing command
+	Incorrent words, phrases, sentences
+	Error handling 
+	Calculation 
+	
+	
+Equivalence Partitioning	 
+
+
+Boundary Value Testing
+
+
+Use the previous Bug graph 
+
+
+Group your test cases for Regression Testing.
+
+	
+Mc Call's Model:
+	Product Revision: Maintainability, Flexibility, Testability
+	Product Transition: Portability, Re-usability, Interoperability
+	Product Operations: Correctness, Reliability, Efficiency, Usability
+	
+
+FURPS model:
+	Functionality, Usability, Reliability, Performance and Supportability	
