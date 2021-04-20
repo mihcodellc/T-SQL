@@ -109,7 +109,7 @@ cross apply sys.dm_exec_sql_text(s.plan_handle)p order by total_worker_time desc
 ----1. execute the query once
 ----2. in Activity monitor, select the query -> right click -> show Live Execution Plan
 ------https://docs.microsoft.com/en-us/sql/relational-databases/performance/live-query-statistics?view=sql-server-ver15
---wait types for a session: sys.dm_exec_session_wait_stats, sys.dm_os_wait_stats => refere to WaitingTasks.sql
+--wait types for a session: sys.dm_exec_session_wait_stats, sys.dm_os_wait_stats => refer to WaitingTasks.sql
 
 
 ----***see the plan before execute
@@ -127,6 +127,30 @@ cross apply sys.dm_exec_sql_text(s.plan_handle)p order by total_worker_time desc
 --https://www.datadoghq.com/blog/sql-server-monitoring-tools/#richer-real-time-sql-server-monitoring-tools
 
 --***TUNING
-DBCC SHOW_STATISTICS ('atable','an_index')  
+set statistics io, time on
+set statistics profile on
+set showplan_all on
+set showplan_text on
+set noexec on
+DBCC SHOW_STATISTICS ('atable','an_index') with STAT_HEADER -- 'DBCC for a table indexes.sql'
+
+--stats on a table
+SELECT sp.stats_id,  name,  filter_definition, last_updated, 
+       rows, rows_sampled, steps, unfiltered_rows, modification_counter
+ FROM sys.stats AS stat
+     CROSS APPLY sys.dm_db_stats_properties(stat.object_id, stat.stats_id) AS sp
+WHERE stat.object_id = OBJECT_ID('APPS.BillableUnits');
+
 UPDATE STATISTICS atable;
-UPDATE STATISTICS dbo.A ix1 WITH FULLSCAN, PERSIST_SAMPLE_PERCENT = ON;
+UPDATE STATISTICS dbo.A ix1 WITH FULLSCAN, PERSIST_SAMPLE_PERCENT = ON; -- on not available on all sql server version
+
+CREATE STATISTICS statName ON table(col1, col2) WITH FULLSCAN
+DROP STATISTICS table.statName
+
+
+--io latency
+SELECT *
+FROM sys.dm_io_virtual_file_stats(DB_ID('AdventureWorks2014'), NULL) divfs
+ORDER BY divfs.io_stall DESC;
+
+--WHO IS DOIN WHAT REFER TO CONNECTED.SQL
