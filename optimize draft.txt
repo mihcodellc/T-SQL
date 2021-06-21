@@ -1,0 +1,132 @@
+
+Optimize ThinkHealth 
+Limits to this task, 
+	how often the database is used? Reads(scan/seek)
+	Run the script and Compare overtime
+	not a production DB, No lock escalations available
+
+
+Test sp_BlitzFirst with the new table dbo.BelloBlitzIndex  created by me 
+Analyse a group of problem pointed: 100-Non-Unique clustered indexes with more usage or size: PatientInformation
+If you don't create then SQL server will. to overcome this problem, use random  Clustered Key. But you will have to deal with hard PageSplits
+	SQL Server can avoid a complete scan of the Index in the leaf level because physical sorting order.
+	create a cluster index, you have single hotspot at the end of your Index;
+	Why is not created? why a identity column as a primary key?
+https://www.brentozar.com/blitzindex/sp_blitzindex-index-hoarding/
+https://www.sqlpassion.at/archive/2016/03/29/clustered-indexes-advantages-disadvantages/
+	
+
+
+Analyze a group of problem pointed: Heap with a Nonclustered Primary Key
+Notice: Original page for details is redirected without the phrase for the problem
+Search to give an explanation for their appearance in the results on web but I did see a 
+the suggest query doesn't work when I try to apply to create the index
+https://www.brentozar.com/blitzindex/sp_blitzindex-self-loathing-indexes/
+https://stackoverflow.com/questions/149213/what-are-hypothetical-indexes
+Google search with https://stackoverflow.com/questions/149213/what-are-hypothetical-indexes
+execute the command sp_help, sp_depends to compare different the primary key shown for output tables
+Refers to Index_info.sql commented with sys.index and compare to sp_BlitzIndex
+Conclusion: There is some duplicate objects id but one with names, other without names and index=0
+Suggestions: we should purge the DB of these objects
+fill the documentation for the time frame 30'
+
+Analyses output of Blit_Index.sql:
+Fill factor hurts performance. is it a reason to use it on [APPS].[EligibilityInformation].it has a lot writes.
+Watch out [APPS].[TriggerStatus] performance for multi columns index. It knows many reads(scans/seeks)
+Summarize Index_info.sql output
+Missing index ON PatientInformation, ClientDacore for a better perfomance
+Watch out the tables TriggerStatus, ScheduledServices, EmailQueue, PatientInformation. they have a high rate of reads.
+
+
+
+Fragmentation percentage < 30 % is acceptable
+TOP 15 fragmented tables : 
+	PatientAssignmentX_Ref, FD_AttributeBase, Prescriptions, CDCSubstanceMental, Blotter, ClientDataCore, PSRWorkUnit
+	PSRProgressNote
+	who2_locks
+	FD_AttributeMap
+	PatientInformation
+	ICD9
+	EHRLabResultObservation
+	FD_RecordTextValue
+	BillingAcctRec
+https://www.brentozar.com/archive/2012/08/sql-server-index-fragmentation/
+https://social.msdn.microsoft.com/Forums/sqlserver/en-US/1a0ae67d-68c0-4435-b03e-2311eae45ceb/fragmentation-percentage-is-this-good-or-bad?forum=sqldisasterrecovery
+https://logicalread.com/fix-sql-server-index-fragmentation-mc11/#.XMthPBRKiUk
+https://blog.sqlauthority.com/2010/01/12/sql-server-fragmentation-detect-fragmentation-and-eliminate-fragmentation/
+add Comment Index_info.sql to make more sens of some query
+break 15mn
+Inefficient non clustered index (writes > reads) to remove 
+	TABLES						INDEX
+	EmailQueue					Status_EmailQueue
+	EligibilityInformation		idx_nc_PatientID_FK_InsEligType
+	UserAnnouncements			IX_UserAnnouncements_1
+Index not read at all to remove
+[iThinkHealth].[APPS].[UserActivityLog]				PK_UserActivityLog
+[iThinkHealth].[APPS].[EmailQueue]					Status_EmailQueue
+[iThinkHealth].[APPS].[PatientCurrentEligibility]	PK_PatientCurrentEligibility
+[iThinkHealth].[APPS].[UserAnnouncements]			IX_UserAnnouncements_1
+[iThinkHealth].[APPS].[UserTimeTracking]			PK_UserTimeTracking
+
+
+
+
+
+
+1h 15
+run Misc_Top10_type_Index_Queries.sql and analyze
+		
+			[APPS].[sp_UpdatePatientEligibility]: Time ,  CPU ,  Read , Writes 
+			[APPS].[sp_InsertPatientCurrElig: Read, Writes 
+			[APPS].[sp_UpdateEmailQueueStatus]
+			TRIGGER [APPS].[UpdatePatient] ON [APPS].[PatientInformation]:  CPU 
+			[APPS].[sp_GetFD_Attributes]:  CPU 
+			[APPS].[sp_RecordLog]:  CPU , Read, Writes 
+			[APPS].[sp_GetAdditionalCo]:  Time  
+			
+			https://logicalread.com/troubleshoot-high-cpu-sql-server-pd01/#.XMxYyRRKiUk
+			https://stackoverflow.com/questions/162231/what-constitutes-high-cpu-for-sql-server
+			
+1h55 -
+run "SQL Server 2008 R2 Diagnostic Information Queries (May 2013).sql" and see what else can be use for indexes
+			Possible Bad NC Indexes
+			EligibilityInformation	idx_nc_PatientID_FK_InsEligType
+			EmailQueue				Status_EmailQueue
+			https://www.sqlskills.com/blogs/paul/wait-statistics-or-please-tell-me-where-it-hurts/
+			https://sqlperformance.com/2017/01/sql-performance/compression-effect-on-performance
+			https://mostafaelmasry.com/2017/11/24/improve-sql-server-performance-with-compression/
+			Compression decreases I/O pressure, better memory utilisation but increases CPU. Don't take over 
+			physical resources, configuration, indexing, and query tuning.
+			Why No compression on the tables?
+			https://sqlbak.com/blog/update-statistics-sql-server/
+			the statistics are not up to date. How often do you update the statistics?
+			what are the dba checklist for performances tuning?
+			https://www.sqlserver-dba.com/2012/06/sql-server-performance-checklist.html
+			https://www.mssqltips.com/sqlservertip/5114/sql-server-performance-troubleshooting-system-health-checklist/
+			break 15'
+			
+			
+1h40'
+read Index And Integrity Maintenance Documentation.doc
+	defragmentation depending on percentage of fragmentation
+	create indexes
+	update the statistics
+	check integrity - not related to index
+
+
+
+Remarks: 
+1. many values are hard code ie literal. 
+2. Many Foreign keys exist but are not implemented.
+	how do you plan to fix them?
+3. Disable a trigger by inserting the processs in APPS.TriggerStatus
+4. some objects without the prefixes F_ or sp_: function, trigger ...
+Questions:
+1. Why not DISABLE/ENABLE the triggers? What is your politic about the triggers? convention name?
+2. sp_InsertPatientCurrElig creates an insurance if it is not exist but on which status? and inserts an eligibility in PatientCurrentEligibility without check? and run sp_RecordLog
+3. in PatientCurrentEligibility, EligibilityInfoID and his values V, 1, I mean what?
+4. In the table InsuranceInfo, InsLevel, InsuranceType_FK, ContactType_FK : where is their lists and definition?
+	What userID_FK is oding in this table?
+	What mean FullNameID_FK?
+	Whats mean InsuranceTypeCode? only one value "MA"
+5. In sp_InsertPatientCurrElig, Which table contain the different values of hard code literal @InsEligType, ChangeStatus?	

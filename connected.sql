@@ -1,3 +1,6 @@
+-- maximum number of simultaneous user connections allowed
+SELECT @@MAX_CONNECTIONS AS 'Max Connections';  
+
 USE master;  
 GO  
 EXEC sp_who 'active';  
@@ -6,12 +9,10 @@ SELECT
     DB_NAME(dbid) as DBName, dbid,
     (dbid) as NumberOfConnections,
     loginame as LoginName, status
-FROM
-    sys.sysprocesses
+FROM  sys.sysprocesses
 --WHERE 
     --dbid =6 
-GROUP BY 
-    dbid, loginame, status
+GROUP BY dbid, loginame, status
 
 
 --==============================================================================
@@ -71,7 +72,6 @@ WHERE sdes.session_id <> @@SPID
   AND sdest.DatabaseName ='ithinkhealth'
 ORDER BY sdes.last_request_start_time DESC
 
-select open_transaction_count, status, * FROM sys.dm_exec_sessions
 
 --query
 select q.text, st.execution_count, st.last_logical_reads, st.last_execution_time, st.last_logical_writes, last_physical_reads from sys.dm_exec_query_stats st
@@ -100,9 +100,30 @@ exec sp_who 'active';
  where upper(cmd) <> 'AWAITING COMMAND' -- ACTIVE excludes sessions that are waiting for the next command from the user.
  and spid  <> @@SPID
  order by status
+ 
+ --sessions blocking other, active queries & sql text
+ WITH cteBL (session_id, blocking_these) AS 
+(SELECT s.session_id, blocking_these = x.blocking_these FROM sys.dm_exec_sessions s 
+CROSS APPLY    (SELECT isnull(convert(varchar(6), er.session_id),'') + ', '  
+                FROM sys.dm_exec_requests as er
+                WHERE er.blocking_session_id = isnull(s.session_id ,0)
+                AND er.blocking_session_id <> 0
+                FOR XML PATH('') ) AS x (blocking_these)
+)
+SELECT s.session_id, blocked_by = r.blocking_session_id, bl.blocking_these
+, batch_text = t.text, input_buffer = ib.event_info, * 
+FROM sys.dm_exec_sessions s 
+LEFT OUTER JOIN sys.dm_exec_requests r on r.session_id = s.session_id
+INNER JOIN cteBL as bl on s.session_id = bl.session_id
+OUTER APPLY sys.dm_exec_sql_text (r.sql_handle) t
+OUTER APPLY sys.dm_exec_input_buffer(s.session_id, NULL) AS ib
+WHERE blocking_these is not null or r.blocking_session_id > 0
+ORDER BY len(bl.blocking_these) desc, r.blocking_session_id desc, r.session_id;
 
+ --open transaction
 dbcc opentran
 
+-- connection and session info
 SELECT conn.session_id, sess.host_name, sess.program_name,
     sess.nt_domain, sess.login_name, conn.connect_time, sess.last_request_end_time 
 FROM sys.dm_exec_sessions AS sess
@@ -111,14 +132,24 @@ JOIN sys.dm_exec_connections AS conn
 
  select * from sys.dm_exec_connections
 
+ --last statement that was submitted by a session
+    DBCC INPUTBUFFER(<session_id>)
+    --OR
+    SELECT * FROM sys.dm_exec_input_buffer (66,0);
+
+
+select open_transaction_count, status, * FROM sys.dm_exec_sessions
+
 
  --set transaction isolation level read uncommitted
 
---find lock esclation on a table
-
+--find lock esclation on a table 
 SELECT CASE WHEN resource_type = 'OBJECT' THEN OBJECT_NAME(resource_associated_entity_id) else OBJECT_NAME(b.OBJECT_ID) end ObjectName, 
 resource_type, request_mode, resource_description, request_session_id, partition_id, request_status, request_type 
 --into #mylock
 FROM sys.dm_tran_locks a
 LEFT JOIN sys.partitions b ON b.hobt_id = a.resource_associated_entity_id
-WHERE resource_type <> 'DATABASE' AND resource_database_id = DB_ID()
+WHERE resource_type <> 'DATABASE' AND resource_database_id = DB_ID() -- and request_session_id = @@spid;
+
+--Determine Which Queries Are Holding Locks using extend events
+--https://docs.microsoft.com/en-us/sql/relational-databases/extended-events/determine-which-queries-are-holding-locks?view=sql-server-ver15

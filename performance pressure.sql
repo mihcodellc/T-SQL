@@ -1,3 +1,18 @@
+--QUERY PERFORMANCE 
+--performamce center
+--https://docs.microsoft.com/en-us/sql/relational-databases/performance/performance-center-for-sql-server-database-engine-and-azure-sql-database?view=sql-server-ver15
+
+-- sql troubleshooting
+--https://docs.microsoft.com/en-us/troubleshoot/sql/welcome-sql-server
+--https://docs.microsoft.com/en-us/troubleshoot/sql/performance/understand-resolve-blocking
+
+--query processing
+--https://docs.microsoft.com/en-us/sql/relational-databases/query-processing-architecture-guide?view=sql-server-ver15
+
+
+--managing Concurrent Data Access
+--https://docs.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms189130(v=sql.105)
+
 -- ********************************memory pressure 
 
 --https://docs.microsoft.com/en-us/sql/relational-databases/performance-monitor/monitor-memory-usage?view=sql-server-ver15#monitor-operating-system-memory
@@ -40,7 +55,7 @@ set showplan_text on
 
 select * from sys.dm_os_performance_counters 
 --order by counter_name
-where counter_name in ('Batch Requests/sec', 'SQL Compilations/sec' , 'SQL Re-Compilations/sec') and 
+where counter_name in ('Batch Requests/sec', 'SQL Compilations/sec' , 'SQL Re-Compilations/sec') --and 
 --where counter_name like '%time%'
 
 --select * FROM sys.dm_os_performance_counters order by wait_type
@@ -93,11 +108,7 @@ from (select top 10 plan_handle, total_worker_time
 from sys.dm_exec_query_stats)s
 cross apply sys.dm_exec_sql_text(s.plan_handle)p order by total_worker_time desc
 
---QUERY PERFORMANCE 
---performamce center
---https://docs.microsoft.com/en-us/sql/relational-databases/performance/performance-center-for-sql-server-database-engine-and-azure-sql-database?view=sql-server-ver15
---query processing
---https://docs.microsoft.com/en-us/sql/relational-databases/query-processing-architecture-guide?view=sql-server-ver15
+
 --set statistics IO, TIME on
 
 
@@ -134,7 +145,7 @@ set showplan_text on
 set noexec on
 DBCC SHOW_STATISTICS ('atable','an_index') with STAT_HEADER -- 'DBCC for a table indexes.sql'
 
---stats on a table
+--stats on a table: statistic for a table indexes.sql
 SELECT sp.stats_id,  name,  filter_definition, last_updated, 
        rows, rows_sampled, steps, unfiltered_rows, modification_counter
  FROM sys.stats AS stat
@@ -154,3 +165,32 @@ FROM sys.dm_io_virtual_file_stats(DB_ID('AdventureWorks2014'), NULL) divfs
 ORDER BY divfs.io_stall DESC;
 
 --WHO IS DOIN WHAT REFER TO CONNECTED.SQL
+
+-- fragmentation ref to fragmentedIndex.sql
+
+
+
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE; 
+--set transaction isolation level read uncommitted
+
+-- SET LOCK_TIMEOUT 2000 -- in milliseconds -- If another query does not release the lock in 2000 => error msg 1222
+-- SELECT @@LOCK_TIMEOUT
+
+SET XACT_ABORT ON --rollback is certain
+BEGIN TRY
+    BEGIN TRAN
+		  EXEC(@query)
+    COMMIT TRAN
+END TRY
+BEGIN CATCH
+    IF @@TRANCOUNT <> 0 
+    BEGIN
+	   ROLLBACK TRAN
+	   RAISERROR ( 'Deleting Billing Scrubber Rules failed', 16, 1 )
+	   RETURN -1
+    END
+    ELSE
+	   RETURN 0
+END CATCH
+
+SET XACT_ABORT OFF --auto rollback disabled
