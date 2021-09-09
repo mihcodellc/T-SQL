@@ -1,3 +1,24 @@
+--or UI in ssms under management or partially in beneath sql Agent 
+--don't forget windows log is not reset after you restart your machine.
+
+
+   declare @msg nvarchar(1000)
+    set @msg = char(10) + @SPName +'''s parameters : ' +  char(10) +
+			'@param1 = ' + CAST(@var1 AS varchar(12))  +
+			', @param2 = ' + CAST(@var2 AS varchar(12))  +
+			 char(10) + char(10) 
+			+ ISNULL(ERROR_MESSAGE(),'') 
+
+	RAISERROR ( @msg, 16, 1 );
+	--Logs a user-defined message in the SQL Server log file and in the Windows Event Viewer. 
+	-- xp_logevent can be used to send an alert without sending a message to the client
+	-- https://docs.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/xp-logevent-transact-sql?view=sql-server-ver15#result-sets
+     EXEC xp_logevent 60000, @msg, informational;
+
+
+
+
+
 SELECT SERVERPROPERTY('ErrorLogFileName') AS 'Error log file location';
 
 --https://www.sqlshack.com/read-sql-server-error-logs-using-the-xp_readerrorlog-command/

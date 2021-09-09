@@ -1,3 +1,34 @@
+-- code error Timeout expired. The timeout period elapsed 
+-- prior to obtaining a connection from the pool. This may have occurred because all pooled connections were in use and max pool size was reached.
+-- https://sqlperformance.com/2017/07/sql-performance/find-database-connection-leaks
+
+-- session by host
+select count(*) as sessions,
+         s.host_name,
+         s.host_process_id,
+         s.program_name,
+         db_name(s.database_id) as database_name
+   from sys.dm_exec_sessions s
+   where is_user_process = 1 and host_name = 'DEVELOPER15'
+   group by host_name, host_process_id, program_name, database_id
+   order by count(*) desc;
+
+-- sleeping session can be an issue, check the query used and closed them, of no longer needed close or kill it
+-- there are using the TempDB
+  select datediff(minute, s.last_request_end_time, getdate()) as minutes_asleep,
+         s.session_id,
+         db_name(s.database_id) as database_name,
+         s.host_name,
+         s.host_process_id,
+         t.text as last_sql,
+         s.program_name
+    from sys.dm_exec_connections c
+    join sys.dm_exec_sessions s
+         on c.session_id = s.session_id
+   cross apply sys.dm_exec_sql_text(c.most_recent_sql_handle) t
+   where s.is_user_process = 1
+         and s.status = 'sleeping'
+
 -- maximum number of simultaneous user connections allowed
 SELECT @@MAX_CONNECTIONS AS 'Max Connections';  
 
@@ -13,6 +44,27 @@ FROM  sys.sysprocesses
 --WHERE 
     --dbid =6 
 GROUP BY dbid, loginame, status
+
+
+
+
+--Query to return active locks and the duration of the locks being held
+SELECT  Locks.request_session_id AS SessionID ,
+        Obj.Name AS LockedObjectName ,
+        DATEDIFF(second, ActTra.Transaction_begin_time, GETDATE()) AS Duration ,
+        ActTra.Transaction_begin_time ,
+        COUNT(*) AS Locks
+FROM    sys.dm_tran_locks Locks
+        JOIN sys.partitions Parti ON Parti.hobt_id = Locks.resource_associated_entity_id
+        JOIN sys.objects Obj ON Obj.object_id = Parti.object_id
+        JOIN sys.dm_exec_sessions ExeSess ON ExeSess.session_id = Locks.request_session_id
+        JOIN sys.dm_tran_session_transactions TranSess ON ExeSess.session_id = TranSess.session_id
+        JOIN sys.dm_tran_active_transactions ActTra ON TranSess.transaction_id = ActTra.transaction_id
+WHERE   resource_database_id = DB_ID()
+        AND Obj.Type = 'U'
+GROUP BY ActTra.Transaction_begin_time ,
+        Locks.request_session_id ,
+        Obj.Name
 
 
 --==============================================================================
@@ -52,7 +104,7 @@ SELECT
     ,sdec.local_net_address
     ,sdest.Query
 	,sdest.text
-    ,KillCommand  = 'Kill '+ CAST(sdes.session_id  AS VARCHAR)
+    ,KillCommand  = 'Kill '+ CAST(sdes.session_id  AS VARCHAR) + ' WITH STATUSONLY ' --WITH STATUSONLY clause provides progress reports, the time remaining until the blocking is resolved
 FROM sys.dm_exec_sessions AS sdes
 
 INNER JOIN sys.dm_exec_connections AS sdec

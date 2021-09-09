@@ -1,5 +1,15 @@
---QUERY PERFORMANCE 
---performamce center
+--SQL SERVER – ACID (Atomicity, Consistency, Isolation, Durability)
+
+-- SQL SERVER CONFIGURATION MANAGER to activate your sql agent or start db engine ...
+
+--*****Server Performance and Activity Monitoring
+--https://docs.microsoft.com/en-us/sql/relational-databases/performance/server-performance-and-activity-monitoring?view=sql-server-ver15
+
+--******Business continuity and database recovery - SQL Server
+--https://docs.microsoft.com/en-us/sql/database-engine/sql-server-business-continuity-dr?view=sql-server-ver15
+
+--******QUERY PERFORMANCE 
+--performaNce center
 --https://docs.microsoft.com/en-us/sql/relational-databases/performance/performance-center-for-sql-server-database-engine-and-azure-sql-database?view=sql-server-ver15
 
 -- sql troubleshooting
@@ -9,6 +19,7 @@
 --query processing
 --https://docs.microsoft.com/en-us/sql/relational-databases/query-processing-architecture-guide?view=sql-server-ver15
 
+--windows log & SQL server Log to inspect or make write in them for analysis
 
 --managing Concurrent Data Access
 --https://docs.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms189130(v=sql.105)
@@ -38,7 +49,7 @@ sqlserver_start_time,
 (committed_target_kb/1024)  AS Target_Server_Memory_MB
 FROM sys.dm_os_sys_info;
 
---Determining page life expectancy
+--Determining page life expectancy : has to be compare between 2 executions like for any of them in dm_os_performance_counters
 SELECT 'Determining page life expectancy',
 CASE instance_name WHEN '' THEN 'Overall' ELSE instance_name END AS NUMA_Node, cntr_value AS PLE_s
 FROM sys.dm_os_performance_counters    

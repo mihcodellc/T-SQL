@@ -1,3 +1,13 @@
+--** to examine the current wait statistics rather than the cumulative totals since
+--** the last SQL Server service restart
+DBCC SQLPERF ('sys.dm_os_wait_stats', CLEAR);
+
+
+--task that is waiting, the wait type, the status, and whether another session is blocking this session
+SELECT wt.session_id,wt.wait_duration_ms,wait_type, blocking_session_id, s.status
+FROM sys.dm_os_waiting_tasks AS wt
+ JOIN sys.dm_exec_sessions AS s ON wt.session_id = s.session_id
+
 SELECT TOP(10)
  dows.*
 FROM sys.dm_os_wait_stats AS dows
