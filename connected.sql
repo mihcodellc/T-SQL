@@ -2,49 +2,9 @@
 -- prior to obtaining a connection from the pool. This may have occurred because all pooled connections were in use and max pool size was reached.
 -- https://sqlperformance.com/2017/07/sql-performance/find-database-connection-leaks
 
--- session by host
-select count(*) as sessions,
-         s.host_name,
-         s.host_process_id,
-         s.program_name,
-         db_name(s.database_id) as database_name
-   from sys.dm_exec_sessions s
-   where is_user_process = 1 and host_name = 'DEVELOPER15'
-   group by host_name, host_process_id, program_name, database_id
-   order by count(*) desc;
-
--- sleeping session can be an issue, check the query used and closed them, of no longer needed close or kill it
--- there are using the TempDB
-  select datediff(minute, s.last_request_end_time, getdate()) as minutes_asleep,
-         s.session_id,
-         db_name(s.database_id) as database_name,
-         s.host_name,
-         s.host_process_id,
-         t.text as last_sql,
-         s.program_name
-    from sys.dm_exec_connections c
-    join sys.dm_exec_sessions s
-         on c.session_id = s.session_id
-   cross apply sys.dm_exec_sql_text(c.most_recent_sql_handle) t
-   where s.is_user_process = 1
-         and s.status = 'sleeping'
 
 -- maximum number of simultaneous user connections allowed
 SELECT @@MAX_CONNECTIONS AS 'Max Connections';  
-
-USE master;  
-GO  
-EXEC sp_who 'active';  
-GO
-SELECT 
-    DB_NAME(dbid) as DBName, dbid,
-    (dbid) as NumberOfConnections,
-    loginame as LoginName, status
-FROM  sys.sysprocesses
---WHERE 
-    --dbid =6 
-GROUP BY dbid, loginame, status
-
 
 
 
@@ -121,7 +81,7 @@ CROSS APPLY (
 
 ) sdest
 WHERE sdes.session_id <> @@SPID
-  AND sdest.DatabaseName ='ithinkhealth'
+  AND sdest.DatabaseName = db_name()
 ORDER BY sdes.last_request_start_time DESC
 
 
@@ -175,6 +135,17 @@ ORDER BY len(bl.blocking_these) desc, r.blocking_session_id desc, r.session_id;
  --open transaction
 dbcc opentran
 
+
+-- analyze locks
+select db_name(resource_database_id),s.host_name,
+         s.host_process_id,
+         s.program_name, s.session_id, l.request_status, l.request_mode, l.request_owner_type, OBJECT_NAME(l.resource_associated_entity_id)
+from sys.dm_tran_locks l
+join sys.dm_exec_sessions s on request_session_id = s.session_id
+
+where db_name(resource_database_id)= 'iThinkHealth'
+
+
 -- connection and session info
 SELECT conn.session_id, sess.host_name, sess.program_name,
     sess.nt_domain, sess.login_name, conn.connect_time, sess.last_request_end_time 
@@ -205,3 +176,47 @@ WHERE resource_type <> 'DATABASE' AND resource_database_id = DB_ID() -- and requ
 
 --Determine Which Queries Are Holding Locks using extend events
 --https://docs.microsoft.com/en-us/sql/relational-databases/extended-events/determine-which-queries-are-holding-locks?view=sql-server-ver15
+
+
+-- session by host
+select count(*) as sessions,
+         s.host_name,
+         s.host_process_id,
+         s.program_name,
+         db_name(s.database_id) as database_name
+   from sys.dm_exec_sessions s
+   where is_user_process = 1 and host_name = 'DEVELOPER15'
+   group by host_name, host_process_id, program_name, database_id
+   order by count(*) desc;
+
+-- sleeping session can be an issue, check the query used and closed them, of no longer needed close or kill it
+-- there are using the TempDB
+  select datediff(minute, s.last_request_end_time, getdate()) as minutes_asleep,
+         s.session_id,
+         db_name(s.database_id) as database_name,
+         s.host_name,
+         s.host_process_id,
+         t.text as last_sql,
+         s.program_name
+    from sys.dm_exec_connections c
+    join sys.dm_exec_sessions s
+         on c.session_id = s.session_id
+   cross apply sys.dm_exec_sql_text(c.most_recent_sql_handle) t
+   where s.is_user_process = 1
+         and s.status <> 'sleeping'
+
+
+USE master;  
+GO  
+EXEC sp_who 'active';  
+GO
+SELECT 
+    DB_NAME(dbid) as DBName, dbid,
+    (dbid) as NumberOfConnections,
+    loginame as LoginName, status
+FROM  sys.sysprocesses
+--WHERE 
+    --dbid =6 
+GROUP BY dbid, loginame, status
+
+

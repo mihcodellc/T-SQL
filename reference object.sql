@@ -5,4 +5,5 @@ SELECT OBJECT_NAME(object_id),* FROM  sys.sql_dependencies where OBJECT_NAME(obj
 SELECT * FROM sys.dm_sql_referenced_entities  ('Apps.Annoucements', 'OBJECT') 
 
 
-select distinct OBJECT_NAME(object_id) nom,name  from sys.columns where name like '%user%' order by nom
+select distinct OBJECT_NAME(object_id) nom,name  from sys.columns where name like '%patien%' order by nom
+select distinct OBJECT_NAME(object_id) nom,name  from sys.columns where name like '%sign%' order by nom
