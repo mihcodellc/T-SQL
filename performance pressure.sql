@@ -11,6 +11,10 @@
 --******QUERY PERFORMANCE 
 --performaNce center
 --https://docs.microsoft.com/en-us/sql/relational-databases/performance/performance-center-for-sql-server-database-engine-and-azure-sql-database?view=sql-server-ver15
+--https://sqlperformance.com/?s=wait+stat
+--https://www.mssqltips.com/sql-server-webcasts/
+--https://www.sqlshack.com/category/sql-database-development/
+
 
 -- sql troubleshooting
 --https://docs.microsoft.com/en-us/troubleshoot/sql/welcome-sql-server

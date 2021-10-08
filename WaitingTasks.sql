@@ -1,17 +1,44 @@
---** to examine the current wait statistics rather than the cumulative totals since
---** the last SQL Server service restart
+--** to examine the current wait statistics rather than the cumulative totals since the last SQL Server service restart
+--** !!!! ATTENTION IT DOES RESET WAIT AND LATCH STATS !!!!
 DBCC SQLPERF ('sys.dm_os_wait_stats', CLEAR);
 
 
 --task that is waiting, the wait type, the status, and whether another session is blocking this session
-SELECT wt.session_id,wt.wait_duration_ms,wait_type, blocking_session_id, s.status
+SELECT wt.session_id,wt.wait_duration_ms,wait_type, blocking_session_id, s.status, s.host_name,
+         s.host_process_id,
+         s.program_name
 FROM sys.dm_os_waiting_tasks AS wt
  JOIN sys.dm_exec_sessions AS s ON wt.session_id = s.session_id
 
-SELECT TOP(10)
+-- wait types
+SELECT distinct  counter_name FROM sys.dm_os_performance_counters
+WHERE object_name LIKE '%Wait Statistics%' order by counter_name
+
+SELECT * FROM sys.dm_os_performance_counters
+WHERE  counter_name = 'Network IO waits'
+
+ SELECT 
  dows.*
 FROM sys.dm_os_wait_stats AS dows
-ORDER BY dows.wait_time_ms DESC;
+ORDER BY waiting_tasks_count desc, dows.wait_time_ms DESC;
+
+ --waiting task per connection
+SELECT st.text AS [SQL Text], c.connection_id, w.session_id, 
+  w.wait_duration_ms, w.wait_type, w.resource_address, 
+  w.blocking_session_id, w.resource_description, c.client_net_address, c.connect_time
+FROM sys.dm_os_waiting_tasks AS w
+INNER JOIN sys.dm_exec_connections AS c ON w.session_id = c.session_id 
+CROSS APPLY (SELECT * FROM sys.dm_exec_sql_text(c.most_recent_sql_handle)) AS st 
+              WHERE w.session_id > 50 AND w.wait_duration_ms > 0
+ORDER BY c.connection_id, w.session_id
+GO
+
+--Identify tasks from blocked sessions
+SELECT * FROM sys.dm_os_waiting_tasks 
+WHERE blocking_session_id IS NOT NULL
+
+
+
 
 --Applies to: SQL Server ( SQL Server 2016 (13.x) and later).
 SELECT  S.Session_Id , OS.* ,
@@ -277,3 +304,6 @@ N'XE_LIVE_TARGET_TVF'
 ORDER BY Wait_Time_Seconds DESC
 -- OPTION (MAXDOP 1)
 -- ORDER BY Waiting_Tasks_Count DESC
+
+
+
