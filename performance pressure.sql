@@ -80,11 +80,7 @@ where counter_name in ('Batch Requests/sec', 'SQL Compilations/sec' , 'SQL Re-Co
 SELECT CAST(100.0 * SUM(signal_wait_time_ms) / SUM (wait_time_ms) AS NUMERIC(20,2))
 AS [%signal (cpu) waits],
 CAST(100.0 * SUM(wait_time_ms - signal_wait_time_ms) / SUM (wait_time_ms) AS NUMERIC(20,2))
-AS [%resource waits] FROM sys.dm_os_wait_stats OPTION (RECOMPILE);SELECT CAST(100.0 * SUM(signal_wait_time_ms) / SUM (wait_time_ms) AS NUMERIC(20,2))
-AS [%signal (cpu) waits],
-CAST(100.0 * SUM(wait_time_ms - signal_wait_time_ms) / SUM (wait_time_ms) AS NUMERIC(20,2))
 AS [%resource waits] FROM sys.dm_os_wait_stats OPTION (RECOMPILE);
-
 
 SELECT COUNT(*) AS workers_waiting, t2.Scheduler_id
 FROM sys.dm_os_workers AS t1, sys.dm_os_schedulers AS t2
