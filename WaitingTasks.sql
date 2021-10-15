@@ -17,6 +17,11 @@ WHERE object_name LIKE '%Wait Statistics%' order by counter_name
 SELECT * FROM sys.dm_os_performance_counters
 WHERE  counter_name = 'Network IO waits'
 
+--wait type by instance_name
+SELECT * FROM sys.dm_os_performance_counters
+where object_name LIKE '%Wait Statistics%' order by counter_name
+
+
  SELECT 
  dows.*
 FROM sys.dm_os_wait_stats AS dows

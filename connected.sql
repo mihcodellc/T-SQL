@@ -7,13 +7,12 @@
 SELECT @@MAX_CONNECTIONS AS 'Max Connections';  
 
 
-
 --Query to return active locks and the duration of the locks being held
 SELECT  Locks.request_session_id AS SessionID ,
         Obj.Name AS LockedObjectName ,
         DATEDIFF(second, ActTra.Transaction_begin_time, GETDATE()) AS Duration ,
         ActTra.Transaction_begin_time ,
-        COUNT(*) AS Locks
+        COUNT(*) AS Locks--, ExeSess.host_name, ExeSess.program_name
 FROM    sys.dm_tran_locks Locks
         JOIN sys.partitions Parti ON Parti.hobt_id = Locks.resource_associated_entity_id
         JOIN sys.objects Obj ON Obj.object_id = Parti.object_id
@@ -24,8 +23,20 @@ WHERE   resource_database_id = DB_ID()
         AND Obj.Type = 'U'
 GROUP BY ActTra.Transaction_begin_time ,
         Locks.request_session_id ,
-        Obj.Name
+        Obj.Name--, ExeSess.host_name, ExeSess.program_name
 
+ --open transaction
+dbcc opentran
+
+
+-- analyze locks
+select db_name(resource_database_id),s.host_name,
+         s.host_process_id,
+         s.program_name, s.session_id, l.request_status, l.request_mode, l.request_owner_type, OBJECT_NAME(l.resource_associated_entity_id)
+from sys.dm_tran_locks l
+join sys.dm_exec_sessions s on request_session_id = s.session_id
+
+where db_name(resource_database_id)= 'iThinkHealth'
 
 --==============================================================================
 -- See who is connected to the database.
@@ -46,7 +57,6 @@ SELECT
     ,sdes.program_name
     ,sdes.login_name
     ,sdes.status
-
     ,sdec.num_reads
     ,sdec.num_writes
     ,sdec.last_read
@@ -110,7 +120,7 @@ exec sp_who 'active';
     ,request_id  
  from  sys.sysprocesses  
  where upper(cmd) <> 'AWAITING COMMAND' -- ACTIVE excludes sessions that are waiting for the next command from the user.
- and spid  <> @@SPID
+ and spid  <> @@SPID and status <> 'sleeping'  
  order by status
  
  --sessions blocking other, active queries & sql text
@@ -132,18 +142,7 @@ OUTER APPLY sys.dm_exec_input_buffer(s.session_id, NULL) AS ib
 WHERE blocking_these is not null or r.blocking_session_id > 0
 ORDER BY len(bl.blocking_these) desc, r.blocking_session_id desc, r.session_id;
 
- --open transaction
-dbcc opentran
 
-
--- analyze locks
-select db_name(resource_database_id),s.host_name,
-         s.host_process_id,
-         s.program_name, s.session_id, l.request_status, l.request_mode, l.request_owner_type, OBJECT_NAME(l.resource_associated_entity_id)
-from sys.dm_tran_locks l
-join sys.dm_exec_sessions s on request_session_id = s.session_id
-
-where db_name(resource_database_id)= 'iThinkHealth'
 
 
 -- connection and session info
