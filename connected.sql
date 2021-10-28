@@ -3,6 +3,10 @@
 -- https://sqlperformance.com/2017/07/sql-performance/find-database-connection-leaks
 
 
+--report on deadlock
+-- https://www.mssqltips.com/sqlservertip/6430/monitor-deadlocks-in-sql-server-with-systemhealth-extended-events/
+
+
 -- maximum number of simultaneous user connections allowed
 SELECT @@MAX_CONNECTIONS AS 'Max Connections';  
 
@@ -12,7 +16,7 @@ SELECT  Locks.request_session_id AS SessionID ,
         Obj.Name AS LockedObjectName ,
         DATEDIFF(second, ActTra.Transaction_begin_time, GETDATE()) AS Duration ,
         ActTra.Transaction_begin_time ,
-        COUNT(*) AS Locks--, ExeSess.host_name, ExeSess.program_name
+        COUNT(*) AS Locks, ExeSess.host_name, ExeSess.program_name
 FROM    sys.dm_tran_locks Locks
         JOIN sys.partitions Parti ON Parti.hobt_id = Locks.resource_associated_entity_id
         JOIN sys.objects Obj ON Obj.object_id = Parti.object_id
@@ -23,7 +27,7 @@ WHERE   resource_database_id = DB_ID()
         AND Obj.Type = 'U'
 GROUP BY ActTra.Transaction_begin_time ,
         Locks.request_session_id ,
-        Obj.Name--, ExeSess.host_name, ExeSess.program_name
+        Obj.Name, ExeSess.host_name, ExeSess.program_name
 
  --open transaction
 dbcc opentran
@@ -177,14 +181,14 @@ WHERE resource_type <> 'DATABASE' AND resource_database_id = DB_ID() -- and requ
 --https://docs.microsoft.com/en-us/sql/relational-databases/extended-events/determine-which-queries-are-holding-locks?view=sql-server-ver15
 
 
--- session by host
+-- session by host -- look at connections per process per database
 select count(*) as sessions,
          s.host_name,
          s.host_process_id,
          s.program_name,
          db_name(s.database_id) as database_name
    from sys.dm_exec_sessions s
-   where is_user_process = 1 and host_name = 'DEVELOPER15'
+   where is_user_process = 1 --and host_name = 'DEVELOPER15'
    group by host_name, host_process_id, program_name, database_id
    order by count(*) desc;
 
