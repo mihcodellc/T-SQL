@@ -6,7 +6,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-ALTER PROCEDURE [dbo].[sp_SQLskills_helpindex]
+CREATE PROCEDURE [dbo].[sp_SQLskills_helpindex]
 (
 	@objname nvarchar(776)		-- the table to check for indexes
 	, @IncludeListOrdered BIT = 0
