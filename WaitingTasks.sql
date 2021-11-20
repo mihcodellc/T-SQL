@@ -27,6 +27,8 @@ where object_name LIKE '%Wait Statistics%' order by counter_name
 FROM sys.dm_os_wait_stats AS dows
 ORDER BY waiting_tasks_count desc, dows.wait_time_ms DESC;
 
+select * from sys.dm_os_waiting_tasks 
+
  --waiting task per connection
 SELECT st.text AS [SQL Text], c.connection_id, w.session_id, 
   w.wait_duration_ms, w.wait_type, w.resource_address, 
@@ -36,7 +38,24 @@ INNER JOIN sys.dm_exec_connections AS c ON w.session_id = c.session_id
 CROSS APPLY (SELECT * FROM sys.dm_exec_sql_text(c.most_recent_sql_handle)) AS st 
               WHERE w.session_id > 50 AND w.wait_duration_ms > 0
 ORDER BY c.connection_id, w.session_id
+--OR
+SELECT blocking.session_id AS blocking_session_id ,
+ blocked.session_id AS blocked_session_id , waitstats.wait_type AS blocking_resource ,
+ waitstats.wait_duration_ms , waitstats.resource_description ,  blocked_cache.text AS blocked_text ,
+ blocking_cache.text AS blocking_text
+FROM sys.dm_exec_connections AS blocking
+ INNER JOIN sys.dm_exec_requests blocked  ON blocking.session_id = blocked.blocking_session_id
+ CROSS APPLY sys.dm_exec_sql_text(blocked.sql_handle)  blocked_cache
+ CROSS APPLY sys.dm_exec_sql_text(blocking.most_recent_sql_handle)  blocking_cache
+ INNER JOIN sys.dm_os_waiting_tasks waitstats
+ ON waitstats.session_id = blocked.session_id
+
 GO
+
+----------------------------------------------------------------------------------------------------------------
+-- all your query wait or not, set options, reads, transactions_isolation_level, deadlock_priority, memory, plan
+select * from sys.dm_exec_requests
+----------------------------------------------------------------------------------------------------------------
 
 --Identify tasks from blocked sessions
 SELECT * FROM sys.dm_os_waiting_tasks 
@@ -214,7 +233,7 @@ GROUP BY [W1].[RowNum]
 HAVING SUM ([W2].[Percentage]) - MAX( [W1].[Percentage] ) < 95; -- percentage threshold
 GO
 
-
+-- most waits on your server
 SELECT  wait_type AS Wait_Type, 
 wait_time_ms / 1000.0 AS Wait_Time_Seconds,
 waiting_tasks_count AS Waiting_Tasks_Count,

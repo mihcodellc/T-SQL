@@ -194,7 +194,7 @@ WHILE @@FETCH_STATUS = 0 BEGIN
 				SET @UPSERT = @UPSERT + Char(9) + 'DECLARE @TableName varchar(30)' + Char(13)
 				SET @UPSERT = @UPSERT + Char(9) + 'DECLARE @FirstKey varchar(50)' + Char(13)
 				SET @UPSERT = @UPSERT + Char(9) + 'DECLARE @SecondKey varchar(50)' + Char(13) 
-				SET @UPSERT = @UPSERT + Char(9) + 'DECLARE @ChangeDesc varchar(255) -- Money 17, smallmoney 10, INT 11, SMALLINT 6, TINYINT 4, BIGINT 20, FLOAT<(53)> DATETIME 25: +1MAX ' + Char(13)+ Char(13)
+				SET @UPSERT = @UPSERT + Char(9) + 'DECLARE @ChangeDesc varchar(5000) -- Money 17, smallmoney 10, INT 11, SMALLINT 6, TINYINT 4, BIGINT 20, FLOAT<(53)> DATETIME 25: +1MAX ' + Char(13)+ Char(13)
 
 				SET @UPSERT = @UPSERT + Char(9) + 'SET	@UserActivityLogID = 0' + Char(13) 
 				SET @UPSERT = @UPSERT + Char(9) + 'SET	@TableName = ''' + @CurrentTable + '''' + Char(13) 
@@ -209,7 +209,18 @@ WHILE @@FETCH_STATUS = 0 BEGIN
 				SET @UPSERT = @UPSERT + Char(9) + '	@FirstKey,' + Char(13)
 				SET @UPSERT = @UPSERT + Char(9) + '	@SecondKey,' + Char(13)
 				SET @UPSERT = @UPSERT + Char(9) + '	Null,' + Char(13)
-				SET @UPSERT = @UPSERT + Char(9) + '	@ChangeDesc, NULL, @SPName' + Char(13) + Char(13)
+				SET @UPSERT = @UPSERT + Char(9) + '	@ChangeDesc, NULL, @SPName' + Char(13) + Char(13) +
+					'--	 ' + Char(13) + Char(9) +					'SET @error = @@Error ' + Char(13) + Char(9) +  Char(13) + Char(9) +
+					'If (@error <> 0)' + Char(13) +
+					'BEGIN' + Char(13) + Char(9) + Char(9) +
+					'	--Raise the error message to the calling object ' + Char(13) + Char(9) + Char(9) +
+					'	IF @OperationType = ''Update'' ' + Char(13) + Char(9) + 
+					'		 RAISERROR (''Update ' + @TableName + ' information failed'', 16, 1 )' + Char(13) + Char(9) + Char(9) +
+					'	ELSE ' + Char(13) + Char(9) + 
+					'		 RAISERROR (''Insert ' + @TableName + ' information failed'', 16, 1 )' + Char(13) + Char(9) + Char(9) +
+					'	RETURN -2 ' + Char(13) + Char(9) +
+					'END' + Char(13) +  Char(13) 
+
 				
 				SET @UPSERT = @UPSERT + 'END' + Char(13) + Char(13) --END FOR UPDATE
 				SET @UPSERT = @UPSERT + Char(13)
@@ -332,7 +343,7 @@ WHILE @@FETCH_STATUS = 0 BEGIN
 			SET @DELETE = @DELETE + Char(9) + 'DECLARE @TableName varchar(30)' + Char(13)
 			SET @DELETE = @DELETE + Char(9) + 'DECLARE @FirstKey varchar(50)' + Char(13) 
 			SET @DELETE = @DELETE + Char(9) + 'DECLARE @SecondKey varchar(50)' + Char(13)
-			SET @DELETE = @DELETE + Char(9) + 'DECLARE @ChangeDesc varchar(255)' + Char(13)+ Char(13)
+			SET @DELETE = @DELETE + Char(9) + 'DECLARE @ChangeDesc varchar(5000)' + Char(13)+ Char(13)
 
 			SET @DELETE = @DELETE + Char(9) + 'SET	@UserActivityLogID = 0' + Char(13) 
 			SET @DELETE = @DELETE + Char(9) + 'SET	@TableName = ''' + @CurrentTable + '''' + Char(13)
@@ -355,7 +366,7 @@ WHILE @@FETCH_STATUS = 0 BEGIN
 					'If (@error <> 0)' + Char(13) +
 					'BEGIN' + Char(13) + Char(9) + Char(9) +
 					'	--Raise the error message to the calling object ' + Char(13) + Char(9) + Char(9) +
-					'	RAISERROR (''Deleting from the <> table failed'', 16, 1 )' + Char(13) + Char(9) + Char(9) +
+					'	RAISERROR (''Delete  the ' + @TableName + ' Information failed'', 16, 1 )' + Char(13) + Char(9) + Char(9) +
 					'	RETURN -2 ' + Char(13) + Char(9) +
 					'END' + Char(13) +  Char(13) 
 
@@ -474,7 +485,7 @@ IF @CurrentTable <> '' BEGIN
 		SET @UPSERT = @UPSERT + Char(9) + 'SET	@TableName = ''' + @CurrentTable + '''' + Char(13) + Char(13)
 		SET @UPSERT = @UPSERT + Char(9) + 'DECLARE @FirstKey varchar(50)' + Char(13) + Char(13)
 		SET @UPSERT = @UPSERT + Char(9) + 'DECLARE @SecondKey varchar(50)' + Char(13) + Char(13)
-		SET @UPSERT = @UPSERT + Char(9) + 'DECLARE @ChangeDesc varchar(255)' + Char(13)+ Char(13)
+		SET @UPSERT = @UPSERT + Char(9) + 'DECLARE @ChangeDesc varchar(5000)' + Char(13)+ Char(13)
 		SET @UPSERT = @UPSERT + Char(9) + 'EXEC ' + @SchemeName + 'sp_RecordLog' + Char(13)
 		SET @UPSERT = @UPSERT + Char(9) + '	@UserActivityLogID,' + Char(13)
 		SET @UPSERT = @UPSERT + Char(9) + '	@UserID_FK,' + Char(13)
@@ -483,7 +494,19 @@ IF @CurrentTable <> '' BEGIN
 		SET @UPSERT = @UPSERT + Char(9) + '	@FirstKey,' + Char(13)
 		SET @UPSERT = @UPSERT + Char(9) + '	@SecondKey,' + Char(13)
 		SET @UPSERT = @UPSERT + Char(9) + '	Null,' + Char(13)
-		SET @UPSERT = @UPSERT + Char(9) + '	@ChangeDesc, NULL, @SPName' + Char(13) + Char(13)
+		SET @UPSERT = @UPSERT + Char(9) + '	@ChangeDesc, NULL, @SPName' + Char(13) + Char(13) +
+
+					'--	 ' + Char(13) + Char(9) +					'SET @error = @@Error ' + Char(13) + Char(9) +  Char(13) + Char(9) +
+					'If (@error <> 0)' + Char(13) +
+					'BEGIN' + Char(13) + Char(9) + Char(9) +
+					'	--Raise the error message to the calling object ' + Char(13) + Char(9) + Char(9) +
+					'	IF @OperationType = ''Update'' ' + Char(13) + Char(9) + 
+					'		 RAISERROR (''Update ' + @TableName + ' information failed'', 16, 1 )' + Char(13) + Char(9) + Char(9) +
+					'	ELSE ' + Char(13) + Char(9) + 
+					'		 RAISERROR (''Insert ' + @TableName + ' information failed'', 16, 1 )' + Char(13) + Char(9) + Char(9) +
+					'	RETURN -2 ' + Char(13) + Char(9) +
+					'END' + Char(13) +  Char(13) 
+
 
 		SET @UPSERT = @UPSERT + 'SET NOCOUNT OFF' + Char(13)
 		SET @UPSERT = @UPSERT + Char(13)

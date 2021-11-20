@@ -28,7 +28,14 @@
 --managing Concurrent Data Access
 --https://docs.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms189130(v=sql.105)
 
--- ********************************memory pressure 
+-- ********************************MEMORY PRESSURE 
+select * from sys.dm_os_waiting_tasks 
+where wait_type in (N'PAGELATCH_XX')
+
+
+select * from sys.dm_os_wait_stats 
+where wait_type in (N'PAGELATCH_XX')
+
 
 --https://docs.microsoft.com/en-us/sql/relational-databases/performance-monitor/monitor-memory-usage?view=sql-server-ver15#monitor-operating-system-memory
 
@@ -74,13 +81,27 @@ where counter_name in ('Batch Requests/sec', 'SQL Compilations/sec' , 'SQL Re-Co
 --where counter_name like '%time%'
 
 --select * FROM sys.dm_os_performance_counters order by wait_type
+----------------------------------------------------------------------------------------------------------------
+-- all your query wait or not, set options, reads, transactions_isolation_level, deadlock_priority, memory, plan
+select * from sys.dm_exec_requests
+----------------------------------------------------------------------------------------------------------------
+
 
 ---********************************** CPU pressure
+select * from sys.dm_os_waiting_tasks 
+where wait_type in (N'CXPACKET', N'SOS_SCHEDULER_YIELD', N'THREADPOOL', N'CMEMTHREAD')
+
+
+select * from sys.dm_os_wait_stats 
+where wait_type in (N'CXPACKET', N'SOS_SCHEDULER_YIELD', N'THREADPOOL', N'CMEMTHREAD')
+
 
 SELECT CAST(100.0 * SUM(signal_wait_time_ms) / SUM (wait_time_ms) AS NUMERIC(20,2))
 AS [%signal (cpu) waits],
 CAST(100.0 * SUM(wait_time_ms - signal_wait_time_ms) / SUM (wait_time_ms) AS NUMERIC(20,2))
-AS [%resource waits] FROM sys.dm_os_wait_stats OPTION (RECOMPILE);
+AS [%resource waits] 
+FROM sys.dm_os_wait_stats OPTION (RECOMPILE);
+
 
 SELECT COUNT(*) AS workers_waiting, t2.Scheduler_id
 FROM sys.dm_os_workers AS t1, sys.dm_os_schedulers AS t2
@@ -119,6 +140,41 @@ from (select top 10 plan_handle, total_worker_time
 from sys.dm_exec_query_stats)s
 cross apply sys.dm_exec_sql_text(s.plan_handle)p order by total_worker_time desc
 
+
+---********************************** Disk pressure
+select * from sys.dm_os_waiting_tasks 
+where wait_type in (N'PAGEIOLATCH_XX', N'WRITELOG', N'ASYNC_NETWORK_IO')
+
+
+select * from sys.dm_os_wait_stats 
+where wait_type in (N'PAGEIOLATCH_XX', N'WRITELOG', N'ASYNC_NETWORK_IO')
+
+-- Virtual file statistics:  high volumes of reads or writes, and IO latencies
+SELECT DB_NAME(vfs.database_id) AS database_name ,
+ vfs.database_id ,
+ vfs.file_id ,
+ io_stall_read_ms / NULLIF(num_of_reads, 0) AS avg_read_latency ,
+ io_stall_write_ms / NULLIF(num_of_writes, 0)
+ AS avg_write_latency ,
+ io_stall_write_ms / NULLIF(num_of_writes + num_of_writes, 0)
+ AS avg_total_latency ,
+ num_of_bytes_read / NULLIF(num_of_reads, 0)
+ AS avg_bytes_per_read ,
+ num_of_bytes_written / NULLIF(num_of_writes, 0)
+ AS avg_bytes_per_write ,
+ vfs.io_stall ,
+ vfs.num_of_reads ,
+ vfs.num_of_bytes_read ,
+ vfs.io_stall_read_ms ,
+ vfs.num_of_writes ,
+ vfs.num_of_bytes_written ,
+ vfs.io_stall_write_ms ,
+ size_on_disk_bytes / 1024 / 1024. AS size_on_disk_mbytes ,
+ physical_name
+FROM sys.dm_io_virtual_file_stats(NULL, NULL) AS vfs
+ JOIN sys.master_files AS mf ON vfs.database_id = mf.database_id
+ AND vfs.file_id = mf.file_id
+ORDER BY avg_total_latency DESC
 
 --set statistics IO, TIME on
 
@@ -163,7 +219,7 @@ SELECT sp.stats_id,  name,  filter_definition, last_updated,
      CROSS APPLY sys.dm_db_stats_properties(stat.object_id, stat.stats_id) AS sp
 WHERE stat.object_id = OBJECT_ID('APPS.BillableUnits');
 
-UPDATE STATISTICS atable;
+UPDATE STATISTICS atable; -- may not be usable till there is a change in data
 UPDATE STATISTICS dbo.A ix1 WITH FULLSCAN, PERSIST_SAMPLE_PERCENT = ON; -- on not available on all sql server version
 
 CREATE STATISTICS statName ON table(col1, col2) WITH FULLSCAN

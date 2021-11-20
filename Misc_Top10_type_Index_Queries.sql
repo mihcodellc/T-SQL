@@ -4,8 +4,42 @@ exec sp_readerrorlog 0,1,'Copyright (c)'
 SELECT login_time FROM sys.dm_exec_sessions WHERE session_id = 1; 
 SELECT start_time from sys.traces where is_default = 1;
 SELECT is_auto_create_stats_on, create_date, nAME AS DbnAME FROM sys.databases ORDER BY NAME
-SELECT ' last the server is restarted'
-SELECT create_date FROM sys.databases WHERE name = 'tempdb';
+ 
+SELECT create_date ' last the server is restarted' FROM sys.databases WHERE name = 'tempdb';
+
+
+SELECT [wait_type] ,
+ [wait_time_ms] ,
+ DATEADD(SS, -[wait_time_ms] / 1000, GETDATE())
+ AS 'Date/TimeCleared' ,
+ CASE WHEN [wait_time_ms] < 1000
+ THEN CAST([wait_time_ms] AS VARCHAR(15)) + 'ms'
+ WHEN [wait_time_ms] BETWEEN 1000 AND 60000
+ THEN CAST(( [wait_time_ms] / 1000 )
+ AS VARCHAR(15)) + ' seconds'
+ WHEN [wait_time_ms] BETWEEN 60001 AND 3600000
+ THEN CAST(( [wait_time_ms] / 60000 )
+ AS VARCHAR(15)) + ' minutes'
+ WHEN [wait_time_ms] BETWEEN 3600001 AND 86400000
+ THEN CAST(( [wait_time_ms] / 3600000 )
+ AS VARCHAR(15)) + ' hours'
+ WHEN [wait_time_ms] > 86400000
+ THEN CAST(( [wait_time_ms] / 86400000 )
+ AS VARCHAR(15)) + ' days'
+ END AS 'TimeSinceCleared'
+FROM [sys].[dm_os_wait_stats]
+WHERE [wait_type] = 'SQLTRACE_INCREMENTAL_FLUSH_SLEEP';
+/*
+ check SQL Server start time - 2008 and higher
+*/
+SELECT [sqlserver_start_time]
+FROM [sys].[dm_os_sys_info];
+/*
+ check SQL Server start time - 2005 and higher
+*/
+SELECT [create_date]
+FROM [sys].[databases]
+WHERE [database_id] = 2
 
 -- adding up
 SELECT DB_NAME(t.dbid) as DbName, OBJECT_NAME(t.objectid),s.plan_handle,  s.TotalExecutionCount,
