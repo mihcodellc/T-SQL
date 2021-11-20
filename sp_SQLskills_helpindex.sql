@@ -1,50 +1,18 @@
--- latest here https://www.sqlskills.com/sql-server-resources/sql-server-demos/
-
-/*============================================================================
-  File:     sp_SQLskills_helpindex.sql
-
-  Summary:  So, what are the included columns?! Do you have a filter?
-			This is a MODIFIED sp_helpindex script that includes:
-               - Index IDs
-               - INCLUDEd columns
-               - Filtered index columns
-               - Leaf/tree details for rowstore indexes
-               - Columns defined for columnstore indexes
-            Additional details:
-               - whether or not the index is disabled
-               - Index usage stats
-
-  Date:     November 2021
-
-  Version:  Works on versions 2008-2019 (requires: sp_SQLskills_ExposeColsInIndexLevels)
-------------------------------------------------------------------------------
-  Written by Kimberly L. Tripp, SYSolutions, Inc.
-
-  For more scripts and sample code, check out 
-    http://www.SQLskills.com
-============================================================================*/
-
-USE [master];
+USE [master]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_SQLskills_helpindex]    Script Date: 11/19/2021 6:13:06 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
 GO
 
-IF OBJECTPROPERTY(OBJECT_ID('sp_SQLskills_SQL2008_finddupes_helpindex'), 'IsProcedure') = 1
-	DROP PROCEDURE [sp_SQLskills_SQL2008_finddupes_helpindex];
-GO
-
-IF OBJECTPROPERTY(OBJECT_ID(N'sp_SQLskills_helpindex')
-		, N'IsProcedure') = 1
-	DROP PROCEDURE [dbo].[sp_SQLskills_helpindex];
-
-SET ANSI_NULLS ON;
-SET QUOTED_IDENTIFIER ON;
-GO
-
-CREATE PROCEDURE [dbo].[sp_SQLskills_helpindex]
+ALTER PROCEDURE [dbo].[sp_SQLskills_helpindex]
 (
 	@objname nvarchar(776)		-- the table to check for indexes
 	, @IncludeListOrdered BIT = 0
 )
 AS
+-- 11/19/2021: By Monktar Bello - added @create_date
 --November 2021: Cleaned up and consolidated so only one helpindex for
 --               usage AND for finddupes. Default is "unordered" which
 --               means "as created." For dupes, we 'order' the INCLUDE
@@ -91,7 +59,8 @@ AS
 			@filter_definition nvarchar(max),
 			@ColsInTree nvarchar(2126),
 			@ColsInLeaf nvarchar(max),
-            @ExecStr nvarchar(max)
+            @ExecStr nvarchar(max),
+		  @create_date datetime
 
 	-- Check to see that the object names are local to the current database.
 	select @dbname = parsename(@objname,3)
@@ -153,7 +122,8 @@ AS
 		inc_Count			smallint,
 		inc_columns			nvarchar(max),
 		cols_in_tree		nvarchar(2126),
-		cols_in_leaf		nvarchar(max)
+		cols_in_leaf		nvarchar(max),
+		create_date		datetime
 	)
 
 	CREATE TABLE #IncludedColumns
@@ -297,10 +267,16 @@ AS
 					, @ColsInLeaf = @keys + N', RID' + CASE WHEN @inc_columns IS NOT NULL THEN N', ' + @inc_columns ELSE N'' END
 		END
 
+		--creation date
+		  SELECT @create_date = o.create_date
+		  FROM     sys.indexes i
+		  INNER JOIN  sys.objects o ON i.name = o.name
+		  WHERE i.index_id = @indid
+
 		-- INSERT ROW FOR INDEX
 		
 		insert into #spindtab values (@indname, @indid, @type, @ignore_dup_key, @is_unique, @is_hypothetical,
-			@is_primary_key, @is_unique_key, @is_disabled, @auto_created, @no_recompute, @groupname, @keys, @filter_definition, @inc_Count, @inc_columns, @ColsInTree, @ColsInLeaf)
+			@is_primary_key, @is_unique_key, @is_disabled, @auto_created, @no_recompute, @groupname, @keys, @filter_definition, @inc_Count, @inc_columns, @ColsInTree, @ColsInLeaf, @create_date)
 
 		-- Next index
     	fetch ms_crs_ind into @indid, @type, @groupid, @indname, @ignore_dup_key, @is_unique, @is_hypothetical,
@@ -353,7 +329,7 @@ AS
 		           ''columns_in_leaf'' = 
 			          case when type IN (5, 6) then ''Columns with columnstore index: '' + cols_in_leaf
                             when type = 7 then ''n/a, HASH''
-			          else cols_in_leaf end 
+			          else cols_in_leaf end, create_date 
 
 	        from #spindtab
 	        order by index_id '
@@ -403,7 +379,7 @@ AS
 		           ''columns_in_leaf'' = 
 			          case when type IN (5, 6) then ''Columns with columnstore index: '' + cols_in_leaf
                             when type = 7 then ''n/a, HASH''
-			          else cols_in_leaf end 
+			          else cols_in_leaf end, create_date 
 
 	        from #spindtab
 	        order by index_id '
@@ -412,7 +388,3 @@ AS
     EXEC (@ExecStr)
 
 	return (0) -- sp_SQLskills_helpindex
-go
-
-exec [sys].[sp_MS_marksystemobject] 'sp_SQLskills_helpindex'
-go
