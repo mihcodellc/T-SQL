@@ -1864,6 +1864,17 @@ ON i.[object_id] = o.[object_id]
 WHERE ps.database_id = DB_ID()
 AND ps.page_count > 2500
 ORDER BY ps.avg_fragmentation_in_percent DESC OPTION (RECOMPILE);
+
+
+SELECT a.object_id, object_name(a.object_id) AS TableName,
+    a.index_id, b.name AS IndedxName, avg_fragmentation_in_percent,b.type_desc, b.fill_factor,  b.has_filter, b.is_disabled
+FROM sys.dm_db_index_physical_stats (DB_ID (N'My_DBTest') , NULL, NULL, NULL, NULL) AS a
+INNER JOIN sys.indexes AS b
+    ON a.object_id = b.object_id
+    AND a.index_id = b.index_id
+where avg_fragmentation_in_percent > 80
+order by avg_fragmentation_in_percent desc
+
 ------
 
 -- Helps determine whether you have framentation in your relational indexes
