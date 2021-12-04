@@ -1,4 +1,4 @@
---SQL SERVER – ACID (Atomicity, Consistency, Isolation, Durability)
+--SQL SERVER â€“ ACID (Atomicity, Consistency, Isolation, Durability)
 
 -- SQL SERVER CONFIGURATION MANAGER to activate your sql agent or start db engine ...
 
@@ -205,7 +205,7 @@ ORDER BY avg_total_latency DESC
 --https://www.datadoghq.com/blog/sql-server-monitoring-tools/#richer-real-time-sql-server-monitoring-tools
 
 --***TUNING
-set statistics io, time on
+set statistics io, time on -- Query > Include Client Statistics
 set statistics profile on
 set showplan_all on
 set showplan_text on
