@@ -18,6 +18,19 @@ create_date
 ----------- https://docs.microsoft.com/en-us/troubleshoot/sql/performance/recommended-updates-configuration-options
 ----------- https://docs.microsoft.com/en-us/troubleshoot/sql/general/determine-version-edition-update-level
 
+
+  EXEC sp_databases;
+
+
+  select name, type_desc, size, max_size, growth, is_percent_growth, differential_base_lsn
+from sys.master_files s_mf
+    where 
+        s_mf.state = 0 and -- ONLINE
+        has_dbaccess(db_name(s_mf.database_id)) = 1 -- Only look at databases to which we have access
+
+-- end overview
+
+
 SELECT [wait_type] ,
  [wait_time_ms] ,
  DATEADD(SS, -[wait_time_ms] / 1000, GETDATE())
