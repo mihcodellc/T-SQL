@@ -22,11 +22,12 @@ create_date
   EXEC sp_databases;
 
 
-  select name, type_desc, size, max_size, growth, is_percent_growth, differential_base_lsn
+  select name, type_desc, size, size * 8/1024/1024 'Size (GiB)', max_size, growth, is_percent_growth, differential_base_lsn
 from sys.master_files s_mf
     where 
         s_mf.state = 0 and -- ONLINE
         has_dbaccess(db_name(s_mf.database_id)) = 1 -- Only look at databases to which we have access
+order by 'Size (GiB)'
 
 -- end overview
 
