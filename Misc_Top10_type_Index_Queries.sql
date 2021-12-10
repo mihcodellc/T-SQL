@@ -5,8 +5,18 @@ SELECT login_time FROM sys.dm_exec_sessions WHERE session_id = 1;
 SELECT start_time from sys.traces where is_default = 1;
 SELECT is_auto_create_stats_on, create_date, nAME AS DbnAME FROM sys.databases ORDER BY NAME
  
-SELECT create_date ' last the server is restarted' FROM sys.databases WHERE name = 'tempdb';
+ 
+ -- overview on your db database
+SELECT create_date ' last time the server is restarted' FROM sys.databases WHERE name = 'tempdb';
+select database_id, name, is_query_store_on, compatibility_level,is_trustworthy_on, snapshot_isolation_state_desc,recovery_model_desc,
+is_auto_create_stats_on, is_auto_update_stats_on, is_concat_null_yields_null_on, is_encrypted, two_digit_year_cutoff, containment_desc,
+create_date
+ from sys.databases
+ WHERE [database_id] > 4 -- 1 master, 2 tempdb, 3 model, 4 msdb
 
+-- compare with 
+----------- https://docs.microsoft.com/en-us/troubleshoot/sql/performance/recommended-updates-configuration-options
+----------- https://docs.microsoft.com/en-us/troubleshoot/sql/general/determine-version-edition-update-level
 
 SELECT [wait_type] ,
  [wait_time_ms] ,
