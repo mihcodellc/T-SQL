@@ -10,7 +10,7 @@
 			+ ISNULL(ERROR_MESSAGE(),'') 
 
 	RAISERROR ( @msg, 16, 1 );
-	--Logs a user-defined message in the SQL Server log file and in the Windows Event Viewer. 
+	--Logs a user-defined message in the SQL Server log file and in the Windows Event Viewer. ie eventvwr.msc
 	-- xp_logevent can be used to send an alert without sending a message to the client
 	-- https://docs.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/xp-logevent-transact-sql?view=sql-server-ver15#result-sets
      EXEC xp_logevent 60000, @msg, informational;
@@ -37,8 +37,8 @@ DECLARE @logFileType SMALLINT= 1;
 DECLARE @start DATETIME;
 DECLARE @end DATETIME;
 DECLARE @logno INT= 0;
-SET @start = '2019-11-07 00:00:01.000';
-SET @end = '2019-11-07 09:00:00.000';
+SET @start = '2021-11-07 00:00:01.000';
+SET @end = '2021-11-07 09:00:00.000';
 DECLARE @searchString1 NVARCHAR(256)= 'Recovery';
 DECLARE @searchString2 NVARCHAR(256)= 'MSDB';
 EXEC master.dbo.xp_readerrorlog 

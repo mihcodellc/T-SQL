@@ -10,18 +10,15 @@ SELECT wt.session_id,wt.wait_duration_ms,wait_type, blocking_session_id, s.statu
 FROM sys.dm_os_waiting_tasks AS wt
  JOIN sys.dm_exec_sessions AS s ON wt.session_id = s.session_id
 
--- wait types
-SELECT distinct  counter_name FROM sys.dm_os_performance_counters
-WHERE object_name LIKE '%Wait Statistics%' order by counter_name
 
 SELECT * FROM sys.dm_os_performance_counters
 WHERE  counter_name = 'Network IO waits'
 
---wait type by instance_name
+--wait in performance counter
 SELECT * FROM sys.dm_os_performance_counters
 where object_name LIKE '%Wait Statistics%' order by counter_name
 
-
+-- wait types and stats
  SELECT 
  dows.*
 FROM sys.dm_os_wait_stats AS dows
@@ -29,7 +26,7 @@ ORDER BY waiting_tasks_count desc, dows.wait_time_ms DESC;
 
 select * from sys.dm_os_waiting_tasks 
 
- --waiting task per connection
+ --waiting task per connection and wait stats of paul randal for link to wait type description
 SELECT st.text AS [SQL Text], c.connection_id, w.session_id, 
   w.wait_duration_ms, w.wait_type, w.resource_address, 
   w.blocking_session_id, w.resource_description, c.client_net_address, c.connect_time
@@ -38,11 +35,20 @@ INNER JOIN sys.dm_exec_connections AS c ON w.session_id = c.session_id
 CROSS APPLY (SELECT * FROM sys.dm_exec_sql_text(c.most_recent_sql_handle)) AS st 
               WHERE w.session_id > 50 AND w.wait_duration_ms > 0
 ORDER BY c.connection_id, w.session_id
+	   SELECT st.text AS [SQL Text], c.connection_id, w.session_id,  w.blocking_session_id,
+		w.wait_duration_ms, w.wait_type waitTypeIncludLOck, w.resource_address, 
+		w.resource_description, c.client_net_address, c.connect_time, db_name(blocked.database_id) as blockInDB
+	   FROM sys.dm_os_waiting_tasks AS w
+	   INNER JOIN sys.dm_exec_connections AS c ON w.session_id = c.session_id 
+	   INNER JOIN sys.dm_exec_requests as blocked on blocked.session_id = w.session_id
+	   CROSS APPLY (SELECT * FROM sys.dm_exec_sql_text(c.most_recent_sql_handle)) AS st 
+				  WHERE w.session_id > 50 AND w.wait_duration_ms > 0
+	   ORDER BY c.connection_id, w.session_id
 --OR
 SELECT blocking.session_id AS blocking_session_id ,
- blocked.session_id AS blocked_session_id , waitstats.wait_type AS blocking_resource ,
+ blocked.session_id AS blocked_session_id , waitstats.wait_type AS blocking_resourceORwaitTypeIncludLOck ,
  waitstats.wait_duration_ms , waitstats.resource_description ,  blocked_cache.text AS blocked_text ,
- blocking_cache.text AS blocking_text
+ blocking_cache.text AS blocking_text, blocked.blocking_session_id sessionblocking, blocked.session_id sessionblocked, db_name(blocked.database_id) dbconnectTo
 FROM sys.dm_exec_connections AS blocking
  INNER JOIN sys.dm_exec_requests blocked  ON blocking.session_id = blocked.blocking_session_id
  CROSS APPLY sys.dm_exec_sql_text(blocked.sql_handle)  blocked_cache
@@ -50,7 +56,54 @@ FROM sys.dm_exec_connections AS blocking
  INNER JOIN sys.dm_os_waiting_tasks waitstats
  ON waitstats.session_id = blocked.session_id
 
-GO
+GO --more details
+SELECT
+     sdes.session_id
+    ,sdes.login_time
+    ,sdes.last_request_start_time
+    ,sdes.last_request_end_time
+    ,sdes.is_user_process
+    ,sdes.host_name
+    ,sdes.program_name
+    ,sdes.login_name
+    ,sdes.status
+    ,sdec.num_reads
+    ,sdec.num_writes
+    ,sdec.last_read
+    ,sdec.last_write
+    ,sdes.reads
+    ,sdes.logical_reads
+    ,sdes.writes
+
+    ,sdest.DatabaseName
+    ,sdest.ObjName
+    ,sdes.client_interface_name
+    ,sdes.nt_domain
+    ,sdes.nt_user_name
+    ,sdec.client_net_address
+    ,sdec.local_net_address
+    ,sdest.Query
+	,sdest.text
+    ,KillCommand  = 'Kill '+ CAST(sdes.session_id  AS VARCHAR) + ' WITH STATUSONLY ' --WITH STATUSONLY clause provides progress reports, the time remaining until the blocking is resolved
+FROM sys.dm_exec_sessions AS sdes
+
+INNER JOIN sys.dm_exec_connections AS sdec
+        ON sdec.session_id = sdes.session_id
+
+CROSS APPLY (
+
+    SELECT DB_NAME(dbid) AS DatabaseName, OBJECT_NAME(objectid) AS ObjName,
+			COALESCE(
+					(SELECT TEXT AS [processing-instruction(definition)] FROM sys.dm_exec_sql_text(sdec.most_recent_sql_handle) FOR XML PATH(''),TYPE), '') AS Query, 
+			text
+
+    FROM sys.dm_exec_sql_text(sdec.most_recent_sql_handle)
+
+) sdest
+WHERE sdes.session_id <> @@SPID
+  AND sdest.DatabaseName = db_name() --and sdes.status = 'sleeping' 
+ORDER BY sdes.last_request_start_time DESC
+
 
 ----------------------------------------------------------------------------------------------------------------
 -- all your query wait or not, set options, reads, transactions_isolation_level, deadlock_priority, memory, plan
