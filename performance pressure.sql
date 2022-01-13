@@ -29,6 +29,10 @@
 --managing Concurrent Data Access
 --https://docs.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms189130(v=sql.105)
 
+
+--system dynamic view ORGANIZED even for disater recovery
+-- https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/system-dynamic-management-views?view=sql-server-ver15
+
 -- ********************************MEMORY PRESSURE 
 select * from sys.dm_os_waiting_tasks 
 where wait_type in (N'PAGELATCH_XX')
@@ -36,6 +40,9 @@ where wait_type in (N'PAGELATCH_XX')
 
 select * from sys.dm_os_wait_stats 
 where wait_type in (N'PAGELATCH_XX')
+
+--mesure pressure using powershell and log it over time on each server and ask why it is high if noted
+https://www.mssqltips.com/sqlservertip/5114/sql-server-performance-troubleshooting-system-health-checklist/
 
 
 --https://docs.microsoft.com/en-us/sql/relational-databases/performance-monitor/monitor-memory-usage?view=sql-server-ver15#monitor-operating-system-memory
