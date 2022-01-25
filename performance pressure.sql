@@ -23,6 +23,7 @@
 
 --query processing
 --https://docs.microsoft.com/en-us/sql/relational-databases/query-processing-architecture-guide?view=sql-server-ver15
+--https://docs.microsoft.com/en-us/sql/relational-databases/sql-server-guides?view=sql-server-2017
 
 --windows log & SQL server Log to inspect or make write in them for analysis
 
