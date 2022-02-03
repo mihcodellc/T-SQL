@@ -36,7 +36,8 @@ dbcc opentran
 -- analyze locks
 select db_name(resource_database_id),s.host_name,
          s.host_process_id,
-         s.program_name, s.session_id, l.request_status, l.request_mode, l.request_owner_type, OBJECT_NAME(l.resource_associated_entity_id)
+         s.program_name, s.session_id, l.request_status, l.request_mode, 
+		 l.request_owner_type, OBJECT_NAME(l.resource_associated_entity_id)
 from sys.dm_tran_locks l
 join sys.dm_exec_sessions s on request_session_id = s.session_id
 
@@ -49,6 +50,8 @@ where db_name(resource_database_id)= 'iThinkHealth'
 -- Marcelo Miorelli
 -- 18-july-2017 - London (UK)
 -- Tested on SQL Server 2016.
+-- it run on current database; remove this part if looking for all dbs
+-- Complement exec sp_WhoIsActive
 --==============================================================================
 
 SELECT
@@ -86,16 +89,16 @@ INNER JOIN sys.dm_exec_connections AS sdec
 
 CROSS APPLY (
 
-    SELECT DB_NAME(dbid) AS DatabaseName, OBJECT_NAME(objectid) AS ObjName,
+    SELECT DB_NAME(dbid) AS DatabaseName, OBJECT_NAME(objectid) AS ObjName, dbid ,
 			COALESCE(
-					(SELECT TEXT AS [processing-instruction(definition)] FROM sys.dm_exec_sql_text(sdec.most_recent_sql_handle) FOR XML PATH(''),TYPE), '') AS Query, 
+										(SELECT TEXT AS [processing-instruction(definition)] FROM sys.dm_exec_sql_text(sdec.most_recent_sql_handle) FOR XML PATH('')), '') AS Query, 
 			text
 
     FROM sys.dm_exec_sql_text(sdec.most_recent_sql_handle)
 
 ) sdest
 WHERE sdes.session_id <> @@SPID
-  AND sdest.DatabaseName = db_name()
+  AND sdest.DatabaseName = db_name() -- and sdest.dbid IS NOT NULL
 ORDER BY sdes.last_request_start_time DESC
 
 
@@ -212,6 +215,9 @@ select count(*) as sessions,
 USE master;  
 GO  
 EXEC sp_who 'active';  
+exec sp_who2by  --user SP
+exec sp_who2
+
 GO
 SELECT 
     DB_NAME(dbid) as DBName, dbid,
