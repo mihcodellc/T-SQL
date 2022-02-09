@@ -1,11 +1,18 @@
-SELECT OBJECTPROPERTY(OBJECT_ID(referencing_entity_name), 'IsTable') AS [IsTable], *  FROM sys.dm_sql_referencing_entities ('dbo.DepositDetail', 'OBJECT'); 
-SELECT DISTINCT referenced_schema_name, referenced_entity_name,is_updated, is_selected /*, referenced_minor_name 'Columns'*/ 
-FROM sys.dm_sql_referenced_entities  ('dbo.DepositDetail', 'OBJECT') 
---SELECT * FROM  sys.objects where name='sp_Report_AgencyStatistic' 
-SELECT OBJECTPROPERTY(object_id, 'IsTable') AS [IsTable],OBJECT_NAME(object_id),* FROM  sys.sql_dependencies
-where OBJECT_NAME(object_id)='dbo.DepositDetail' 
+SELECT OBJECTPROPERTY(OBJECT_ID(referencing_entity_name), 'IsTable') AS [IsTable], *  
+FROM sys.dm_sql_referencing_entities ('dbo.E835ServiceLineDetail', 'OBJECT'); -- schema included in the name
 
-SELECT OBJECTPROPERTY(referenced_id, 'IsTable') AS [IsTable],* FROM sys.dm_sql_referenced_entities  ('dbo.DepositDetail', 'OBJECT') 
+SELECT DISTINCT referenced_schema_name, referenced_entity_name,is_updated, is_selected 
+FROM sys.dm_sql_referenced_entities  ('dbo.E835ServiceLineDetail', 'OBJECT')  -- schema included in the name
+
+SELECT OBJECTPROPERTY(object_id, 'IsTable') AS [IsTable],
+OBJECTPROPERTY(object_id, 'IsPrimaryKey') AS [IsPrimaryKey],
+OBJECTPROPERTY(object_id, 'IsForeignKey') AS [IsForeignKey],
+OBJECTPROPERTY(object_id, 'IsTrigger') AS [IsTrigger],
+OBJECTPROPERTY(object_id, 'IsView') AS [IsView],
+OBJECTPROPERTY(object_id, 'IsProcedure') AS [IsProcedure],
+OBJECT_NAME(object_id) obj,OBJECT_NAME(referenced_major_id) maj,is_updated, is_selected 
+FROM  sys.sql_dependencies
+where OBJECT_NAME(referenced_major_id)='E835ServiceLineDetail' --no schema in the name
 
 
 
