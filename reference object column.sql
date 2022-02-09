@@ -1,3 +1,5 @@
+-- dynamic views
+-- https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/system-dynamic-management-views?view=sql-server-ver15
 SELECT OBJECTPROPERTY(OBJECT_ID(referencing_entity_name), 'IsTable') AS [IsTable], *  
 FROM sys.dm_sql_referencing_entities ('dbo.E835ServiceLineDetail', 'OBJECT'); -- schema included in the name
 
