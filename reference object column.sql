@@ -36,7 +36,7 @@ select schema_name(fk_tab.schema_id) + '.' + fk_tab.name as foreign_table,
     fk_col.name as fk_column_name,
     ' = ' as [join],
     pk_col.name as pk_column_name,
-    fk.name as fk_constraint_name
+    fk.name as fk_constraint_name, fk.create_date
 from sys.foreign_keys fk
     inner join sys.tables fk_tab
         on fk_tab.object_id = fk.parent_object_id
