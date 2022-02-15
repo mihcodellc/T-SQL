@@ -14,7 +14,7 @@ OBJECTPROPERTY(object_id, 'IsView') AS [IsView],
 OBJECTPROPERTY(object_id, 'IsProcedure') AS [IsProcedure],
 OBJECT_NAME(object_id) obj,OBJECT_NAME(referenced_major_id) maj,is_updated, is_selected 
 FROM  sys.sql_dependencies
-where OBJECT_NAME(referenced_major_id)='E835ServiceLineDetail' --no schema in the name
+where OBJECT_NAME(referenced_major_id)='AnObject' --no schema in the name
 
 
 
@@ -25,7 +25,12 @@ select distinct OBJECT_NAME(object_id) nom,name  from sys.columns where name lik
 EXEC sp_MSforeachdb N'USE [?]; SELECT DB_NAME()  SELECT * FROM SYS.tables WHERE NAME LIKE ''%E835Claim%'' order by name;'
 
 EXEC sp_MSforeachdb N'USE [?]; SELECT DB_NAME(); select distinct OBJECT_NAME(object_id) nom,name  
-from sys.columns where name like ''%FacilityCodeId%'' order by nom'
+from sys.columns where name like ''%CodeId%'' order by nom'
+
+-- search object in schema information
+EXEC sp_MSforeachdb N'USE [?]; SELECT DB_NAME(); SELECT ROUTINE_SCHEMA, ROUTINE_NAME
+FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_TYPE = ''PROCEDURE'' and ROUTINE_NAME = ''IndexOptimize''; '
+
 
 -- https://dataedo.com/kb/query/sql-server/list-of-foreign-keys-with-columns
 --Query below returns foreign key constrant columns defined in a database.
@@ -55,3 +60,9 @@ order by schema_name(fk_tab.schema_id) + '.' + fk_tab.name,
     fk_cols.constraint_column_id
 
 
+-- columns, datatype, table from your database
+SELECT OBJECT_SCHEMA_NAME(a.object_id), OBJECT_NAME(a.object_id), a.name,b.type_desc,  b.type 
+FROM sys.all_columns a 
+JOIN sys.all_objects b on a.object_id = b.object_id
+JOIN sys.types t on a.user_type_id = t.user_type_id
+WHERE a.name like '%lo%' and b.type ='U' and t.name in ('int','smallint', 'numeric', 'bigint')
