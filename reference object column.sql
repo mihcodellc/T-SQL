@@ -1,10 +1,10 @@
 -- dynamic views
 -- https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/system-dynamic-management-views?view=sql-server-ver15
 SELECT OBJECTPROPERTY(OBJECT_ID(referencing_entity_name), 'IsTable') AS [IsTable], *  
-FROM sys.dm_sql_referencing_entities ('dbo.E835ServiceLineDetail', 'OBJECT'); -- schema included in the name
+FROM sys.dm_sql_referencing_entities ('dbo.AnObject', 'OBJECT'); -- schema included in the name
 
 SELECT DISTINCT referenced_schema_name, referenced_entity_name,is_updated, is_selected 
-FROM sys.dm_sql_referenced_entities  ('dbo.E835ServiceLineDetail', 'OBJECT')  -- schema included in the name
+FROM sys.dm_sql_referenced_entities  ('dbo.AnObject', 'OBJECT')  -- schema included in the name
 
 SELECT OBJECTPROPERTY(object_id, 'IsTable') AS [IsTable],
 OBJECTPROPERTY(object_id, 'IsPrimaryKey') AS [IsPrimaryKey],
