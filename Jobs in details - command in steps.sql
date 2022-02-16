@@ -3,10 +3,15 @@
 SELECT
 [sJOB].[name] AS [JobName] ,
 REPLACE(REPLACE(REPLACE([sJSTP].[command], CHAR(10) + CHAR(13), ' '), CHAR(13), ' '), CHAR(10), ' ') AS [ExecutableCommand] ,
+[sJSTP].[database_name] AS [Database] ,
 CASE [sJOB].[enabled]
 WHEN 1 THEN 'Yes'
 WHEN 0 THEN 'No'
 END AS [IsEnabled] ,
+CASE
+WHEN [sSCH].[schedule_uid] IS NULL THEN 'No'
+ELSE 'Yes'
+END AS [IsScheduled],
 [sJOB].[date_created] AS [JobCreatedOn] ,
 [sJOB].[date_modified] AS [JobLastModifiedOn] ,
 [sJSTP].[step_id] AS [StepNo] ,
@@ -30,7 +35,6 @@ WHEN 'TSQL' THEN 'Transact-SQL script (T-SQL)'
 ELSE sJSTP.subsystem
 END AS [StepType] ,
 [sPROX].[name] AS [RunAs] ,
-[sJSTP].[database_name] AS [Database] ,
 CASE [sJSTP].[on_success_action]
 WHEN 1 THEN 'Quit the job reporting success'
 WHEN 2 THEN 'Quit the job reporting failure'
@@ -45,10 +49,6 @@ WHEN 2 THEN 'Quit the job reporting failure'
 WHEN 3 THEN 'Go to the next step'
 WHEN 4 THEN 'Go to Step: ' + QUOTENAME(CAST([sJSTP].[on_fail_step_id] AS VARCHAR(3))) + ' ' + [sOFSTP].[step_name]
 END AS [OnFailureAction],
-CASE
-WHEN [sSCH].[schedule_uid] IS NULL THEN 'No'
-ELSE 'Yes'
-END AS [IsScheduled],
 [sSCH].[name] AS [JobScheduleName],
 CASE 
 WHEN [sSCH].[freq_type] = 64 THEN 'Start automatically when SQL Server Agent starts'
@@ -125,5 +125,6 @@ LEFT JOIN [msdb].[dbo].[syscategories] AS [sCAT] ON [sJOB].[category_id] = [sCAT
 LEFT JOIN [msdb].[sys].[database_principals] AS [sDBP] ON [sJOB].[owner_sid] = [sDBP].[sid]
 LEFT JOIN [msdb].[dbo].[sysjobschedules] AS [sJOBSCH] ON [sJOB].[job_id] = [sJOBSCH].[job_id]
 LEFT JOIN [msdb].[dbo].[sysschedules] AS [sSCH] ON [sJOBSCH].[schedule_id] = [sSCH].[schedule_id]
-ORDER BY ExecutableCommand,
-[JobName] , [StepNo]
+--where [sJOB].[enabled] = 1 and [sJOB].[name] like 'OLA%'
+--ORDER BY ExecutableCommand,
+ORDER BY [JobName] , [StepNo]
