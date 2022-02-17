@@ -1,5 +1,4 @@
--- latest here https://www.sqlskills.com/sql-server-resources/sql-server-demos/
-
+-- original version here https://www.sqlskills.com/blogs/kimberly/use-these-updates-to-sqlskills-index-procedures/
 /*============================================================================
   File:     sp_SQLskills_finddupes.sql
 
@@ -40,7 +39,7 @@ CREATE PROCEDURE [dbo].[sp_SQLskills_finddupes]
                                         -- when NULL it will check ALL tables
 )
 AS
-
+-- 2/17/2022: By Monktar Bello - added objname, Type, and create_date to #DropIndexes table 
 --  Jul 2011: V1 to find duplicate indexes.
 
 -- See my blog for updates and/or additional information
@@ -105,14 +104,20 @@ CREATE TABLE #DropIndexes
 CREATE TABLE #FindDupes
 (
     index_id INT,
-	is_disabled BIT,
-	index_name sysname,
-	index_description VARCHAR(210),
-	index_keys NVARCHAR(2126),
+    is_disabled BIT,
+    index_name sysname,
+    index_description VARCHAR(210),
+    index_keys NVARCHAR(2126),
     included_columns NVARCHAR(MAX),
-	filter_definition NVARCHAR(MAX),
-	columns_in_tree NVARCHAR(2126),
-	columns_in_leaf NVARCHAR(MAX)
+    filter_definition NVARCHAR(MAX),
+    columns_in_tree NVARCHAR(2126),
+    columns_in_leaf NVARCHAR(MAX),
+    create_date		datetime, 
+    objname nvarchar(776),
+    [type]	     		tinyint,
+    TypeDescription	nvarchar(max)
+
+
 );
 
 -- OPEN CURSOR OVER TABLE(S)
