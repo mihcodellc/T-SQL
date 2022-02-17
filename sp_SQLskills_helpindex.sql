@@ -12,6 +12,7 @@ CREATE PROCEDURE [dbo].[sp_SQLskills_helpindex]
 	, @IncludeListOrdered BIT = 0
 )
 AS
+-- 2/17/2022: By Monktar Bello - added @@objname to the output table, Type
 -- 11/19/2021: By Monktar Bello - added @create_date
 --November 2021: Cleaned up and consolidated so only one helpindex for
 --               usage AND for finddupes. Default is "unordered" which
@@ -123,7 +124,8 @@ AS
 		inc_columns			nvarchar(max),
 		cols_in_tree		nvarchar(2126),
 		cols_in_leaf		nvarchar(max),
-		create_date		datetime
+		create_date		datetime, 
+		objname nvarchar(776)
 	)
 
 	CREATE TABLE #IncludedColumns
@@ -276,7 +278,7 @@ AS
 		-- INSERT ROW FOR INDEX
 		
 		insert into #spindtab values (@indname, @indid, @type, @ignore_dup_key, @is_unique, @is_hypothetical,
-			@is_primary_key, @is_unique_key, @is_disabled, @auto_created, @no_recompute, @groupname, @keys, @filter_definition, @inc_Count, @inc_columns, @ColsInTree, @ColsInLeaf, @create_date)
+			@is_primary_key, @is_unique_key, @is_disabled, @auto_created, @no_recompute, @groupname, @keys, @filter_definition, @inc_Count, @inc_columns, @ColsInTree, @ColsInLeaf, @create_date, @objname)
 
 		-- Next index
     	fetch ms_crs_ind into @indid, @type, @groupid, @indname, @ignore_dup_key, @is_unique, @is_hypothetical,
@@ -329,7 +331,13 @@ AS
 		           ''columns_in_leaf'' = 
 			          case when type IN (5, 6) then ''Columns with columnstore index: '' + cols_in_leaf
                             when type = 7 then ''n/a, HASH''
-			          else cols_in_leaf end, create_date 
+			          else cols_in_leaf end, create_date, objname, Type,
+					  case when index_id = 1 and type = 1 then ''clustered''                    
+						when index_id = 1 and type = 5 then ''clustered, columnstore''        
+						when index_id > 1 and type = 2 then ''nonclustered''     
+						when index_id > 1 and type = 6 then ''nonclustered, columnstore''     
+						when index_id > 1 and type = 7 then ''nonclustered, HASH''     
+						else ''new index type'' end TypeDescription 
 
 	        from #spindtab
 	        order by index_id '
@@ -379,7 +387,13 @@ AS
 		           ''columns_in_leaf'' = 
 			          case when type IN (5, 6) then ''Columns with columnstore index: '' + cols_in_leaf
                             when type = 7 then ''n/a, HASH''
-			          else cols_in_leaf end, create_date 
+			          else cols_in_leaf end, create_date, objname, Type,
+					  case when index_id = 1 and type = 1 then ''clustered''                    
+						when index_id = 1 and type = 5 then ''clustered, columnstore''        
+						when index_id > 1 and type = 2 then ''nonclustered''     
+						when index_id > 1 and type = 6 then ''nonclustered, columnstore''     
+						when index_id > 1 and type = 7 then ''nonclustered, HASH''     
+						else ''new index type'' end TypeDescription
 
 	        from #spindtab
 	        order by index_id '
