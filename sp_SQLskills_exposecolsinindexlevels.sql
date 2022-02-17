@@ -1,4 +1,5 @@
 -- latest here https://www.sqlskills.com/sql-server-resources/sql-server-demos/
+-- https://www.sqlskills.com/blogs/kimberly/use-these-updates-to-sqlskills-index-procedures/
 
 /*============================================================================
   File:     sp_SQLskills_ExposeColsInIndexLevels.sql
