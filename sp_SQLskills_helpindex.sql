@@ -1,9 +1,40 @@
-USE [master]
+/*============================================================================
+  File:     sp_SQLskills_helpindex.sql
+
+  Summary:  So, what are the included columns?! Do you have a filter?
+			This is a MODIFIED sp_helpindex script that includes:
+               - Index IDs
+               - INCLUDEd columns
+               - Filtered index columns
+               - Leaf/tree details for rowstore indexes
+               - Columns defined for columnstore indexes
+            Additional details:
+               - whether or not the index is disabled
+               - Index usage stats
+
+  Date:     November 2021
+
+  Version:  Works on versions 2008-2019 (requires: sp_SQLskills_ExposeColsInIndexLevels)
+------------------------------------------------------------------------------
+  Written by Kimberly L. Tripp, SYSolutions, Inc.
+
+  For more scripts and sample code, check out 
+    http://www.SQLskills.com
+============================================================================*/
+
+USE [master];
 GO
-/****** Object:  StoredProcedure [dbo].[sp_SQLskills_helpindex]    Script Date: 11/19/2021 6:13:06 PM ******/
-SET ANSI_NULLS ON
+
+IF OBJECTPROPERTY(OBJECT_ID('sp_SQLskills_SQL2008_finddupes_helpindex'), 'IsProcedure') = 1
+	DROP PROCEDURE [sp_SQLskills_SQL2008_finddupes_helpindex];
 GO
-SET QUOTED_IDENTIFIER ON
+
+IF OBJECTPROPERTY(OBJECT_ID(N'sp_SQLskills_helpindex')
+		, N'IsProcedure') = 1
+	DROP PROCEDURE [dbo].[sp_SQLskills_helpindex];
+
+SET ANSI_NULLS ON;
+SET QUOTED_IDENTIFIER ON;
 GO
 
 CREATE PROCEDURE [dbo].[sp_SQLskills_helpindex]
@@ -402,3 +433,7 @@ AS
     EXEC (@ExecStr)
 
 	return (0) -- sp_SQLskills_helpindex
+go
+
+exec [sys].[sp_MS_marksystemobject] 'sp_SQLskills_helpindex'
+go
