@@ -371,7 +371,7 @@ AS
 						else ''new index type'' end TypeDescription 
 
 	        from #spindtab
-	        order by index_id '
+	        order by index_keys, included_columns, index_id '
             
     IF CONVERT(smallint, SUBSTRING(CONVERT(varchar(50), SERVERPROPERTY('ProductVersion')), 1, 2)) >= 16
         
@@ -427,7 +427,7 @@ AS
 						else ''new index type'' end TypeDescription
 
 	        from #spindtab
-	        order by index_id '
+	        order by index_keys, included_columns, index_id '
 
     --SELECT (@ExecStr)
     EXEC (@ExecStr)
