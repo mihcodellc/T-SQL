@@ -250,7 +250,7 @@ DEALLOCATE TableCursor;
 
 -- DISPLAY THE RESULTS
 
-IF (SELECT COUNT(*) FROM #IndexesKeys) = 0
+IF (SELECT COUNT(*) FROM #FindKeysToConsolidate) = 0
 	    RAISERROR('Database: %s has NO possible consolidation indexes.', 10, 0, @DBName);
 ELSE
     SELECT ObjName, Keys, IndId, index_keys, inc_columns, Indname, type, groupid 
