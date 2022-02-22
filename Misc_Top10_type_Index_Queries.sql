@@ -269,6 +269,19 @@ go
 --Unused / Missing indexes  
 /* 
  Return unused and missing indexes
+ better monitoring over a cycle  of workload
+ -- https://www.brentozar.com/archive/2018/10/unused-indexes-are-they-really-unused-or-have-they-just-not-been-used-yet/
+ --OR
+ -- Courtesy of Erin Stellato
+SELECT DB_NAME(ius.database_id),OBJECT_NAME(i.object_id) [TableName],
+    i.name [IndexName],	ius.database_id,i.object_id, i.index_id, 
+    ius.user_seeks,ius.user_scans,ius.user_lookups,ius.user_updates 
+FROM sys.indexes i
+INNER JOIN sys.dm_db_index_usage_stats ius 
+    ON ius.index_id = i.index_id AND ius.object_id = i.object_id
+WHERE ius.database_id = DB_ID(N'MedRx')
+    AND i.object_id = OBJECT_ID('dbo.LockboxDocumentTracking')
+
 */
 -- Return unused indexes
 -- Note : run this query against target database (not against master database)
