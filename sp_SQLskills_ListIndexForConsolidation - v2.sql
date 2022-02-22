@@ -4,7 +4,7 @@
   Summary:  Run against a single database this procedure will list ALL
             indexes that could be combined!
 		  IF @ObjName and @KeysFilter not null,it returns
-		  for each candidate index, the last top 5 queries using it 
+		  for each candidate index, the last top 5 queries using it;  
 		  allowing to measure the impact of your consolidation
 					
   Date:     February 2021
@@ -126,6 +126,7 @@ CREATE TABLE #ListIndexInfo
 
 CREATE TABLE #FindKeysToConsolidate
 (
+    schemaName nvarchar(780),
     ObjName NVARCHAR(776),
     IndId smallint,
     Indname sysname,
@@ -195,6 +196,8 @@ BEGIN
                         + N'.' 
                         + QUOTENAME(@TableName)
                         + N''', 1';
+                
+			 --print PARSENAME(@SchemaName,2)+'.'+PARSENAME(@TableName,1)
 
     INSERT INTO #ListIndexInfo
 	    EXEC (@ExecStr);  --EXEC sp_SQLskills_helpindex @TableName
@@ -202,7 +205,7 @@ BEGIN
     -- column in different key
     IF @KeysFilter IS NULL
 	   INSERT INTO #FindKeysToConsolidate
-	   SELECT a.ObjName, a.IndId, a.Indname, a.Keys, a.type, a.groupid, inf.index_keys, inc_columns 
+	   SELECT @SchemaName, a.ObjName, a.IndId, a.Indname, a.Keys, a.type, a.groupid, inf.index_keys, inc_columns 
 	   FROM #IndexesKeys a
 	   JOIN #IndexesKeys b 
 		  ON a.ObjName = b.ObjName and a.Keys = b.Keys
@@ -213,7 +216,7 @@ BEGIN
 	   ORDER BY a.ObjName, a.Keys
     ELSE
 	   INSERT INTO #FindKeysToConsolidate
-	   SELECT a.ObjName, a.IndId, a.Indname, a.Keys, a.type, a.groupid, inf.index_keys, inc_columns 
+	   SELECT @SchemaName, a.ObjName, a.IndId, a.Indname, a.Keys, a.type, a.groupid, inf.index_keys, inc_columns 
 	   FROM #IndexesKeys a
 	   JOIN #IndexesKeys b 
 		  ON a.ObjName = b.ObjName and a.Keys = b.Keys
@@ -228,7 +231,7 @@ BEGIN
     FETCH TableCursor
         INTO @SchemaName, @TableName;
 END;
-	
+CLOSE TableCursor 	
 DEALLOCATE TableCursor;
 
 -- DISPLAY THE RESULTS
@@ -237,12 +240,13 @@ IF (SELECT COUNT(*) FROM #FindKeysToConsolidate) = 0
 	    RAISERROR('Database: %s has NO possible indexes'' consolidation .', 10, 0, @DBName);
 ELSE
 BEGIN
-    SELECT ObjName, Keys, IndId, index_keys, inc_columns, PARSENAME(Indname, 1) Indname , type, groupid 
+    SELECT schemaName, ObjName, Keys, IndId, index_keys, inc_columns, PARSENAME(Indname, 1) Indname , type, groupid 
     FROM #FindKeysToConsolidate
-    ORDER BY ObjName, Keys;
+    ORDER BY ObjName, Keys, index_keys;
 
     IF @KeysFilter IS NOT NULL  AND @ObjName IS NOT NULL
     BEGIN
+
 	   DECLARE itsQueryCursor CURSOR FOR
 		  SELECT PARSENAME(Indname, 1) Indname, index_keys FROM #FindKeysToConsolidate
 		  ORDER BY Indname;
@@ -264,10 +268,11 @@ BEGIN
 			 CROSS APPLY sys.dm_exec_sql_text(querystats.sql_handle) AS sqltext 
 			 WHERE 
 				textplan.query_plan like '%' + @indname + '%'
-			 ORDER BY querystats.last_execution_time DESC, querystats.total_logical_reads DESC, querystats.total_logical_writes DESC 
+			 --ORDER BY querystats.last_execution_time DESC, querystats.total_logical_reads DESC, querystats.total_logical_writes DESC 
 			 OPTION (RECOMPILE);
 		  FETCH NEXT FROM itsQueryCursor INTO @indname, @index_keys
 	   END
+	   CLOSE itsQueryCursor;
 	   DEALLOCATE itsQueryCursor;
 
     END
