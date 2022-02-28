@@ -98,8 +98,8 @@ GROUP BY ActTra.Transaction_begin_time ,
 
 -- Find your worst scans
 --
---An index scan may not be an issue so we’ll concentrate on table scans 
---A clustered index scan is a table scan so we’ll select on index id 0 and 1
+--An index scan may not be an issue so weâ€™ll concentrate on table scans 
+--A clustered index scan is a table scan so weâ€™ll select on index id 0 and 1
 
 select object_name(s.object_id) as TableName,isnull(i.name,'HEAP') as IndexName, 
 case i.index_id
@@ -225,11 +225,13 @@ BEGIN TRY
         ,CONVERT(decimal(12,2), CAST(COUNT(*) as bigint)*CAST(8 as float)/1024) as buffer_mb
     FROM '+@DatabaseName+'.sys.dm_os_buffer_descriptors AS bd 
         INNER JOIN AllocationUnits au ON bd.allocation_unit_id = au.allocation_unit_id
-    WHERE bd.database_id = db_id()
+    WHERE bd.database_id = db_id() and (au.object_id = @ObjectID or  @ObjectID is null)
     GROUP BY au.object_id, au.index_id, au.partition_number'
 
+
     INSERT INTO #MemoryBuffer
-    EXEC sp_ExecuteSQL @SQL
+    EXEC sp_ExecuteSQL @SQL,N'@ObjectID int', @ObjectID = @ObjectID
+
 
     -- Create Main Temporary Tables
     IF OBJECT_ID('tempdb..#IndexBaseLine') IS NOT NULL
@@ -272,8 +274,8 @@ BEGIN TRY
         ,user_lookups bigint
         ,user_updates bigint
         ,read_to_update_ratio nvarchar(30)
-        ,read_to_update int
-        ,update_to_read int
+        ,read_to_update numeric
+        ,update_to_read numeric
         ,row_lock_count bigint
         ,row_lock_wait_count bigint
         ,row_lock_wait_in_ms bigint
