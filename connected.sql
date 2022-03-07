@@ -235,5 +235,5 @@ FROM sys.dm_exec_sessions WHERE DB_NAME(database_id) = 'dbBello' AND database_id
 
 ----drop database if exists dbBello
 ----create database dbBello WITH TRUSTWORTHY ON
-----ALTER AUTHORIZATION ON DATABASE::MyDatabase TO sa; --EXEC sp_changedbowner 'sa' deprecated
+----ALTER AUTHORIZATION ON DATABASE::dbBello TO sa; --EXEC sp_changedbowner 'sa' deprecated
 
