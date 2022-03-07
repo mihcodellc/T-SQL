@@ -237,3 +237,10 @@ FROM sys.dm_exec_sessions WHERE DB_NAME(database_id) = 'dbBello' AND database_id
 ----create database dbBello WITH TRUSTWORTHY ON
 ----ALTER AUTHORIZATION ON DATABASE::dbBello TO sa; --EXEC sp_changedbowner 'sa' deprecated
 
+---- drop an user from all db on the instance
+--exec sp_MSforeachdb N'use [?] ; 
+--IF  EXISTS (SELECT 1 FROM sys.database_principals WHERE name = N''testbello'')
+--    DROP USER [testbello];'
+
+--USER HAS TO BE IN THE DATBASE TOALLOW HIM TO DO ANYTHING IN IT
+
