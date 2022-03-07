@@ -228,4 +228,9 @@ FROM  sys.sysprocesses
     --dbid =6 
 GROUP BY dbid, loginame, status
 
+-- kill connection to dbBello
+SELECT status,database_id, DB_NAME(database_id) DBNAME,
+'use master; Kill ' + convert(char(4), session_id) as Command
+FROM sys.dm_exec_sessions WHERE DB_NAME(database_id) = 'dbBello' AND database_id>0
 
+----drop database if exists dbBello
