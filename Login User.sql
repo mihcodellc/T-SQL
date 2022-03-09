@@ -1,3 +1,10 @@
+---- drop an user from all db on the instance
+--exec sp_MSforeachdb N'use [?] ; 
+--IF  EXISTS (SELECT 1 FROM sys.database_principals WHERE name = N''testbello'')
+--    DROP USER [testbello];'
+
+--Drop login [testbello]
+
 
 --login(server level) has to be existing login in sys.server_principals or sysadmin
 --user(db level) has to be existing user in sys.database_principals or sysadmin
