@@ -128,3 +128,15 @@ LEFT JOIN [msdb].[dbo].[sysschedules] AS [sSCH] ON [sJOBSCH].[schedule_id] = [sS
 --where [sJOB].[enabled] = 1 and [sJOB].[name] like 'OLA%'
 --ORDER BY ExecutableCommand,
 ORDER BY [JobName] , [StepNo]
+
+
+--  fail jobs
+  declare @date int;
+  set @date = 20220307
+
+  SELECT job.name, his.[message], his.sql_severity, his.retries_attempted, his.run_time
+	    , job.notify_email_operator_id
+  FROM [msdb].[dbo].[sysjobhistory] as his
+  JOIN [msdb].[dbo].[sysjobs] as job on job.job_id = his.job_id
+  WHERE run_date = @date
+  AND run_status IN (0/*FAILED*/,2/*RETRY*/, 3/*CANCELED*/)
