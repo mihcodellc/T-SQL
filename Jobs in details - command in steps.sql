@@ -135,7 +135,7 @@ ORDER BY [JobName] , [StepNo]
   set @date = 20220307
 
  SELECT job.name, his.[message], his.sql_severity, his.retries_attempted, his.run_time
-	    , job.notify_email_operator_id, run_status 
+	    , job.notify_email_operator_id, run_status, his.run_date 
   FROM [msdb].[dbo].[sysjobhistory] as his
   JOIN [msdb].[dbo].[sysjobs] as job on job.job_id = his.job_id
   WHERE run_date = @date
