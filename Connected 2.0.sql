@@ -6,7 +6,7 @@
 --report on deadlock
 -- https://www.mssqltips.com/sqlservertip/6430/monitor-deadlocks-in-sql-server-with-systemhealth-extended-events/
 
-set transaction isolation level read uncommitted
+--set transaction isolation level read uncommitted
 
 ---- maximum number of simultaneous user connections allowed
 --SELECT @@MAX_CONNECTIONS AS 'Max Connections';  
@@ -48,6 +48,39 @@ ORDER BY len(bl.blocking_these) desc, r.blocking_session_id desc, r.session_id;
 --        Locks.request_session_id ,
 --        Obj.Name, ExeSess.host_name, ExeSess.program_name
 
+
+--USE master;  
+--GO  
+--EXEC sp_who 'active';  
+----exec sp_who2by  --user SP
+--exec sp_who2
+select 'SQL blockers (using sp_who2)'
+CREATE TABLE #Temp (
+	spid INT
+	,STATUS VARCHAR(40)
+	,LOGIN VARCHAR(40)
+	,hostname VARCHAR(40)
+	,blkby VARCHAR(40)
+	,dbname VARCHAR(40)
+	,command VARCHAR(200)
+	,cputime BIGINT
+	,diskio BIGINT
+	,lastbatch VARCHAR(40)
+	,programname VARCHAR(200)
+	,spid2 INT
+	,requestid INT
+	);
+
+INSERT INTO #Temp
+EXEC sp_who2;
+
+SELECT *
+FROM #Temp
+WHERE trim(blkby) != '.'
+
+DROP TABLE #Temp;
+
+
 if (select IS_SRVROLEMEMBER('sysadmin','mbello') IsMemberOfSysAdmin) = 1
 begin
     select 'open transaction'
@@ -71,7 +104,7 @@ join sys.dm_exec_sessions s on request_session_id = s.session_id
 
 where s.host_process_id > 0
 and db_name(l.resource_database_id) in('MedRx', 'RMSOCR', 'MedRxAnalytics', 'Billing') and s.session_id <> @@SPID
-order by request_mode
+order by s.host_name-- request_mode
 
 --select 'find lock esclation on a table '
 --SELECT CASE WHEN resource_type = 'OBJECT' THEN OBJECT_NAME(resource_associated_entity_id) else OBJECT_NAME(b.OBJECT_ID) end ObjectName, 
@@ -95,7 +128,7 @@ order by request_mode
 -- it run on current database; remove this part if looking for all dbs
 -- Complement exec sp_WhoIsActive
 --==============================================================================
-select 'who is connected'
+select 'who is connected : Analyse what each spid is doing, reads and writes'
 SELECT
      sdes.session_id
     ,sdes.login_time
@@ -228,12 +261,6 @@ select ' active'
 --   group by host_name, host_process_id, program_name, database_id
 --   order by count(*) desc;
 
-
---USE master;  
---GO  
---EXEC sp_who 'active';  
---exec sp_who2by  --user SP
---exec sp_who2
 
 --GO
 --SELECT 
