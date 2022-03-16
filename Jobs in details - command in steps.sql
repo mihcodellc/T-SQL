@@ -132,7 +132,7 @@ ORDER BY [JobName] , [StepNo]
 
 --  fail jobs
   declare @date int;
-  set @date = 20220307
+    set @date = convert(int,replace(convert(CHAR(10), GETDATE(), 112),'-','')) --20220316
 
  SELECT job.name, his.[message], his.sql_severity, his.retries_attempted, his.run_time
 	    , job.notify_email_operator_id, run_status, his.run_date 
