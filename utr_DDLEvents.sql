@@ -1,6 +1,9 @@
 --ENABLE TRIGGER utr_DDLEvents
 --	ON DATABASE;
 
+--DROP TRIGGER utr_DDLEvents ON DATABASE
+
+
 CREATE TRIGGER utr_DDLEvents
 	ON DATABASE 
 FOR  DDL_DATABASE_LEVEL_EVENTS -- DDL_LOGIN_EVENTS,
@@ -56,7 +59,7 @@ IF (@EventType NOT IN (
 				'UPDATE_STATISTICS'
 			--,	'ALTER_INDEX'	-- We do want to include Disabling of indexes
 		)
-	--AND NOT (@EventType = 'ALTER_INDEX' AND @TSQLCommand NOT LIKE '%DISABLE%')
+	AND NOT (@EventType = 'ALTER_INDEX' AND @TSQLCommand NOT LIKE '%DISABLE%')
 	)
 BEGIN
 
