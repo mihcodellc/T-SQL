@@ -133,10 +133,17 @@ ORDER BY [JobName] , [StepNo]
 --  fail jobs
   declare @date int;
     set @date = convert(int,replace(convert(CHAR(10), GETDATE(), 112),'-','')) --20220316
-
- SELECT job.name, his.[message], his.sql_severity, his.retries_attempted, his.run_time
-	    , job.notify_email_operator_id, run_status, his.run_date 
+    select @date
+ SELECT job.name, his.run_status ,
+			CASE WHEN his.run_status = 1 THEN 'Success'  
+		     WHEN his.run_status = 0 THEN 'Failure'
+			WHEN his.run_status = 2 THEN 'Retried'
+			WHEN his.run_status = 3 THEN 'Cancelled'
+			WHEN his.run_status = 4 THEN 'In Progress'
+			ELSE 'Unknown' END   AS outcome_message, his.run_duration as 'Duration HHMMSS', his.[message],
+ his.sql_severity, his.retries_attempted, his.run_time, his.run_date
+	    , job.notify_email_operator_id,  his.[server]
   FROM [msdb].[dbo].[sysjobhistory] as his
   JOIN [msdb].[dbo].[sysjobs] as job on job.job_id = his.job_id
   WHERE run_date in (@date,@date-1)
-  AND run_status IN (0/*FAILED*/,2/*RETRY*/, 3/*CANCELED*/)
+  AND run_status IN (0/*FAILED*/,2/*RETRY*/, 3/*CANCELED*/, 4/*In Progress*/) --1 Succeeded
