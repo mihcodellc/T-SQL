@@ -138,5 +138,5 @@ ORDER BY [JobName] , [StepNo]
 	    , job.notify_email_operator_id, run_status, his.run_date 
   FROM [msdb].[dbo].[sysjobhistory] as his
   JOIN [msdb].[dbo].[sysjobs] as job on job.job_id = his.job_id
-  WHERE run_date = @date
+  WHERE run_date in (@date,@date-1)
   AND run_status IN (0/*FAILED*/,2/*RETRY*/, 3/*CANCELED*/)
