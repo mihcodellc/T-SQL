@@ -1,4 +1,4 @@
--- you can still use the report(all executions and drill down or filter) on ssisdb
+-- you can still use the report(all executions and drill down or filter) on ssisdb under IS Catalogs
 -- OR 
 --change the @mydate and 
 -- replace execution_id on 2nd table by the one to investigate from table 1 
