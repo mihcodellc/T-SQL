@@ -1,6 +1,6 @@
 -- you can still use the report(all executions and drill down or filter) on ssisdb
 -- OR 
---change the date and 
+--change the @mydate and 
 -- replace execution_id on 2nd table by the one to investigate from table 1 
 --then on the 4th table use the event_message_id on 3rd - 3
 declare @mydate datetime = '20220301'
