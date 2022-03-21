@@ -26,7 +26,7 @@ SELECT distinct inf.[execution_id]
   --convert(DATETIME, convert(CHAR(10), GETDATE(), 110), 110)
 
 
-  /****** Script for SelectTopNRows command from SSMS  ******/
+  /****** packages steps  ******/
 SELECT TOP (1000) [statistics_id]
       ,[execution_id]
       ,[executable_id]
@@ -39,6 +39,8 @@ SELECT TOP (1000) [statistics_id]
   FROM [SSISDB].[catalog].[executable_statistics]
   where start_time > @mydate and execution_id  = 1772004
 
+
+  --- packages events
   SELECT [event_message_id]
       ,[operation_id]
       ,[message_time]
@@ -60,6 +62,8 @@ SELECT TOP (1000) [statistics_id]
    where  operation_id in(1772004)
    and event_name in ('OnTaskFailed')
 
+
+   --packages events prior to the fail
    SELECT [event_message_id]
       ,[operation_id]
       ,[message_time]
