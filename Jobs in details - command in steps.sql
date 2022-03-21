@@ -125,15 +125,31 @@ LEFT JOIN [msdb].[dbo].[syscategories] AS [sCAT] ON [sJOB].[category_id] = [sCAT
 LEFT JOIN [msdb].[sys].[database_principals] AS [sDBP] ON [sJOB].[owner_sid] = [sDBP].[sid]
 LEFT JOIN [msdb].[dbo].[sysjobschedules] AS [sJOBSCH] ON [sJOB].[job_id] = [sJOBSCH].[job_id]
 LEFT JOIN [msdb].[dbo].[sysschedules] AS [sSCH] ON [sJOBSCH].[schedule_id] = [sSCH].[schedule_id]
---where [sJOB].[enabled] = 1 and [sJOB].[name] like 'OLA%'
+--where [sJOB].[enabled] = 1 and [sSCH].[schedule_uid] is null -- and [sJOB].[name] like 'OLA%'
 --ORDER BY ExecutableCommand,
-ORDER BY [JobName] , [StepNo]
+--ORDER BY frequency, Recurrence, jobname, [StepNo]
+--ORDER BY [JobName] , [StepNo]
 
 
---  fail jobs
+-- jobs recurring overview
+select [sJOB].name as jobName,[sSCH].name scheduleName, [sSCH].date_created sch_created, sJOB.date_created jobCreated,[sSCH].[freq_type],  
+    CASE 
+WHEN [sSCH].[freq_type] = 64 THEN 'Runs automatically when SQL Server Agent starts'
+WHEN [sSCH].[freq_type] = 128 THEN 'Runs whenever the CPUs become idle'
+WHEN [sSCH].[freq_type] IN (4/*daily*/,8/*Weekly*/,16/*Monthly*/,32/*Monthly with freq_interval*/) THEN 'Recurring'
+WHEN [sSCH].[freq_type] = 1 THEN 'One Time'
+END [ScheduleType], [sSCH].[freq_interval] 
+from [msdb].[dbo].[sysjobs] [sJOB]
+join [msdb].[dbo].[sysjobschedules] AS [sJOBSCH] ON [sJOB].[job_id] = [sJOBSCH].[job_id]
+join [msdb].[dbo].[sysschedules] AS [sSCH] ON [sJOBSCH].[schedule_id] = [sSCH].[schedule_id]
+where [sJOB].enabled = 1 and [sSCH].[freq_type] > 1 --remove ontime
+order by freq_type, jobName
+
+
+--  fail jobs based on scheduled period covering all your current jobs
   declare @date int;
     set @date = convert(int,replace(convert(CHAR(10), GETDATE(), 112),'-','')) --20220316
-    select @date
+    select @date, @date-45
  SELECT job.name, his.run_status ,
 			CASE WHEN his.run_status = 1 THEN 'Success'  
 		     WHEN his.run_status = 0 THEN 'Failure'
@@ -145,5 +161,7 @@ ORDER BY [JobName] , [StepNo]
 	    , job.notify_email_operator_id,  his.[server]
   FROM [msdb].[dbo].[sysjobhistory] as his
   JOIN [msdb].[dbo].[sysjobs] as job on job.job_id = his.job_id
-  WHERE run_date in (@date,@date-1)
+  WHERE run_date between @date-45  and  @date
   AND run_status IN (0/*FAILED*/,2/*RETRY*/, 3/*CANCELED*/, 4/*In Progress*/) --1 Succeeded
+
+  
