@@ -66,3 +66,21 @@ FROM sys.all_columns a
 JOIN sys.all_objects b on a.object_id = b.object_id
 JOIN sys.types t on a.user_type_id = t.user_type_id
 WHERE a.name like '%lo%' and b.type ='U' and t.name in ('int','smallint', 'numeric', 'bigint')
+
+
+-- identity column and how close to the max number
+;with cte as(
+SELECT OBJECT_SCHEMA_NAME(a.object_id) as aschema, OBJECT_NAME(a.object_id) aTable, a.name aColumn,b.type_desc,  b.type, t.name as typeName
+, (select sum(row_count) from sys.dm_db_partition_stats st where st.object_id = a.object_id and st.index_id < 2) as number_rows
+, case when t.name = 'bigint' then  9223372036854775807
+	  when t.name = 'int' then  2147483647 
+	  when t.name = 'smallint' then  32767
+	  when t.name = 'tinyint' then  255 end maxNumber
+FROM sys.all_columns a 
+JOIN sys.all_objects b on a.object_id = b.object_id
+JOIN sys.types t on a.user_type_id = t.user_type_id
+WHERE b.type ='U' and t.name in ('int','smallint', 'bigint', 'tinyint ') and a.is_identity = 1
+)
+select *, number_rows/maxNumber * 100 as his_percentage from cte
+where number_rows/maxNumber * 100 > 33
+order by his_percentage desc
