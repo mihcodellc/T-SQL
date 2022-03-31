@@ -5,6 +5,9 @@
 
 --Drop login [testbello]
 
+--orphan in database ie user but no login
+exec sp_change_users_login @Action='Report'
+
 
 --login(server level) has to be existing login in sys.server_principals or sysadmin
 --user(db level) has to be existing user in sys.database_principals or sysadmin
