@@ -28,6 +28,9 @@ select name from sys.objects
 where type ='tr' order by name
 
 
+-- all databases
+exec sp_MSforeachdb N'use [?]; select db_name(), * from sys.triggers  '
+
 
 --DATABASE
 -- event related to existing trigger
