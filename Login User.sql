@@ -111,7 +111,12 @@ join sys.database_permissions permissionst
     order by principalName
 
 --members and their principals on database level
-select  principal_id PrincipalID, principals.name principalName,  members.member_principal_id memberID
-from sys.server_principals principals
-left join sys.server_role_members members 
-    on principals.principal_id = members.role_principal_id
+SELECT rol.name AS DatabaseRoleName,   
+   isnull (us.name, '') AS UserMemberName, us.principal_id MemberID   
+ FROM sys.database_principals AS rol    
+ LEFT JOIN  sys.database_role_members AS mb
+	   ON mb.role_principal_id = rol.principal_id  
+ LEFT JOIN sys.database_principals AS us  
+	   ON mb.member_principal_id = us.principal_id  
+WHERE rol.type = 'R' and rol.name = 'devops_restart'
+ORDER BY  rol.name;  
