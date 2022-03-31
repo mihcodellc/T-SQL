@@ -118,5 +118,5 @@ SELECT rol.name AS DatabaseRoleName,
 	   ON mb.role_principal_id = rol.principal_id  
  LEFT JOIN sys.database_principals AS us  
 	   ON mb.member_principal_id = us.principal_id  
-WHERE rol.type = 'R' and rol.name = 'devops_restart'
+WHERE rol.type = 'R' --and rol.name = 'aRoleName'
 ORDER BY  rol.name;  
