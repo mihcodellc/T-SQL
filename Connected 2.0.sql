@@ -11,6 +11,7 @@
 ---- maximum number of simultaneous user connections allowed
 --SELECT @@MAX_CONNECTIONS AS 'Max Connections';  
 
+
  select 'sessions blocking other, active queries & sql text'
  ;WITH cteBL (session_id, blocking_these) AS 
 (SELECT s.session_id, blocking_these = x.blocking_these FROM sys.dm_exec_sessions s 
@@ -20,9 +21,10 @@ CROSS APPLY    (SELECT isnull(convert(varchar(6), er.session_id),'') + ', '
                 AND er.blocking_session_id <> 0
                 FOR XML PATH('') ) AS x (blocking_these)
 )
-SELECT s.session_id, blocked_by = r.blocking_session_id, bl.blocking_these
-, batch_text = t.text, input_buffer = ib.event_info, * 
-FROM sys.dm_exec_sessions s 
+SELECT bl.session_id, blocked_by = r.blocking_session_id, bl.blocking_these
+, batch_text = t.text, input_buffer = ib.event_info,sdec.client_net_address, sdec.local_net_address,s.host_name, *
+FROM sys.dm_exec_sessions s
+INNER JOIN sys.dm_exec_connections AS sdec  ON sdec.session_id = s.session_id
 LEFT OUTER JOIN sys.dm_exec_requests r on r.session_id = s.session_id
 INNER JOIN cteBL as bl on s.session_id = bl.session_id
 OUTER APPLY sys.dm_exec_sql_text (r.sql_handle) t
@@ -48,37 +50,47 @@ ORDER BY len(bl.blocking_these) desc, r.blocking_session_id desc, r.session_id;
 --        Locks.request_session_id ,
 --        Obj.Name, ExeSess.host_name, ExeSess.program_name
 
+SELECT t1.resource_type AS [lock type], DB_NAME(resource_database_id) AS [database],
+t1.resource_associated_entity_id AS [blk object],t1.request_mode AS [lock req],  -- lock requested
+t1.request_session_id AS [waiter sid], t2.wait_duration_ms AS [wait time],       -- spid of waiter  
+(SELECT [text] FROM sys.dm_exec_requests AS r WITH (NOLOCK)                      -- get sql for waiter
+CROSS APPLY sys.dm_exec_sql_text(r.[sql_handle]) 
+WHERE r.session_id = t1.request_session_id) AS [waiter_batch],
+(SELECT SUBSTRING(qt.[text],r.statement_start_offset/2, 
+    (CASE WHEN r.statement_end_offset = -1 
+    THEN LEN(CONVERT(nvarchar(max), qt.[text])) * 2 
+    ELSE r.statement_end_offset END - r.statement_start_offset)/2) 
+FROM sys.dm_exec_requests AS r WITH (NOLOCK)
+CROSS APPLY sys.dm_exec_sql_text(r.[sql_handle]) AS qt
+WHERE r.session_id = t1.request_session_id) AS [waiter_stmt],					-- statement blocked
+t2.blocking_session_id AS [blocker sid],										-- spid of blocker
+(SELECT [text] FROM sys.sysprocesses AS p										-- get sql for blocker
+CROSS APPLY sys.dm_exec_sql_text(p.[sql_handle]) 
+WHERE p.spid = t2.blocking_session_id) AS [blocker_batch]
+FROM sys.dm_tran_locks AS t1 WITH (NOLOCK)
+INNER JOIN sys.dm_os_waiting_tasks AS t2 WITH (NOLOCK)
+ON t1.lock_owner_address = t2.resource_address OPTION (RECOMPILE);
 
---USE master;  
---GO  
---EXEC sp_who 'active';  
-----exec sp_who2by  --user SP
---exec sp_who2
-select 'SQL blockers (using sp_who2)'
-CREATE TABLE #Temp (
-	spid INT
-	,STATUS VARCHAR(40)
-	,LOGIN VARCHAR(40)
-	,hostname VARCHAR(40)
-	,blkby VARCHAR(40)
-	,dbname VARCHAR(40)
-	,command VARCHAR(200)
-	,cputime BIGINT
-	,diskio BIGINT
-	,lastbatch VARCHAR(40)
-	,programname VARCHAR(200)
-	,spid2 INT
-	,requestid INT
-	);
 
-INSERT INTO #Temp
-EXEC sp_who2;
+/*
+-- https://github.com/amachanic/sp_whoisactive
 
-SELECT *
-FROM #Temp
-WHERE trim(blkby) != '.'
+-- open tran, cpu,memory used
+*/
+exec [RmsAdmin].dbo.sp_WhoIsActive  
+		    @show_own_spid = 0
+		  , @get_task_info =2 /*task-based metrics*/
+		  , @get_avg_time = 1
+		  , @get_locks = 1
+		  --, @get_transaction_info = 1
+		  --, @delta_interval = 0
+		  , @find_block_leaders =1
+		  , @show_sleeping_spids = 0 --1 sleeping with open transaction
+		  --, @get_plans = 1 
+		  , @sort_order = '[blocked_session_count] desc, [Used_Memory] desc, [open_tran_count] desc, [CPU] desc' 
+		  --, @destination_table = ''
+		  --, @output_column_list = '[col1][col2]...'
 
-DROP TABLE #Temp;
 
 
 if (select IS_SRVROLEMEMBER('sysadmin','mbello') IsMemberOfSysAdmin) = 1
@@ -103,7 +115,7 @@ from sys.dm_tran_locks l
 join sys.dm_exec_sessions s on request_session_id = s.session_id
 
 where s.host_process_id > 0
-and db_name(l.resource_database_id) in('MedRx', 'RMSOCR', 'MedRxAnalytics', 'Billing') and s.session_id <> @@SPID
+and db_name(l.resource_database_id) = db_name() and s.session_id <> @@SPID
 order by s.host_name-- request_mode
 
 --select 'find lock esclation on a table '
@@ -130,12 +142,13 @@ order by s.host_name-- request_mode
 --==============================================================================
 select 'who is connected : Analyse what each spid is doing, reads and writes'
 SELECT
+	  DATEDIFF(hh,sdes.last_request_end_time,sdes.last_request_start_time) 'elapse_time in hours',
      sdes.session_id
     ,sdes.login_time
     ,sdes.last_request_start_time
     ,sdes.last_request_end_time
     ,sdes.is_user_process
-    ,sdes.host_name
+    ,sdes.host_name 
     ,sdes.program_name
     ,sdes.login_name
     ,sdes.status
@@ -172,9 +185,9 @@ CROSS APPLY (
     FROM sys.dm_exec_sql_text(sdec.most_recent_sql_handle)
 
 ) sdest
-WHERE sdes.session_id <> @@SPID and sdes.last_request_end_time < DATEADD(hh,-12,getdate())
-  --AND sdest.DatabaseName in('MedRx', 'RMSOCR', 'MedRxAnalytics', 'Billing')-- and sdest.dbid IS NOT NULL
-ORDER BY sdes.last_request_start_time DESC
+WHERE sdes.session_id <> @@SPID --and sdes.last_request_end_time < DATEADD(hh,-12,getdate())
+  --AND sdest.DatabaseName in('db1', 'db2', ...)-- and sdest.dbid IS NOT NULL
+ORDER BY sdes.session_id, sdes.last_request_start_time DESC
 
 -- sleeping session can be an issue, check the query used and closed them, of no longer needed close or kill it
 -- there are using the TempDB
@@ -206,22 +219,22 @@ select 'sessions running but asleep'
 --select q.query_plan, st.execution_count, st.last_logical_reads, st.last_execution_time, st.last_logical_writes, last_physical_reads from sys.dm_exec_procedure_stats st
 --cross apply sys.dm_exec_query_plan(st.sql_handle) q
 
---exec sp_who 'active';  
-select ' active'
- select spid , ecid, status  
-              ,loginame=rtrim(loginame)  
-       ,hostname ,blk=convert(char(5),blocked)  
-       ,dbname = case  
-      when dbid = 0 then null  
-      when dbid <> 0 then db_name(dbid)  
-     end  
-    ,cmd  
-    ,request_id  
- from  sys.sysprocesses  
- where upper(cmd) <> 'AWAITING COMMAND' -- ACTIVE excludes sessions that are waiting for the next command from the user.
- and spid  <> @@SPID and status <> 'sleeping'   and loginame <> 'sa'
- and db_name(dbid) in ('MedRx', 'RMSOCR', 'MedRxAnalytics', 'Billing')
- order by status
+----exec sp_who 'active';  
+--select ' active'
+-- select spid , ecid, status  
+--              ,loginame=rtrim(loginame)  
+--       ,hostname ,blk=convert(char(5),blocked)  
+--       ,dbname = case  
+--      when dbid = 0 then null  
+--      when dbid <> 0 then db_name(dbid)  
+--     end  
+--    ,cmd  
+--    ,request_id  
+-- from  sys.sysprocesses  
+-- where upper(cmd) <> 'AWAITING COMMAND' -- ACTIVE excludes sessions that are waiting for the next command from the user.
+-- and spid  <> @@SPID and status <> 'sleeping'   and loginame <> 'sa'
+-- and db_name(dbid) in ('MedRx', 'RMSOCR', 'MedRxAnalytics', 'Billing')
+-- order by status
  
 
 
@@ -288,3 +301,14 @@ select ' active'
 
 --USER HAS TO BE IN THE DATBASE TOALLOW HIM TO DO ANYTHING IN IT
 
+
+
+
+select 'Get a count of SQL connections by IP address (Query 39) (Connection Counts by IP Address)' 
+SELECT ec.client_net_address, es.[program_name], es.[host_name], es.login_name, 
+COUNT(ec.session_id) AS [connection count] 
+FROM sys.dm_exec_sessions AS es WITH (NOLOCK) 
+INNER JOIN sys.dm_exec_connections AS ec WITH (NOLOCK) 
+ON es.session_id = ec.session_id 
+GROUP BY ec.client_net_address, es.[program_name], es.[host_name], es.login_name  
+ORDER BY [connection count] desc--ec.client_net_address, es.[program_name] OPTION (RECOMPILE);
