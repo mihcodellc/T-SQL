@@ -1,25 +1,34 @@
 
 -- ****** for the table
-declare @table nvarchar(128), @index  nvarchar(128), @db nvarchar(128), @searchTable nvarchar(128), @tableSchema nvarchar(128)
+declare @table nvarchar(128), @index  nvarchar(128), 
+@db nvarchar(128), @searchTable nvarchar(128), @tableSchema nvarchar(128),
+@indexID int
 
 -- set the variables
-select @db = DB_NAME(), @searchTable = 'BillableUnits', @tableSchema = 'apps'
+select @db = DB_NAME(), @searchTable = 'Mytable', @tableSchema = 'MySchema'
 
 DECLARE MyStats CURSOR FOR   
-	select distinct @tableSchema+'.'+OBJECT_NAME(st.object_id), ix.name --, st.* 
+	select distinct @tableSchema+'.'+OBJECT_NAME(st.object_id), ix.name, st.index_id --, st.* 
 	from sys.dm_db_index_usage_stats st
 	join sys.indexes ix on st.object_id = ix.object_id
 	where DB_NAME(database_id) = @db 
 	and OBJECT_NAME(st.object_id) = @searchTable
+	and ix.name='x'
 
 OPEN MyStats  
   
-FETCH NEXT FROM MyStats INTO @table, @index  
+FETCH NEXT FROM MyStats INTO @table, @index, @indexID   
   
 WHILE @@FETCH_STATUS = 0  
 BEGIN  
-   DBCC SHOW_STATISTICS (@table,@index) --with STAT_HEADER, DENSITY_VECTOR, HISTOGRAM         
-   SELECT '********************************************************************************************************************************************'
+	--fragmentation
+	SELECT [object_id], [index_id], [partition_number], [avg_fragmentation_in_percent], 
+	[page_count], record_count, index_type_desc, alloc_unit_type_desc, avg_page_space_used_in_percent
+	FROM sys.dm_db_index_physical_stats (DB_ID(), object_id(@table), @@indexID, NULL, 'SAMPLED') nolock
+
+	DBCC SHOW_STATISTICS (@table,@index) --with STAT_HEADER, DENSITY_VECTOR, HISTOGRAM         
+	   SELECT '********************************************************************************************************************************************'
+	   
    FETCH NEXT FROM MyStats INTO @table, @index    
 END   
 CLOSE MyStats;  
@@ -28,6 +37,7 @@ DEALLOCATE MyStats;
 -- https://docs.microsoft.com/en-us/sql/relational-databases/indexes/reorganize-and-rebuild-indexes?view=sql-server-ver15
 -- Monitor index fragmentation and page density over time to see if there is a correlation on performance
 
+-- https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-db-index-physical-stats-transact-sql?view=sql-server-ver15
 -- check the fragmentation and page density of a "rowstore" index using Transact-SQL
 SELECT OBJECT_SCHEMA_NAME(ips.object_id) AS schema_name,
        OBJECT_NAME(ips.object_id) AS object_name,
@@ -37,12 +47,15 @@ SELECT OBJECT_SCHEMA_NAME(ips.object_id) AS schema_name,
        ips.avg_page_space_used_in_percent,
        ips.page_count,
        ips.alloc_unit_type_desc
-FROM sys.dm_db_index_physical_stats(DB_ID(), default, default, default, 'SAMPLED') AS ips
-INNER JOIN sys.indexes AS i 
-ON ips.object_id = i.object_id
-   AND ips.index_id = i.index_id
-   and i.object_id = OBJECT_ID('ExtractOutput')
+FROM  ---DEFAULT, NULL, LIMITED, SAMPLED, or DETAILED. The default (NULL) is LIMITED
+sys.indexes AS i 
+join sys.dm_db_index_physical_stats(DB_ID(), OBJECT_ID('TableName'), null, null, 'SAMPLED') AS ips
+ON ips.object_id = i.object_id  AND ips.index_id = i.index_id
+   --and i.object_id = OBJECT_ID('LockboxClaimDetailArchive')
+where i.is_disabled = 0
 ORDER BY page_count DESC;
+
+
 
 -- check the fragmentation of a "columnstore" index using Transact-SQL
 SELECT OBJECT_SCHEMA_NAME(i.object_id) AS schema_name,
