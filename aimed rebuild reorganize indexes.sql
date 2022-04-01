@@ -1,3 +1,7 @@
+--use IndexOptimize.sql from
+-- https://ola.hallengren.com/downloads.html
+-- instead of the one below
+
 -- http://www.sqlmusings.com
 USE SUSDB  -- <databasename> statement has been executed first.
 GO
