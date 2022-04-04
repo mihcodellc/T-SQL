@@ -36,7 +36,7 @@
 
 --CPU pressure & memory pressure
 --***ref to sp_PressureDetector.sql likely over time to decide
--- compare to connected.sql (include  sp_WhoIsActive.sql) to fix issues right now
+-- compare to connected.sql (include  sp_WhoIsActive.sql) to fix issues right now and BlitzFirst to not get fired, see urgent things
 -- it using some of the queries here and written by elder in the field.
 --you should vet always
 
