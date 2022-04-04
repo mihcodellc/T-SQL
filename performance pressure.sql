@@ -1,4 +1,4 @@
---SQL SERVER – ACID (Atomicity, Consistency, Isolation, Durability)
+--SQL SERVER â€“ ACID (Atomicity, Consistency, Isolation, Durability)
 
 -- SQL SERVER CONFIGURATION MANAGER to activate your sql agent or start db engine ...
 
@@ -33,6 +33,11 @@
 
 --system dynamic view ORGANIZED even for disater recovery
 -- https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/system-dynamic-management-views?view=sql-server-ver15
+
+--CPU pressure & memory pressure
+--***ref to sp_PressureDetector.sql it using some of the queries here and written by elder in the field.
+--you should vet always
+
 
 -- ********************************MEMORY PRESSURE 
 select * from sys.dm_os_waiting_tasks 
