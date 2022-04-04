@@ -35,7 +35,9 @@
 -- https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/system-dynamic-management-views?view=sql-server-ver15
 
 --CPU pressure & memory pressure
---***ref to sp_PressureDetector.sql it using some of the queries here and written by elder in the field.
+--***ref to sp_PressureDetector.sql likely over time to decide
+-- compare to connected.sql (include  sp_WhoIsActive.sql) to fix issues right now
+-- it using some of the queries here and written by elder in the field.
 --you should vet always
 
 
