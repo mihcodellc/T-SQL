@@ -1,5 +1,6 @@
 --Monktar Bello comments
 -- maybe a complement for sp_WhoIsActive.sql, Connected 2.0.sql
+-- https://www.erikdarlingdata.com/sql-server/does-my-sql-server-need-more-memory/
 SET ANSI_NULLS ON;
 SET ANSI_PADDING ON;
 SET ANSI_WARNINGS ON;
