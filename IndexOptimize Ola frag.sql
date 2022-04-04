@@ -1,6 +1,7 @@
 -- defrgamentation come at a cost on size available to perform the action
 -- statistics up to date may help than defragmentation
 -- based on the size, you want to rebuild a percentage of data DEFRAGMENTED or ONLINE REBUILD with option to continue where you left
+--attention leaving a lot of unused space on disk or memory
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
