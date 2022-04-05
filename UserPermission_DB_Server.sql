@@ -1,5 +1,5 @@
 
--- consider sp_help_permissions instead 
+-- consider sp_help_permissions instead if don't have impersonate permission
 /*============================================================================
   File:     UserPermission_DB_Server.sql
   Summary:  
