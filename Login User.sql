@@ -84,6 +84,13 @@ SELECT HAS_PERMS_BY_NAME('MedRx', 'database', 'SELECT');
 SELECT HAS_PERMS_BY_NAME(null, null, 'CONTROL SERVER');
 SELECT HAS_PERMS_BY_NAME(null, null, 'IMPERSONATE');
 
+-- search permissions on the server and db
+exec mydb.dbo.sp_help_permissions @principal ='mbello', @permission_list = 1, @permission = '%view server%' 
+
+--alter role
+exec sp_addrolemember 'exist_role', 'alogin'
+exec sp_droprolemember 'exist_role', 'alogin'
+
 --****************************************************************
 --LIMIT: NO IMPLICIT PERMISSIONS, NOT EXCLUDE DISABLED PRINCIPALS
 --permissions of principals & members if any on server level 
@@ -120,3 +127,5 @@ SELECT rol.name AS DatabaseRoleName,
 	   ON mb.member_principal_id = us.principal_id  
 WHERE rol.type = 'R' --and rol.name = 'aRoleName'
 ORDER BY  rol.name;  
+
+EXEC sp_helprolemember 'aRoleName';
