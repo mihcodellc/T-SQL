@@ -20,8 +20,10 @@ if exists(select 1 from sys.database_principals where name = 'aUser')
 
 --login(server level) has to be existing login in sys.server_principals or sysadmin
 --user(db level) has to be existing user in sys.database_principals or sysadmin
---EXECUTE AS login = 'mbello'  
+--EXECUTE AS login = 'mbello'  --- always follow with REVERT;
 EXECUTE AS user = 'obrown' -- an error to execute this is likely permission on current db
+SELECT * FROM fn_my_permissions(null, 'SERVER') 
+REVERT;
 ----db
 --select * from sys.database_principals WHERE name LIKE '%mbello%'
 ----server and db
