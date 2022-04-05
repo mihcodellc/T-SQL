@@ -1,5 +1,5 @@
 
-
+--consider use sp_help_permissions instead
 /*============================================================================
   File:     UserPermission_DB_Server.sql
   Summary:  
