@@ -1,12 +1,15 @@
-
---consider use sp_help_permissions instead
+-- consider sp_help_permissions instead if don't have impersonate permission
+/*
+Last update 4/5/2022 : Monktar Bello - put in @UserDB and filtered with @LoginUser  
+*/
 /*============================================================================
   File:     UserPermission_DB_Server.sql
   Summary:  
 	   Run without a specific permission, it returns 
-		  -all single database principals with their permissions
-		  -members of a role
-		  -all logins
+		  -all single database principals with their permissions 4238
+		  -members of a role 38
+		  -all logins 81
+		  -sysadmin 16
 	   
 	   it loop through all databases & current server
 
@@ -45,12 +48,15 @@
 --check execution context at begin and the end
 --select USER_NAME() dbUser, SUSER_SNAME() ServerUser
 
-declare @LoginUser sysname, @canImpersonate int, @permission sysname, @type char(1), @db sysname; 
+declare @LoginUser sysname, @canImpersonate int, @permission sysname, @type char(1), @db sysname, @UserDB sysname; 
 declare @query nvarchar(2000)
+declare @clause nvarchar(2000)
+
 set @query = ''
 
 --SET @permission = '%SELECT%';
---SET @LoginUser = 'jdoudican'
+SET @LoginUser = 'jmartin'
+SET @UserDB = 'MedRx'
 
 SELECT @canImpersonate = HAS_PERMS_BY_NAME(null, null, 'IMPERSONATE ANY LOGIN');
 
@@ -83,24 +89,40 @@ BEGIN
 		and name not like '##%' -- not sure some are SQL login and others are certificate
 		and name not like 'NT %'
 		and type not in ('G','R', 'C')
-    
-	exec sp_MSforeachdb N'
-    use [?]
-    INSERT INTO #Principals
-    SELECT name, ''USER'', type, db_name() as db 
-	   FROM sys.database_principals
-	   WHERE NAME NOT IN (''public'', ''INFORMATION_SCHEMA'',''sys'') --
-		    and name not like ''##%'' -- not sure some are SQL login and others are certificate 
-		    and name not like ''NT %'' -- network principal
-		    and type not in (''G'',''R'', ''C'')
-	   ORDER BY NAME;
-    '
+		and (name=@LoginUser or @LoginUser is null )
 
+    IF LEN(@UserDB) > 0
+    BEGIN
+	   INSERT INTO #Principals
+	   SELECT name, 'USER', type, db_name() as db 
+		  FROM sys.database_principals
+		  WHERE NAME NOT IN ('public', 'INFORMATION_SCHEMA','sys') --
+			   and name not like '##%' -- not sure some are SQL login and others are certificate 
+			   and name not like 'NT %' -- network principal
+			   and type not in ('G','R', 'C')
+    END
+    ELSE
+    BEGIN
+	   set @clause = '
+	   use [?]
+	   INSERT INTO #Principals
+	   SELECT name, ''USER'', type, db_name() as db 
+		  FROM sys.database_principals
+		  WHERE NAME NOT IN (''public'', ''INFORMATION_SCHEMA'',''sys'') --
+			   and name not like ''##%'' -- not sure some are SQL login and others are certificate 
+			   and name not like ''NT %'' -- network principal
+			   and type not in (''G'',''R'', ''C'')
+			   and (name=''' + @LoginUser + ''' or 1=1 )
+		  ORDER BY NAME;
+	   '
+	    exec sp_MSforeachdb @clause
+     END
+   
     --***CURSOR ON USER
     DECLARE UserCursor CURSOR FOR
 	   SELECT distinct name, db  
 	   FROM #Principals
-	   WHERE isLoginUser = 'USER' 
+	   WHERE isLoginUser = 'USER'  AND (db = @UserDB OR  @UserDB IS NULL)
 
     OPEN UserCursor 
     FETCH NEXT FROM UserCursor INTO @name,  @db
@@ -121,7 +143,7 @@ BEGIN
 			 -- permission on db
 			 INSERT INTO #UserPermissions
 			 SELECT @name, entity_name, subentity_name, permission_name,  db_name() 
-				FROM fn_my_permissions(null, ''database'');
+			 FROM fn_my_permissions(null, ''database'');
 			 REVERT;
 		  END
 		  ELSE
@@ -160,6 +182,8 @@ BEGIN
 	   SELECT name 
 	   FROM #Principals
 	   WHERE isLoginUser = 'LOGIN' 
+	   		and (name=@LoginUser or @LoginUser is null )
+
 
     OPEN UserCursor 
     FETCH NEXT FROM UserCursor INTO @name
@@ -182,10 +206,13 @@ BEGIN
     CLOSE UserCursor
     DEALLOCATE UserCursor
 
-	exec sp_MSforeachdb N'
-	use [?];
-    	INSERT INTO #UserPermissions
+
+
     -- get other details on those I can''t run with "execute as"  
+    IF @UserDB IS NOT NULL
+    BEGIN
+	set @clause = ' use [?];
+    	INSERT INTO #UserPermissions
     select distinct principals.name principalName,permissionst.class_desc, 
 		  coalesce(tp.table_schema +''.''+tp.table_name, 
 				    cp.table_schema +''.''+cp.table_name, '''') as subentity_name, --may need improvement also reliable schema is in sys.objects 
@@ -204,7 +231,12 @@ BEGIN
 	   or principals.name  like ''NT %''
 	   or principals.type  in (''G'', ''C'',''R'')
 	   )
+	   and (name=''' + @LoginUser + ''' or 1=1 )
     ';
+
+	exec sp_MSforeachdb @clause
+	END
+
 
     INSERT INTO #UserPermissions
     select principals.name principalName,permissionst.class_desc, '''', permissionst.permission_name COLLATE DATABASE_DEFAULT
@@ -248,14 +280,17 @@ BEGIN
     ORDER BY PrincipalName
 
     --all logins
-    select name as [SQL_Logins] from sys.server_principals order by name
+    if @LoginUser is null
+    begin
+        --all logins
+	   select name as [SQL_Logins] from sys.server_principals order by name
 
-    --sysadmins : sp_helpsrvrolemember 'sysadmin' isnot ordered
-    SELECT DISTINCT PrincipalName as isSysAdmin 
-    FROM #uROLES
-    WHERE (PrincipalName = @LoginUser OR  @LoginUser IS NULL) and rolename = 'sysadmin'
-    ORDER BY PrincipalName
-
+	   --sysadmins : sp_helpsrvrolemember 'sysadmin' isnot ordered
+	   SELECT DISTINCT PrincipalName as isSysAdmin 
+	   FROM #uROLES
+	   WHERE (PrincipalName = @LoginUser OR  @LoginUser IS NULL) and rolename = 'sysadmin'
+	   ORDER BY PrincipalName
+    end
 
     IF OBJECT_ID('tempDB..#UserPermissions') IS NOT NULL
 	   DROP TABLE #UserPermissions
