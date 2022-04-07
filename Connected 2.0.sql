@@ -318,3 +318,7 @@ COUNT(ec.session_id) AS [connection count]
 FROM sys.dm_exec_sessions AS es WITH (NOLOCK) 
 INNER JOIN sys.dm_exec_connections AS ec WITH (NOLOCK) 
 ON es.session_id = ec.session_id 
+
+
+select 'Get server Pressure' 
+exec RmsAdmin.dbo.sp_PressureDetector  --@help = 1
