@@ -7,8 +7,8 @@ create server ROLE devops_jr AUTHORIZATION sysadmin
 CREATE server ROLE devops_sr AUTHORIZATION sysadmin
 
 --Allow supervisor to do what his staff can do USING SERVER ROLE
- exec sp_addsrvrolemember 'devops_new', 'devops_jr'
- exec sp_addsrvrolemember 'devops_jr', 'devops_sr'
+ exec sp_addsrvrolemember 'devops_sr', 'devops_jr'
+ exec sp_addsrvrolemember 'devops_jr', 'devops_new'
 
  -- USE THE DATABASE WHERE THE PROC EXISTS
 use DBA_DB
