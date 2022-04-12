@@ -86,3 +86,7 @@ SELECT rol.name AS ServerRoleName,
 	   ON mb.member_principal_id = us.principal_id  
 WHERE rol.type = 'R' and rol.name = 'devops_new'
 ORDER BY  rol.name;  
+
+
+-- search permissions on the server and db
+exec mydb.dbo.sp_help_permissions @principal ='mbello', @permission_list = 1, @permission = '%view server%' 
