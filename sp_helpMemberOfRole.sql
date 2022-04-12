@@ -17,6 +17,8 @@ CREATE PROCEDURE sp_helpMemberOfRole
 
 AS
 begin
+-- Last update: 4/12/2022 - Monktar Bello: combined existing MS supposed to be removed in new releases
+
 CREATE TABLE #ROLES (
 	RoleON VARCHAR(15)
 	,rolename SYSNAME
