@@ -273,6 +273,8 @@ BEGIN
     --MEMBERS OF ROLES
     INSERT INTO #uROLES
     exec sp_helpMemberOfRole 
+    --exec sp_helpMemberOfRole    @UserLogin = NULL,   @srvrolename  = NULL,  @rolename  =   'db_datawriter' 
+
 
     SELECT DISTINCT PrincipalName, RoleON, rolename 
     FROM #uROLES
