@@ -55,7 +55,7 @@ revert; -- DON'T MISS THIS
 
 
 --** check before and after for each role, principal
-----** list object with permissions for role, principal, 
+----** list object with permissions for role, principal, explicitly granted
 select principals.name principalName, principal_id PrincipalID
     , permissionst.permission_name, permissionst.state_desc, permissionst.class_desc
     ,  object_name( permissionst.major_id)
