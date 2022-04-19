@@ -6,7 +6,7 @@ SELECT rol.name AS DatabaseRoleName,
 	   ON mb.role_principal_id = rol.principal_id  
  LEFT JOIN sys.database_principals AS us  
 	   ON mb.member_principal_id = us.principal_id  
-WHERE us.name in('bstone','cross','jmartin','kcrawford','klord','zgeyser','bpaudel','cward','dcordova','gsingh')
+WHERE us.name in('bmbello')
 and rol.type = 'R'
 ORDER BY  rol.name;  
 
@@ -86,8 +86,8 @@ EXEC sp_helprolemember 'db_datareader';  --db_datawriter
 
 
 
-CREATE LOGIN rdraviam
-    WITH PASSWORD = 'Rd@vI0r)20RM$22',
+CREATE LOGIN mbello
+    WITH PASSWORD = 'mbelo7256',
     --MUST_CHANGE, 
     CHECK_EXPIRATION = ON, CHECK_POLICY = ON, DEFAULT_DATABASE = MedRx 
 
@@ -96,13 +96,13 @@ GRANT VIEW ANY DATABASE TO rdraviam
 
 use MedRx;
 CREATE USER rdraviam
-exec sp_addrolemember sqldev_jr, 'rdraviam'
+exec sp_addrolemember sqldev_jr, 'mbello'
 deny execute to rdraviam
 
 
 
 
-exec as login = 'rdraviam'
+exec as login = 'mbello'
 select * from fn_my_permissions(null,'database')
 union all
 select * from fn_my_permissions(null,'server')
