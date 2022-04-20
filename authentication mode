@@ -1,0 +1,19 @@
+-- https://blog.sqlauthority.com/2018/10/13/sql-server-how-to-change-authentication-mode-using-t-sql-query/
+-- https://docs.microsoft.com/en-us/sql/database-engine/configure-windows/change-server-authentication-mode?view=sql-server-ver15#:~:text=To%20change%20security%20authentication%20mode%201%20In%20SQL,the%20requirement%20to%20restart%20SQL%20Server.%20See%20More.
+
+--server properties > Security page > under Server authentication > restart the instance
+
+-- To set mode to “Windows Authentication” (LoginMode= 1)
+
+USE [master]
+GO
+EXEC xp_instance_regwrite N'HKEY_LOCAL_MACHINE', 
+N'Software\Microsoft\MSSQLServer\MSSQLServer', N'LoginMode', REG_DWORD, 1
+GO
+
+-- To set mode to “SQL Server and Windows Authentication mode” (LoginMode= 2)
+USE [master]
+GO
+EXEC xp_instance_regwrite N'HKEY_LOCAL_MACHINE', 
+N'Software\Microsoft\MSSQLServer\MSSQLServer', N'LoginMode', REG_DWORD, 2
+GO
