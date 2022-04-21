@@ -1,5 +1,6 @@
+use [SSISDB]
 -- you can still use the report(all executions and drill down or filter) on ssisdb
--- OR 
+-- OR  
 --change the @mydate using the first query 
 --then on the 4th table use the event_message_id on 3rd - 3
 declare @mydate datetime = convert(DATETIME, convert(CHAR(10), dateadd(dd,-1,GETDATE()), 110), 110)
@@ -28,18 +29,18 @@ SELECT  inf.[execution_id]
   order by inf.start_time desc
 
   /****** statistics  ******/
-SELECT [statistics_id]
+SELECT [execution_result] as [1 Failure,  2 Completion 3 Cancelled, 0 Success]
       ,[execution_id]
       ,[executable_id]
       ,[execution_path]
       ,[start_time]
       ,[end_time]
       ,[execution_duration]
-      ,[execution_result]
       ,[execution_value]
   FROM [SSISDB].[catalog].[executable_statistics] st
-  where start_time between @mydate and dateadd(dd,1,@mydate)
+  where start_time between @mydate and dateadd(dd,2,@mydate)
 	   and exists (select 1 from SSISDB.internal.execution_info inf where inf.execution_id  = st.execution_id and inf.start_time between @mydate and dateadd(dd,2,@mydate))
+	   --and st.execution_result in (1,2,3)
   order by start_time desc
 
  /****** event_messages  ******/
