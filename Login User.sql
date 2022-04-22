@@ -8,6 +8,18 @@
 --orphan in database ie user but no login
 exec sp_change_users_login @Action='Report'
 
+---- orphan user from all db on the instance
+create table #tempUser(cmd nvarchar(200), dbName nvarchar(200) )
+exec sp_MSforeachdb N'use [?] ; 
+    insert into #tempUser
+ select name, db_name() from sysusers
+            where   issqluser = 1
+            and   sid is not NULL
+            and   len(sid) <= 16
+            and   suser_sname(sid) is null   and name <> ''guest'' '
+select * from #tempUser
+drop table #tempUser
+
 -- create role
 CREATE APPLICATION ROLE app_MiseAjour WITH PASSWORD = 'Pa$$w0rd'
 CREATE ROLE app_MiseAjour WITH PASSWORD = 'Pa$$w0rd'
