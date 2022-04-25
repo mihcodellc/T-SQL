@@ -1,9 +1,22 @@
 ---- drop an user from all db on the instance
---exec sp_MSforeachdb N'use [?] ; 
---IF  EXISTS (SELECT 1 FROM sys.database_principals WHERE name = N''testbello'')
---    DROP USER [testbello];'
+IF OBJECT_ID('tempdb..#temp') IS NOT NULL
+    drop table #temp
 
---Drop login [testbello]
+create table #temp(cmd nvarchar(400))
+-- drop an user from all db on the instance
+exec sp_MSforeachdb N'use [?] ; 
+IF  EXISTS (SELECT 1 FROM sys.database_principals WHERE name like N''testbello'')
+    insert into #temp 
+    select ''USE ''+db_name()+ Char(13)  +'' DROP USER [testbello];'' ;'
+
+    select * from #temp
+
+--drop user really
+exec sp_MSforeachdb N'use [?] ; 
+    IF  EXISTS (SELECT 1 FROM sys.database_principals WHERE name = N''testbello'')
+        DROP USER [testbello] ;'
+--drop login
+Drop login [testbello];
 
 --orphan in database ie user but no login
 exec sp_change_users_login @Action='Report'
