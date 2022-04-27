@@ -17,6 +17,8 @@ exec sp_MSforeachdb N'use [?] ;
         DROP USER [testbello] ;'
 --drop login
 Drop login [testbello];
+-- Alter login mbello disable; 
+-- revoke connect from mbello
 
 --orphan in database ie user but no login
 exec sp_change_users_login @Action='Report'
