@@ -7,7 +7,7 @@ create table #temp(cmd nvarchar(400))
 exec sp_MSforeachdb N'use [?] ; 
 IF  EXISTS (SELECT 1 FROM sys.database_principals WHERE name like N''testbello'')
     insert into #temp 
-    select ''USE ''+db_name()+ Char(13)  +'' DROP USER [testbello];'' ;'
+    select ''USE ''+db_name()+ Char(13)  +'' DROP USER '' + name + '';'' FROM sys.database_principals WHERE name like N''testbello''  ;'
 
     select * from #temp
 
@@ -17,8 +17,8 @@ exec sp_MSforeachdb N'use [?] ;
         DROP USER [testbello] ;'
 --drop login
 Drop login [testbello];
--- Alter login mbello disable; 
--- revoke connect from mbello
+-- Alter login testbello disable; 
+-- revoke connect from testbello
 
 --orphan in database ie user but no login
 exec sp_change_users_login @Action='Report'
