@@ -6,6 +6,12 @@
 USE SUSDB  -- <databasename> statement has been executed first.
 GO
 
+--CREATE NONCLUSTERED INDEX [IX_20220427] ON [dbo].[table1]
+--(
+--[keyx] ASC
+--)
+--WITH (ONLINE = ON, FILLFACTOR = 95) ON [PRIMAR
+
 SET NOCOUNT ON
 
 -- adapted from "Rebuild or reorganize indexes (with configuration)" from MSDN Books Online 
