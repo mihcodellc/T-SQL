@@ -59,8 +59,8 @@ declare @clause nvarchar(2000)
 set @query = ''
 
 --SET @permission = '%SELECT%';
---SET @LoginUser = 'falliss'
-SET @UserDB = 'MedRx'
+--SET @LoginUser = 'mbello'
+SET @UserDB = 'test'
 
 SELECT @canImpersonate = HAS_PERMS_BY_NAME(null, null, 'IMPERSONATE ANY LOGIN');
 
