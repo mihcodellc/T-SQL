@@ -48,6 +48,10 @@ Last update 4/5/2022 : Monktar Bello - put in @UserDB and filtered with @LoginUs
 --check execution context at begin and the end
 --select USER_NAME() dbUser, SUSER_SNAME() ServerUser
 
+set nocount on;
+set transaction isolation level read uncommitted
+go
+
 declare @LoginUser sysname, @canImpersonate int, @permission sysname, @type char(1), @db sysname, @UserDB sysname; 
 declare @query nvarchar(2000)
 declare @clause nvarchar(2000)
@@ -55,7 +59,7 @@ declare @clause nvarchar(2000)
 set @query = ''
 
 --SET @permission = '%SELECT%';
-SET @LoginUser = 'jmartin'
+--SET @LoginUser = 'falliss'
 SET @UserDB = 'MedRx'
 
 SELECT @canImpersonate = HAS_PERMS_BY_NAME(null, null, 'IMPERSONATE ANY LOGIN');
@@ -68,6 +72,12 @@ IF @canImpersonate = 1
 BEGIN
 
     DECLARE @name sysname;
+    if object_id('tempdb..#UserPermissions') is not null
+	   drop table #UserPermissions
+    if object_id('tempdb..#Principals') is not null
+	   drop table #Principals
+    if object_id('tempdb..#uROLES') is not null
+	   drop table #uROLES
     CREATE TABLE #UserPermissions ([User/Login] sysname
 							 ,Entity_Name sysname
 							 , SubEntity_Name sysname
