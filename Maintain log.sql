@@ -1,7 +1,11 @@
 -- https://www.brentozar.com/archive/2017/12/whats-bad-shrinking-databases-dbcc-shrinkdatabase/
+-- https://www.brentozar.com/blitz/transaction-log-larger-than-data-file/
+
 -- Shrinking databases and rebuilding indexes is a vicious cycle.
-	-- shrink -> fragmentation
-	-- rebuild -> lot of empty space around
+	-- shrink => fragmentation
+	-- rebuild => lot of empty space around
+	
+	-- normal to see transaction logs at 10-50% of the size of the data files.
 	
 -- DBCC SHRINKFILE instead of 	DBCC SHRINKDATABASE
 
@@ -25,3 +29,12 @@ SELECT
         + CASE is_percent_growth WHEN 1 THEN ' [autogrowth by percent, BAD setting!]' ELSE '' END
 FROM sys.database_files A LEFT JOIN sys.filegroups fg ON A.data_space_id = fg.data_space_id 
 order by A.TYPE desc, A.NAME;
+
+
+-- why each database’s log file isn’t clearing out
+SELECT name, log_reuse_wait_desc FROM sys.databases;	
+
+USE dba_db;  
+GO  
+DBCC SHRINKFILE (dba_db, 20992); –- size it to 20GB
+GO  
