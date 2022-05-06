@@ -272,14 +272,14 @@ BEGIN
 
 		  SELECT DISTINCT [User/Login] --,Entity_Name, SubEntity_Name, Permission_Name
 		  FROM #UserPermissions
-		  WHERE Permission_Name LIKE @permission
+		  WHERE Permission_Name LIKE @permission and  db=@UserDB 
 		  ORDER BY [User/Login]	   
 	   end
     ELSE 
     begin
 	   SELECT DISTINCT [User/Login],Entity_Name, SubEntity_Name, Permission_Name, db as dbName
 	   FROM #UserPermissions u
-	   WHERE ([User/Login] = @LoginUser OR  @LoginUser IS NULL)
+	   WHERE ([User/Login] = @LoginUser OR  @LoginUser IS NULL)  and db=@UserDB 
 	   ORDER BY [User/Login]
     end
 
