@@ -10,6 +10,9 @@ IF  EXISTS (SELECT 1 FROM sys.database_principals WHERE name like N''testbello''
     select ''USE ''+db_name()+ Char(13)  +'' DROP USER '' + name + '';'' FROM sys.database_principals WHERE name like N''testbello''  ;'
 
     select * from #temp
+    
+-- for azure sql
+ select  'DROP USER ' + name + ';' FROM sys.database_principals WHERE name like N'testbello'  ;
 
 --drop user really
 exec sp_MSforeachdb N'use [?] ; 
