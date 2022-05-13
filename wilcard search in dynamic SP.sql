@@ -1,3 +1,10 @@
+-- notepad++ regular expressions search
+---- https://npp-user-manual.org/docs/searching/#regular-expressions
+---- .* ?/storedprocedures/ => return everything before "/storedprocedures/"
+---- copy text on webpage to notepad++ and search using regular expression
+--notepad++ plugin: 
+---- poor manTsql formatter - Compare Plugin
+
 declare @SearchText varchar(5000)=''
 
 --remove known wilcard
