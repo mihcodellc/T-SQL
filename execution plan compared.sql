@@ -6,10 +6,13 @@
 
 
 --get the plan_handle for next query
-select DB_NAME(st.dbid) as DbName, qs.execution_count,  OBJECT_NAME(st.objectid)--, st.* , creation_time, qp.query_plan, plan_handle
-from sys.dm_exec_query_stats as qs cross apply sys.dm_exec_sql_text(sql_handle) st
-cross apply sys.dm_exec_query_plan(plan_handle) as qp 
+select DB_NAME(st.dbid) as DbName, qs.execution_count,  OBJECT_NAME(st.objectid) as obj--, st.* , creation_time, qp.query_plan, plan_handle
+from sys.dm_exec_query_stats as qs 
+cross apply sys.dm_exec_sql_text(qs.sql_handle) st
+cross apply sys.dm_exec_query_plan(qs.plan_handle) as qp  
 where OBJECT_NAME(st.objectid)='testDropCreate'
+--where st.text like '%SELECT TOP 100%text%'
+
 
 
 select o.object_id, OBJECT_NAME(o.object_id),  cached_time, last_execution_time,execution_count, s.plan_handle,h.query_plan, s.* 
@@ -62,6 +65,17 @@ from (values
 select *, case when (@@options & id) = id then 1 else 0 end as setting
 from OPTION_VALUES; -- from https://www.mssqltips.com/sqlservertip/1415/determining-set-options-for-a-current-session-in-sql-server/
 
+-- to be confirmed : session running on adhoc plan
+SELECT st.text, p.plan_handle, db_name(st.dbid) databse, sdec.session_id, sdec.client_net_address, sdes.host_name 
+    ,sdes.program_name
+    ,sdes.login_name
+ --, p.
+FROM sys.dm_exec_cached_plans p
+join sys.dm_exec_query_stats c on c.plan_handle = p.plan_handle
+join sys.dm_exec_connections sdec on sdec.most_recent_sql_handle = c.sql_handle
+JOIN sys.dm_exec_sessions AS sdes on sdes.session_id = sdec.session_id
+cross apply sys.dm_exec_sql_text(p.plan_handle) st
+WHERE objtype = 'Adhoc' AND  usecounts = 1
 
 --Free PRoc cache
 -- https://docs.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-freeproccache-transact-sql?view=sql-server-ver15
