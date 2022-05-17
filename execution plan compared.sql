@@ -68,14 +68,15 @@ from OPTION_VALUES; -- from https://www.mssqltips.com/sqlservertip/1415/determin
 -- to be confirmed : session running on adhoc plan
 SELECT st.text, p.plan_handle, db_name(st.dbid) databse, sdec.session_id, sdec.client_net_address, sdes.host_name 
     ,sdes.program_name
-    ,sdes.login_name
+    ,sdes.login_name, a.value AS set_options
  --, p.
 FROM sys.dm_exec_cached_plans p
 join sys.dm_exec_query_stats c on c.plan_handle = p.plan_handle
 join sys.dm_exec_connections sdec on sdec.most_recent_sql_handle = c.sql_handle
 JOIN sys.dm_exec_sessions AS sdes on sdes.session_id = sdec.session_id
 cross apply sys.dm_exec_sql_text(p.plan_handle) st
-WHERE objtype = 'Adhoc' AND  usecounts = 1
+outer apply sys.dm_exec_plan_attributes(p.plan_handle) a
+WHERE objtype = 'Adhoc' AND  usecounts = 1  AND a.attribute = 'set_options'
 
 --Free PRoc cache
 -- https://docs.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-freeproccache-transact-sql?view=sql-server-ver15
