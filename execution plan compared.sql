@@ -136,4 +136,15 @@ CROSS APPLY sys.dm_exec_sql_text(plan_handle)
 WHERE objtype='Proc'
 ORDER BY dbid,usecounts DESC
 
+-- Avoid DBCC FREPROCACHE; instead use
 dbcc freeproccache(0x05000100EC74AB106027BD060200000001000000000000000000000000000000000000000000000000000000)
+--OR
+DECLARE @PlanHandle VARBINARY(64);
+SELECT @PlanHandle = deps.plan_handle
+FROM sys.dm_exec_procedure_stats AS deps
+WHERE deps.object_id = OBJECT_ID('dbo.AddressByCity');
+
+IF @PlanHandle IS NOT NULL
+BEGIN
+	DBCC FREEPROCCACHE (@PlanHandle);
+END
