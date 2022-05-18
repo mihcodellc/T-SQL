@@ -65,11 +65,11 @@ from (values
 select *, case when (@@options & id) = id then 1 else 0 end as setting
 from OPTION_VALUES; -- from https://www.mssqltips.com/sqlservertip/1415/determining-set-options-for-a-current-session-in-sql-server/
 
--- to be confirmed : session running on adhoc plan
+-- session running on adhoc plan
 SELECT st.text, p.plan_handle, db_name(st.dbid) databse, sdec.session_id, sdec.client_net_address,sdec.local_net_address    ,sdes.login_name
 , sdes.host_name 
     ,sdes.program_name
-    ,sdes.login_name, a.value AS set_options
+    ,sdes.login_name, a.value AS set_options, p.size_in_bytes, p.usecounts
  --, p.
 FROM sys.dm_exec_cached_plans p
 join sys.dm_exec_query_stats c on c.plan_handle = p.plan_handle
@@ -77,17 +77,12 @@ join sys.dm_exec_connections sdec on sdec.most_recent_sql_handle = c.sql_handle
 JOIN sys.dm_exec_sessions AS sdes on sdes.session_id = sdec.session_id
 cross apply sys.dm_exec_sql_text(p.plan_handle) st
 cross apply sys.dm_exec_plan_attributes(c.plan_handle) a
-WHERE objtype = 'Adhoc' AND  usecounts = 1  AND a.attribute = 'set_options'
-
--- different plan for the same query
-SELECT 
-    CAST(COUNT(DISTINCT plan_handle) AS NVARCHAR(50)) 
-    FROM sys.dm_exec_query_stats qs
-CROSS APPLY sys.dm_exec_plan_attributes(qs.plan_handle) pa
-WHERE pa.attribute = 'dbid'
-GROUP BY qs.query_hash, pa.value
-HAVING COUNT(DISTINCT plan_handle) > 50
-		  ORDER BY COUNT(DISTINCT plan_handle) DESC OPTION (RECOMPILE);
+WHERE objtype = 'Adhoc' AND  usecounts = 1  AND a.attribute = 'set_options' -- 'dbid'
+group by st.text, p.plan_handle, db_name(st.dbid) , sdec.session_id, sdec.client_net_address,sdec.local_net_address    ,sdes.login_name
+, sdes.host_name 
+    ,sdes.program_name
+    ,sdes.login_name, a.value , p.size_in_bytes, p.usecounts
+    
 
 --Free PRoc cache
 -- https://docs.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-freeproccache-transact-sql?view=sql-server-ver15
