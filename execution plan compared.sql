@@ -14,12 +14,42 @@ where OBJECT_NAME(st.objectid)='testDropCreate'
 --where st.text like '%SELECT TOP 100%text%'
 
 
-
+-- plan for query or object
 select o.object_id, OBJECT_NAME(o.object_id),  cached_time, last_execution_time,execution_count, s.plan_handle,h.query_plan, s.* 
 from sys.objects o 
 inner join sys.dm_exec_procedure_stats s on o.object_id = s.object_id
 cross apply sys.dm_exec_query_plan(s.plan_handle) h
 where o.object_id = object_id('apps.testDropCreate')
+
+SELECT st.text, memory_object_address, cp.objtype, refcounts, usecounts, 
+    qs.query_plan_hash, qs.query_hash as '/* query_hash = query_plan_hash if not recompiled*/', qs.sql_handle as 'sql_handle same for a batch', qs.plan_handle,  p.query_plan
+    , a.value AS set_options
+FROM sys.dm_exec_cached_plans AS cp
+CROSS APPLY sys.dm_exec_sql_text (cp.plan_handle) st
+CROSS APPLY sys.dm_exec_query_plan (cp.plan_handle) p
+cross apply sys.dm_exec_plan_attributes(cp.plan_handle) a
+INNER JOIN sys.dm_exec_query_stats AS qs ON qs.plan_handle = cp.plan_handle
+WHERE st.text LIKE '%usp_SalesByCustomer%' 
+	   AND a.attribute = 'set_options'
+order by qs.sql_handle, st.text
+
+-- session link to a plan, execution count
+SELECT st.text, c.sql_handle as '/* sql_handle uniq for a batch and 1,N with plan_handle */', p.plan_handle, db_name(st.dbid) databse, sdec.session_id, sdec.client_net_address,sdec.local_net_address    ,sdes.login_name
+, sdes.host_name 
+    ,sdes.program_name
+    ,sdes.login_name, a.value AS set_options, p.size_in_bytes, p.usecounts
+ --, p.
+FROM sys.dm_exec_cached_plans p
+join sys.dm_exec_query_stats c on c.plan_handle = p.plan_handle
+join sys.dm_exec_connections sdec on sdec.most_recent_sql_handle = c.sql_handle
+JOIN sys.dm_exec_sessions AS sdes on sdes.session_id = sdec.session_id
+cross apply sys.dm_exec_sql_text(p.plan_handle) st
+cross apply sys.dm_exec_plan_attributes(c.plan_handle) a
+WHERE a.attribute = 'set_options'
+group by c.sql_handle, st.text, p.plan_handle, db_name(st.dbid) , sdec.session_id, sdec.client_net_address,sdec.local_net_address    ,sdes.login_name
+, sdes.host_name 
+    ,sdes.program_name
+    ,sdes.login_name, a.value , p.size_in_bytes, p.usecounts
 
 select * FROM sys.dm_exec_cached_plans AS decp;
 
@@ -66,7 +96,7 @@ select *, case when (@@options & id) = id then 1 else 0 end as setting
 from OPTION_VALUES; -- from https://www.mssqltips.com/sqlservertip/1415/determining-set-options-for-a-current-session-in-sql-server/
 
 -- session running on adhoc plan
-SELECT st.text, p.plan_handle, db_name(st.dbid) databse, sdec.session_id, sdec.client_net_address,sdec.local_net_address    ,sdes.login_name
+SELECT st.text, c.sql_handle as '/* sql_handle uniq for a batch and 1,N with plan_handle */', p.plan_handle, db_name(st.dbid) databse, sdec.session_id, sdec.client_net_address,sdec.local_net_address    ,sdes.login_name
 , sdes.host_name 
     ,sdes.program_name
     ,sdes.login_name, a.value AS set_options, p.size_in_bytes, p.usecounts
@@ -77,11 +107,24 @@ join sys.dm_exec_connections sdec on sdec.most_recent_sql_handle = c.sql_handle
 JOIN sys.dm_exec_sessions AS sdes on sdes.session_id = sdec.session_id
 cross apply sys.dm_exec_sql_text(p.plan_handle) st
 cross apply sys.dm_exec_plan_attributes(c.plan_handle) a
-WHERE objtype = 'Adhoc' AND  usecounts = 1  AND a.attribute = 'set_options' -- 'dbid'
-group by st.text, p.plan_handle, db_name(st.dbid) , sdec.session_id, sdec.client_net_address,sdec.local_net_address    ,sdes.login_name
+WHERE p.objtype = 'Adhoc' AND  p.usecounts = 1  AND a.attribute = 'set_options'
+group by c.sql_handle, st.text, p.plan_handle, db_name(st.dbid) , sdec.session_id, sdec.client_net_address,sdec.local_net_address    ,sdes.login_name
 , sdes.host_name 
     ,sdes.program_name
     ,sdes.login_name, a.value , p.size_in_bytes, p.usecounts
+
+
+SELECT st.text, memory_object_address, cp.objtype, refcounts, usecounts, 
+    qs.query_plan_hash, qs.query_hash as '/* query_hash = query_plan_hash if not recompiled*/', qs.sql_handle as 'sql_handle same for a batch', qs.plan_handle,  p.query_plan
+    , a.value AS set_options
+FROM sys.dm_exec_cached_plans AS cp
+CROSS APPLY sys.dm_exec_sql_text (cp.plan_handle) st
+CROSS APPLY sys.dm_exec_query_plan (cp.plan_handle) p
+cross apply sys.dm_exec_plan_attributes(cp.plan_handle) a
+INNER JOIN sys.dm_exec_query_stats AS qs ON qs.plan_handle = cp.plan_handle
+WHERE cp.objtype = 'Adhoc' AND  cp.usecounts = 1  -- text LIKE '%usp_SalesByCustomer%'
+	   AND a.attribute = 'set_options'
+order by qs.sql_handle, st.text
     
 
 --Free PRoc cache
