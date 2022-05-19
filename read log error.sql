@@ -18,7 +18,7 @@
 
 
 
-
+-- where is it located?
 SELECT SERVERPROPERTY('ErrorLogFileName') AS 'Error log file location';
 
 --https://www.sqlshack.com/read-sql-server-error-logs-using-the-xp_readerrorlog-command/
