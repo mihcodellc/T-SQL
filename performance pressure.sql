@@ -46,6 +46,7 @@
 -- compare to connected.sql (include  sp_WhoIsActive.sql) to fix issues right now and BlitzFirst to not get fired, see urgent things
 -- it using some of the queries here and written by elder in the field.
 --you should vet always
+-- https://docs.microsoft.com/en-us/troubleshoot/sql/performance/troubleshoot-high-cpu-usage-issues
 
 
 -- ********************************MEMORY PRESSURE 
