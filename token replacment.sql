@@ -5,7 +5,12 @@
 -- from 
 -- http://tomaslind.net/2016/11/04/sql-agent-logging-tokens/
 -- and 
+-- use https://docs.microsoft.com/en-us/sql/ssms/configure-wmi-to-show-server-status-in-sql-server-tools?view=sql-server-ver15
+-- to configure WMI and 
 -- https://www.mssqltips.com/sqlservertip/5493/automated-wmi-alerts-for-sql-server-login-property-changes/
+-- to see how wmi can be used.
+-- WMI didn't work on office computer at this date 5/20/2022
+
 
 -- create a SQL Agent job that expands all tokens available except WMI 
 -- please remember to clean if you test this in ur environment
@@ -47,13 +52,6 @@ EXEC msdb.dbo.sp_add_jobstep
     PRINT ''Step Id: $(ESCAPE_SQUOTE(STEPID))''
     PRINT ''Computer name: $(ESCAPE_SQUOTE(SRVR))''
     PRINT ''Current Time: $(ESCAPE_SQUOTE(TIME))''
-
-    PRINT ''Source Host Name: $(ESCAPE_SQUOTE(WMI(HostName)));''
-    PRINT ''Source Login Name: $(ESCAPE_SQUOTE(WMI(LoginName)));''
-    PRINT ''Source Session Login Name: $(ESCAPE_SQUOTE(WMI(SessionLoginName)));''
-    PRINT ''EventSubClass: $(ESCAPE_SQUOTE(WMI(EventSubClass)));''
-    PRINT ''Success: $(ESCAPE_SQUOTE(WMI(Success)));''
-
  
     PRINT ''*********Goodbye!*********''
     ', 
