@@ -7,7 +7,7 @@ ALTER DATABASE belloTest MODIFY NAME = Test;
 -- Changing logical names
 ALTER DATABASE Test MODIFY FILE (NAME = belloTest, NEWNAME = Test);
 ALTER DATABASE Test MODIFY FILE (NAME = belloTest_log, NEWNAME = Test_log);
---Take Database Offline
+--Take Database Offline EXCEPT FOR Tempdb ; no need because it gets created the next the server is restarted
 USE master --Important otherwise a failure
 ALTER DATABASE Test SET OFFLINE;
 
