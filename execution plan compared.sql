@@ -104,6 +104,28 @@ from OPTION_VALUES; -- from https://www.mssqltips.com/sqlservertip/1415/determin
 -- https://sqlperformance.com/2014/11/t-sql-queries/multiple-plans-identical-query
 -- https://www.red-gate.com/hub/product-learning/sql-monitor/investigating-problems-ad-hoc-queries-using-sql-monitor
 
+-- determining the ratio between the multi-use and single-use query execution plans cached
+SELECT Db_Name(QueryText.dbid) AS database_name,
+  Sum(CASE WHEN ExecPlans.usecounts = 1 THEN 1 ELSE 0 END) AS Single,
+  Sum(CASE WHEN ExecPlans.usecounts > 1 THEN 1 ELSE 0 END) AS Reused,
+  --Sum(ExecPlans.size_in_bytes) / (1024) AS KB -- Arithmetic overflow error converting expression to data type int.
+  -- https://database.guide/fix-arithmetic-overflow-error-converting-expression-to-data-type-int-in-sql-server/
+  Sum(CAST(ExecPlans.size_in_bytes AS BIGINT)) / (1024) AS KB
+   FROM sys.dm_exec_cached_plans AS ExecPlans
+    CROSS APPLY sys.dm_exec_sql_text(ExecPlans.plan_handle) AS QueryText
+   WHERE ExecPlans.cacheobjtype = 'Compiled Plan' AND QueryText.dbid IS NOT NULL 
+     GROUP BY QueryText.dbid;
+    
+--- rate ad hoc queries in your db
+    SELECT Convert(INT,Sum
+        (
+        CASE a.objtype 
+        WHEN 'Adhoc' 
+        THEN 1 ELSE 0 END)
+        * 1.00/ Count(*) * 100
+              ) as 'Ad-hoc query %'
+  FROM sys.dm_exec_cached_plans AS a
+
 -- session running on adhoc plan
 SELECT st.text, c.sql_handle as '/* sql_handle uniq for a batch and 1,N with plan_handle */', p.plan_handle, db_name(st.dbid) databse, sdec.session_id, sdec.client_net_address,sdec.local_net_address    ,sdes.login_name
 , sdes.host_name 
