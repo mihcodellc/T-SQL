@@ -1,26 +1,22 @@
 -- consider sp_help_permissions instead if don't have impersonate permission
 /*
-Last update 5/6/2022 : Monktar Bello - put a fix to @LoginUser and roles, certificates, explicit permissions.   
-4/5/2022 : Monktar Bello - put in @UserDB and filtered with @LoginUser  
-
+Last update 4/5/2022 : Monktar Bello - put in @UserDB and filtered with @LoginUser  
 */
 /*============================================================================
   File:     UserPermission_DB_Server.sql
   Summary:  
 	   Run without a specific permission, it returns 
-		  -all single database principals with their permissions ?
-		  -members of a role ?
-		  -all logins ?
-		  -sysadmin ?
-
-		  !!!!!remember to set @UserDB, @LoginUser, @permission!!!!!!!
+		  -all single database principals with their permissions 4238
+		  -members of a role 38
+		  -all logins 81
+		  -sysadmin 16
 	   
 	   it loop through all databases & current server
 
   	   Mainly, I'm using "fn_my_permissions" & "execute as" for each principal.
 	   I need to work on implicit(inherit) permissions. one solution should be to customize "fn_my_permissions"
 
-	   SET @permission IF you need to see ONLY EXPLICIT permission - wilcard is accepted.
+	   SET @permission IF you need to exclude an EXPLICIT permission DEFAULTED TO '%SELECT%'.
 	   @permission prevails over @LoginUser
 	   Get permissions on server need "execute as login" 
 	   Get permissions on db need "execute as user".
@@ -62,9 +58,16 @@ declare @clause nvarchar(2000)
 
 set @query = ''
 
---SET @permission = 'execute';
---SET @LoginUser = 'testbello'
-SET @UserDB = '?'
+--SET @permission = '%SELECT%';
+SET @LoginUser = 'MBELLO'
+--SET @UserDB = 'MedRx'
+
+
+--if @UserDB is not null and @LoginUser is not null
+--begin
+--    SELECT 'Please, use @LoginUser or @UserDB ' AS REQUIREMENT
+--    return
+--end
 
 SELECT @canImpersonate = HAS_PERMS_BY_NAME(null, null, 'IMPERSONATE ANY LOGIN');
 
@@ -107,14 +110,18 @@ BEGIN
 
     IF LEN(@UserDB) > 0
     BEGIN
+	   set @clause = '
+	   use [' + @UserDB + '];
 	   INSERT INTO #Principals
-	   SELECT name, 'USER', type, db_name() as db 
+	   SELECT name, ''USER'', type, db_name() as db 
 		  FROM sys.database_principals
-		  WHERE NAME NOT IN ('public', 'INFORMATION_SCHEMA','sys') --
-			   and name not like '##%' -- not sure some are SQL login and others are certificate 
-			   and name not like 'NT %' -- network principal
-			   and type not in ('G','R')
-    END
+		  WHERE NAME NOT IN (''public'', ''INFORMATION_SCHEMA'',''sys'') --
+			   and name not like ''##%'' -- not sure some are SQL login and others are certificate 
+			   and name not like ''NT %'' -- network principal
+			   and type not in (''G'',''R'')
+		  ORDER BY NAME;
+	   '
+	    exec (@clause)    END
     ELSE
     BEGIN
 	   set @clause = '
@@ -126,7 +133,6 @@ BEGIN
 			   and name not like ''##%'' -- not sure some are SQL login and others are certificate 
 			   and name not like ''NT %'' -- network principal
 			   and type not in (''G'',''R'')
-			   and (name=''' + @LoginUser + ''' or 1=1 )
 		  ORDER BY NAME;
 	   '
 	    exec sp_MSforeachdb @clause
@@ -224,30 +230,30 @@ BEGIN
     -- get other details on those I can''t run with "execute as"  
     IF @UserDB IS NOT NULL
     BEGIN
-	set @clause = ' use [?];
-    	INSERT INTO #UserPermissions
-    select distinct principals.name principalName,permissionst.class_desc, 
-		  coalesce(tp.table_schema +''.''+tp.table_name, 
-						  cp.table_schema +''.''+cp.table_name, case when object_name( permissionst.major_id) is not null then object_name( permissionst.major_id) else '''' end) as subentity_name, --may need improvement also reliable schema is in sys.objects 
-		  coalesce(tp.PRIVILEGE_TYPE, cp.PRIVILEGE_TYPE
-		  , permissionst.permission_name)  COLLATE DATABASE_DEFAULT as permission_name
-		  , db_name()
-    from sys.database_principals principals
-    join sys.database_permissions permissionst
-	   on permissionst.grantee_principal_id = principals.principal_id
-    left join INFORMATION_SCHEMA.TABLE_PRIVILEGES tp
-	   on tp.GRANTEE = principals.name 
-    left join INFORMATION_SCHEMA.COLUMN_PRIVILEGES cp
-	   on cp.GRANTEE = principals.name	
-    WHERE principals.name NOT IN (''public'') and --
-	   ( principals.name  like ''##%'' -- not sure some are SQL login and others are certificate
-	   or principals.name  like ''NT %''
-	   or principals.type  in (''G'', ''C'',''R'')
-	   )
-	   
-    ';
+	    set @clause = ' use [' + @UserDB + '];
+    	    INSERT INTO #UserPermissions
+	   select distinct principals.name principalName,permissionst.class_desc, 
+			 coalesce(tp.table_schema +''.''+tp.table_name, 
+					   cp.table_schema +''.''+cp.table_name, case when object_name( permissionst.major_id) is not null then object_name( permissionst.major_id) else '''' end) as subentity_name, --may need improvement also reliable schema is in sys.objects 
+			 coalesce(tp.PRIVILEGE_TYPE, cp.PRIVILEGE_TYPE
+			 , permissionst.permission_name)  COLLATE DATABASE_DEFAULT as permission_name
+			 , db_name()
+	   from sys.database_principals principals
+	   join sys.database_permissions permissionst
+		  on permissionst.grantee_principal_id = principals.principal_id
+	   left join INFORMATION_SCHEMA.TABLE_PRIVILEGES tp
+		  on tp.GRANTEE = principals.name 
+	   left join INFORMATION_SCHEMA.COLUMN_PRIVILEGES cp
+		  on cp.GRANTEE = principals.name	
+	   WHERE principals.name NOT IN (''public'') and --
+		  ( principals.name  like ''##%'' -- not sure some are SQL login and others are certificate
+		  or principals.name  like ''NT %''
+		  or principals.type  in (''G'', ''C'',''R'')
+		  )
+		  and (name=''' + @LoginUser + ''' or 1=1 )
+	   ';
 
-	exec sp_MSforeachdb @clause
+	    exec (@clause)
 	END
 
 
@@ -268,19 +274,19 @@ BEGIN
 	   begin
 		  declare @title sysname;
 
-		  SELECT 'Principals with an explicit permission: ' + @permission
+		  SELECT 'Principals without an explicit permission: ' + @permission
 
 		  SELECT DISTINCT [User/Login] --,Entity_Name, SubEntity_Name, Permission_Name
 		  FROM #UserPermissions
-		  WHERE Permission_Name LIKE @permission and  db=@UserDB 
+		  WHERE Permission_Name NOT LIKE @permission
 		  ORDER BY [User/Login]	   
 	   end
     ELSE 
     begin
-	   SELECT DISTINCT [User/Login],Entity_Name, SubEntity_Name, Permission_Name, db as dbName
+	   SELECT DISTINCT [User/Login],Entity_Name, SubEntity_Name, Permission_Name, case when Entity_Name='SERVER' THEN '' ELSE  db END as dbName
 	   FROM #UserPermissions u
-	   WHERE ([User/Login] = @LoginUser OR  @LoginUser IS NULL)  and db=@UserDB 
-	   ORDER BY [User/Login]
+	   WHERE ([User/Login] = @LoginUser OR  @LoginUser IS NULL) and (db = @UserDB OR  @UserDB IS NULL)
+	   ORDER BY Entity_Name, dbName, [User/Login],  Permission_Name
     end
 
     --MEMBERS OF ROLES
@@ -293,6 +299,22 @@ BEGIN
     FROM #uROLES
     WHERE (PrincipalName = @LoginUser OR  @LoginUser IS NULL) 
     ORDER BY PrincipalName
+
+    select principals.name principalName, principal_id PrincipalID
+    , permissionst.permission_name, permissionst.state_desc, permissionst.class_desc
+    ,  object_name( permissionst.major_id) ObjName,
+    OBJECTPROPERTY(permissionst.major_id, 'IsTable') AS [IsTable],
+    OBJECTPROPERTY(permissionst.major_id, 'IsTrigger') AS [IsTrigger],
+    OBJECTPROPERTY(permissionst.major_id, 'IsView') AS [IsView],
+    OBJECTPROPERTY(permissionst.major_id, 'IsProcedure') AS [IsProcedure], DB_NAME() CurrentDatabase
+    from sys.database_principals principals
+    join sys.database_permissions permissionst
+    on permissionst.grantee_principal_id = principals.principal_id
+    WHERE principal_id > 0 AND EXISTS(SELECT 1 FROM #uROLES r where r.rolename = principals.name and (r.PrincipalName = @LoginUser OR  @LoginUser IS NULL))
+    --AND principals.name in ('sqldev_sr','sqldev_jr')
+    --and permission_name ='UPDATE'
+    order by principalName, permission_name
+
 
     --all logins
     if @LoginUser is null
@@ -320,4 +342,3 @@ BEGIN
     --select USER_NAME() dbUser, SUSER_SNAME() ServerUser
   
 END
-
