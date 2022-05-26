@@ -59,8 +59,8 @@ declare @clause nvarchar(2000)
 set @query = ''
 
 --SET @permission = '%SELECT%';
-SET @LoginUser = 'MBELLO'
---SET @UserDB = 'MedRx'
+SET @LoginUser = 'mbello'
+--SET @UserDB = 'MyDB'
 
 
 --if @UserDB is not null and @LoginUser is not null
@@ -90,6 +90,7 @@ BEGIN
 							 , SubEntity_Name sysname
 							 , Permission_Name sysname
 							 , db sysname
+							 , state_desc nvarchar(50)
 						    )
     CREATE TABLE #Principals(name sysname, isLoginUser nvarchar(15), type char(1), db sysname);
     CREATE TABLE #uROLES (
@@ -162,7 +163,7 @@ BEGIN
 			 EXECUTE AS user = @name;
 			 -- permission on db
 			 INSERT INTO #UserPermissions
-			 SELECT @name, entity_name, subentity_name, permission_name,  db_name() 
+			 SELECT @name, entity_name, subentity_name, permission_name,  db_name(), '''' 
 			 FROM fn_my_permissions(null, ''database'');
 			 REVERT;
 		  END
@@ -173,7 +174,7 @@ BEGIN
 						  cp.table_schema +''.''+cp.table_name, case when object_name( permissionst.major_id) is not null then object_name( permissionst.major_id) else '''' end) as subentity_name, --may need improvement also reliable schema is in sys.objects 
 				coalesce(tp.PRIVILEGE_TYPE, cp.PRIVILEGE_TYPE
 				, permissionst.permission_name)  COLLATE DATABASE_DEFAULT as permission_name
-				,  db_name()
+				,  db_name(), permissionst.state_desc
 		  from sys.database_principals principals
 		  join sys.database_permissions permissionst
 			 on permissionst.grantee_principal_id = principals.principal_id
@@ -216,6 +217,7 @@ BEGIN
 			    , ''''
 			    , permissionst.permission_name
 			    , db_name()
+			    , permissionst.state_desc
 		  from sys.server_principals principals
 		  join sys.server_permissions permissionst
 			 on permissionst.grantee_principal_id = principals.principal_id
@@ -237,7 +239,7 @@ BEGIN
 					   cp.table_schema +''.''+cp.table_name, case when object_name( permissionst.major_id) is not null then object_name( permissionst.major_id) else '''' end) as subentity_name, --may need improvement also reliable schema is in sys.objects 
 			 coalesce(tp.PRIVILEGE_TYPE, cp.PRIVILEGE_TYPE
 			 , permissionst.permission_name)  COLLATE DATABASE_DEFAULT as permission_name
-			 , db_name()
+			 , db_name(), permissionst.state_desc
 	   from sys.database_principals principals
 	   join sys.database_permissions permissionst
 		  on permissionst.grantee_principal_id = principals.principal_id
@@ -259,7 +261,7 @@ BEGIN
 
     INSERT INTO #UserPermissions
     select principals.name principalName,permissionst.class_desc, '''', permissionst.permission_name COLLATE DATABASE_DEFAULT
-		  , db_name()
+		  , db_name(), permissionst.state_desc
     from sys.server_principals principals
     join sys.server_permissions permissionst
 	   on permissionst.grantee_principal_id = principals.principal_id
@@ -283,7 +285,7 @@ BEGIN
 	   end
     ELSE 
     begin
-	   SELECT DISTINCT [User/Login],Entity_Name, SubEntity_Name, Permission_Name, case when Entity_Name='SERVER' THEN '' ELSE  db END as dbName
+	   SELECT DISTINCT [User/Login],Entity_Name, SubEntity_Name, Permission_Name, case when Entity_Name='SERVER' THEN '' ELSE  db END as dbName, state_desc
 	   FROM #UserPermissions u
 	   WHERE ([User/Login] = @LoginUser OR  @LoginUser IS NULL) and (db = @UserDB OR  @UserDB IS NULL)
 	   ORDER BY Entity_Name, dbName, [User/Login],  Permission_Name
@@ -292,7 +294,7 @@ BEGIN
     --MEMBERS OF ROLES
     INSERT INTO #uROLES
     exec sp_helpMemberOfRole 
-    --exec sp_helpMemberOfRole    @UserLogin = NULL,   @srvrolename  = NULL,  @rolename  =   'db_datawriter' 
+    --exec sp_helpMemberOfRole    @UserLogin = dkarake ,   @srvrolename  = NULL,  @rolename  =   'db_datawriter' 
 
 
     SELECT DISTINCT PrincipalName,  rolename, RoleON Role_CurrentDatabase
