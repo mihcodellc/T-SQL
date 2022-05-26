@@ -95,6 +95,15 @@ from (values
 select *, case when (@@options & id) = id then 1 else 0 end as setting
 from OPTION_VALUES; -- from https://www.mssqltips.com/sqlservertip/1415/determining-set-options-for-a-current-session-in-sql-server/
 
+--    literal of 8Kilobytes or more in the query
+--non full qualified named names where referring to an object SP, tables ...
+--the query is not the same due to the white space, literals used, or different size(KB) of the query 
+--the batch of the queries (sql_handle) is different
+--partial parameterization(markers) of the query
+
+-- https://sqlperformance.com/2014/11/t-sql-queries/multiple-plans-identical-query
+-- https://www.red-gate.com/hub/product-learning/sql-monitor/investigating-problems-ad-hoc-queries-using-sql-monitor
+
 -- session running on adhoc plan
 SELECT st.text, c.sql_handle as '/* sql_handle uniq for a batch and 1,N with plan_handle */', p.plan_handle, db_name(st.dbid) databse, sdec.session_id, sdec.client_net_address,sdec.local_net_address    ,sdes.login_name
 , sdes.host_name 
