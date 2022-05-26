@@ -295,7 +295,7 @@ BEGIN
     --exec sp_helpMemberOfRole    @UserLogin = NULL,   @srvrolename  = NULL,  @rolename  =   'db_datawriter' 
 
 
-    SELECT DISTINCT PrincipalName, RoleON, rolename 
+    SELECT DISTINCT PrincipalName,  rolename, RoleON Role_CurrentDatabase
     FROM #uROLES
     WHERE (PrincipalName = @LoginUser OR  @LoginUser IS NULL) 
     ORDER BY PrincipalName
