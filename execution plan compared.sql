@@ -95,6 +95,8 @@ from (values
 select *, case when (@@options & id) = id then 1 else 0 end as setting
 from OPTION_VALUES; -- from https://www.mssqltips.com/sqlservertip/1415/determining-set-options-for-a-current-session-in-sql-server/
 
+--paramter sniffing solutions
+-- https://docs.microsoft.com/en-us/azure/azure-sql/identify-query-performance-issues?view=azuresql#ParamSniffing
 
 DECLARE @options INT
 SELECT @options = 262395
