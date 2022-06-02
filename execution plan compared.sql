@@ -117,6 +117,33 @@ IF ( (4096 & @options) = 4096 ) PRINT 'CONCAT_NULL_YIELDS_NULL'
 IF ( (8192 & @options) = 8192 ) PRINT 'NUMERIC_ROUNDABORT'
 IF ( (16384 & @options) = 16384 ) PRINT 'XACT_ABORT'
 
+
+-- set_options ON in string
+SELECT p.plan_handle, p.usecounts, p.size_in_bytes, 
+  case when (1 & cast(MAX(a.value) as int)) = 1  then 'DISABLE_DEF_CNST_CHK, ' else ', ' end +
+  case when (2 & cast(MAX(a.value) as int)) = 2  then 'IMPLICIT_TRANSACTIONS, ' else ', ' end  +
+  case when (4 & cast(MAX(a.value) as int)) = 4  then 'CURSOR_CLOSE_ON_COMMIT, ' else ', ' end  +
+  case when (8 & cast(MAX(a.value) as int)) = 8  then 'ANSI_WARNINGS, ' else ', ' end  +
+  case when (16 & cast(MAX(a.value) as int)) = 16  then 'ANSI_PADDING, ' else ', ' end +
+  case when (32 & cast(MAX(a.value) as int)) = 32  then 'ANSI_NULLS, ' else ', ' end  +
+  case when (64 & cast(MAX(a.value) as int)) = 64  then 'ARITHABORT, ' else ', ' end  +
+  case when (128 & cast(MAX(a.value) as int)) = 128  then 'ARITHIGNORE, ' else ', ' end  +
+  case when (256 & cast(MAX(a.value) as int)) = 256  then 'QUOTED_IDENTIFIER, ' else ', ' end +
+  case when (512 & cast(MAX(a.value) as int)) = 512  then 'NOCOUNT, ' else ', ' end  +
+  case when (1024 & cast(MAX(a.value) as int)) = 1024  then 'ANSI_NULL_DFLT_ON, ' else ', ' end  +
+  case when (2048 & cast(MAX(a.value) as int)) = 2048  then 'ANSI_NULL_DFLT_OFF, ' else ', ' end  +
+  case when (4096 & cast(MAX(a.value) as int)) = 4096  then 'CONCAT_NULL_YIELDS_NULL, ' else ', ' end  +
+  case when (8196 & cast(MAX(a.value) as int)) = 8192  then 'NUMERIC_ROUNDABORT, ' else ', ' end  +
+  case when (16384 & cast(MAX(a.value) as int)) = 16384  then 'XACT_ABORT, ' else ', ' end
+  itsoptions
+  ,MAX(a.value) itsValue, object_name(t.objectid) name
+FROM sys.dm_exec_cached_plans AS p
+CROSS APPLY sys.dm_exec_sql_text(p.plan_handle) AS t
+CROSS APPLY sys.dm_exec_plan_attributes(p.plan_handle) AS a
+WHERE p.objtype = 'Adhoc' AND p.usecounts = 1  --t.objectid = OBJECT_ID(N'SLID_Hist')
+ and a.attribute = N'set_options'
+GROUP BY p.plan_handle, p.usecounts, p.size_in_bytes, t.objectid
+
 --    literal of 8Kilobytes or more in the query
 --non full qualified named names where referring to an object SP, tables ...
 --the query is not the same due to the white space, literals used, or different size(KB) of the query 
