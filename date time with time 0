@@ -1,0 +1,1 @@
+select CONVERT(date,getdate(),101) ,  CONVERT(VARCHAR(10), getdate(), 101)  , convert(datetime,convert(char(10),GETDATE(),110),110)
