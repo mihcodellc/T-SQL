@@ -1,5 +1,5 @@
 --** OS memory state included free
-SELECT available_physical_memory_kb/1024 as "Total Memory MB",
+SELECT available_physical_memory_kb/1024 as "Total Memory MB available_physical",
  available_physical_memory_kb/(total_physical_memory_kb*1.0)*100 AS "% Memory Free",
  total_physical_memory_kb/1024 AS [Physical Memory (MB)], 
        total_page_file_kb/1024 AS [Page File Commit Limit (MB)],
