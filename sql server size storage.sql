@@ -21,6 +21,24 @@ DBCC SQLPERF(LOGSPACE)
 EXEC sp_spaceused @oneresultset = 1 
 --EXEC sp_MSforeachdb N'USE [?]; EXEC sp_spaceused @oneresultset = 1'
 
+select 'space use per table : need extra to show. refer to #t'
+
+--create table #t (name_table nvarchar(128), rows nvarchar(128), reserved nvarchar(128), 
+--data nvarchar(128), index_size nvarchar(128), unused nvarchar(128))
+----truncate table #t
+----run the ouput excluding this line insert into #t EXEC sp_spaceused @objname = [dbo.SysProcesses]
+--select 'insert into #t EXEC sp_spaceused @objname = [' + SCHEMA_NAME(schema_id) +'.'+ name + ']'  from  
+--sys.tables order by name
+
+--select name_table,
+--cast(rows as bigint) rows,
+--cast(substring(reserved,0,CHARINDEX(' ', reserved)) as bigint)/128 reserved_MB,
+--cast(substring(data,0,CHARINDEX(' ', data)) as bigint)/128 data_MB,
+--cast(substring(index_size,0,CHARINDEX(' ', index_size))/128 as bigint) index_size_MB,
+--cast(substring(unused,0,CHARINDEX(' ', unused)) as bigint)/128 unused_MB
+-- from #t
+--where rows > 0 order by data_MB desc, name_table 
+
 -- space of object
 --EXEC sp_spaceused @objname = N'Banks',@updateusage = 'FALSE',@mode = 'ALL', @oneresultset = '0'--, @include_total_xtp_storage = '1';
 
