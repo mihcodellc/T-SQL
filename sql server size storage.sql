@@ -21,7 +21,7 @@ DBCC SQLPERF(LOGSPACE)
 EXEC sp_spaceused @oneresultset = 1 
 --EXEC sp_MSforeachdb N'USE [?]; EXEC sp_spaceused @oneresultset = 1'
 
-select 'space use per table : need extra to show. refer to #t'
+select 'space use per table + index size : need extra to show. refer to #t'
 
 --create table #t (name_table nvarchar(128), rows nvarchar(128), reserved nvarchar(128), 
 --data nvarchar(128), index_size nvarchar(128), unused nvarchar(128))
