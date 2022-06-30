@@ -9,40 +9,73 @@ SELECT available_physical_memory_kb/1024 as "Total Memory MB available_physical"
        system_memory_state_desc AS [System Memory State]
 FROM sys.dm_os_sys_memory WITH (NOLOCK) OPTION (RECOMPILE);
 
-select 'log size on disk'
-DBCC SQLPERF(LOGSPACE)
 
---** space of database SUMMARY
+select  'space of database SUMMARY'
 --EXEC sp_spaceused @updateusage = N'TRUE'; 
---declare @t table (database_name nvarchar(128), database_Data_Log nvarchar(128), unallocated_space nvarchar(128), reserved nvarchar(128), 
---data nvarchar(128), index_size nvarchar(128), unused nvarchar(128))
+declare @t table (database_name nvarchar(128), database_Data_Log nvarchar(128), unallocated_space nvarchar(128), reserved nvarchar(128), 
+data nvarchar(128), index_size nvarchar(128), unused nvarchar(128))
 
---insert into @t
+insert into @t
 EXEC sp_spaceused @oneresultset = 1 
 --EXEC sp_MSforeachdb N'USE [?]; EXEC sp_spaceused @oneresultset = 1'
+select database_name,   
+cast(substring(database_Data_Log,0,CHARINDEX(' ', database_Data_Log)) as float) database_Data_Log_MB,
+convert(float,(substring(unallocated_space,0,CHARINDEX(' ', unallocated_space)))) unallocated_MB,
+cast(substring(reserved,0,CHARINDEX(' ', reserved)) as float)/1000 reserved_MB,
+cast(substring(data,0,CHARINDEX(' ', data)) as float)/1000 data_MB,
+convert(float,(substring(index_size,0,CHARINDEX(' ', index_size))))/1000 index_size_MB,
+cast(substring(unused,0,CHARINDEX(' ', unused)) as float)/1000 unused_MB, GETDATE() as Whe_n 
+ from @t
+
+
 
 select 'space use per table + index size : need extra to show. refer to #t'
 
---create table #t (name_table nvarchar(128), rows nvarchar(128), reserved nvarchar(128), 
---data nvarchar(128), index_size nvarchar(128), unused nvarchar(128))
-----truncate table #t
-----run the ouput excluding this line insert into #t EXEC sp_spaceused @objname = [dbo.SysProcesses]
---select 'insert into #t EXEC sp_spaceused @objname = [' + SCHEMA_NAME(schema_id) +'.'+ name + ']'  from  
---sys.tables order by name
+create table #t (name_table nvarchar(128), rows nvarchar(128), reserved nvarchar(128), 
+data nvarchar(128), index_size nvarchar(128), unused nvarchar(128))
+--truncate table #t
+--Step 2
+--run on db concerned the ouput excluding, if exist, this line insert into #t EXEC sp_spaceused @objname = [dbo.SysProcesses]
+-- https://social.technet.microsoft.com/wiki/contents/articles/16977.aspx for sp_MSforeachtable
+--use ?
+EXEC sp_MSforeachtable ' 
+begin try
+if ''?'' <> ''[dbo].[SysProcesses]''
+insert into #t EXEC sp_spaceused @objname = ''?'' 
+end try
+begin catch
+    select ''?'' as [Full Name]
+end catch
+'
 
---select name_table,
---cast(rows as bigint) rows,
---cast(substring(reserved,0,CHARINDEX(' ', reserved)) as bigint)/128 reserved_MB,
---cast(substring(data,0,CHARINDEX(' ', data)) as bigint)/128 data_MB,
---cast(substring(index_size,0,CHARINDEX(' ', index_size))/128 as bigint) index_size_MB,
---cast(substring(unused,0,CHARINDEX(' ', unused)) as bigint)/128 unused_MB
--- from #t
---where rows > 0 order by data_MB desc, name_table 
+--Exec sp_MSForEachTable '
+-- Select ''?'' as [Full Name]
+-- , PARSENAME(''?'',1) as [Table]
+-- , PARSENAME(''?'',2) as [Schema]
 
--- space of object
---EXEC sp_spaceused @objname = N'Banks',@updateusage = 'FALSE',@mode = 'ALL', @oneresultset = '0'--, @include_total_xtp_storage = '1';
+--select 'insert into #t EXEC sp_spaceused @objname = [' + SCHEMA_NAME(schema_id) +'.'+ name + ']'+char(9)+char(10)  from  
+--sys.tables 
+--where name not like '%SysProcesses%'
+--order by name
+--EXEC sp_tables
 
---select * from @t
+-- OUTPUT here
+--*******************
+--*******************
+-- Step 3
+--Insert into DBA_DB.Tables_growth
+select name_table,
+cast(rows as bigint) rows,
+cast(substring(reserved,0,CHARINDEX(' ', reserved)) as bigint)/128 reserved_MB,
+cast(substring(data,0,CHARINDEX(' ', data)) as bigint)/128 data_MB,
+cast(substring(index_size,0,CHARINDEX(' ', index_size))/128 as bigint) index_size_MB,
+cast(substring(unused,0,CHARINDEX(' ', unused)) as bigint)/128 unused_MB, GETDATE() 
+ from #t
+where rows > 0 order by data_MB desc, name_table   
+--Step 4
+if object_id('tempdb..#t') is not null
+    drop table #t
+
 
 select 'space of database DETAILS'
 SELECT DB_NAME([database_id]) AS [Database Name], 
@@ -98,7 +131,14 @@ IF OBJECT_ID('tempdb..#output') is not null
     drop table #output
 
 
-select ' current db file info'
+select 'log size on disk'
+declare @t1 table(DataBaseName varchar(128), LogSize_MB float, LogSpaceUsed float, Status tinyint)
+insert into @t1
+exec ('DBCC SQLPERF(LOGSPACE)')
+select * from @t1 order by LogSpaceUsed
+
+
+select ' each db file info'
 --exec sp_helpfile;
 ----exec sp_MSforeachdb N' use ?
 ----exec sp_helpfile;
