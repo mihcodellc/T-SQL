@@ -1,5 +1,21 @@
 --aimed rebuild reorganize indexes.sql
 
+set transaction isolation level read uncommitted
+set nocount on
+
+--get  index id
+exec sp_SQLskills_helpindex @objname= TableName
+
+-- replace <TableName> and <index id>
+SELECT a.object_id, object_name(a.object_id) AS TableName,
+    a.index_id, b.name AS IndedxName, avg_fragmentation_in_percent,b.type_desc, b.fill_factor,   b.is_disabled
+FROM sys.dm_db_index_physical_stats (DB_ID (db_name()) , OBJECT_ID('<TableName>'), <index id>, NULL, NULL) AS a -- 1 ie index id
+INNER JOIN sys.indexes AS b
+    ON a.object_id = b.object_id
+    AND a.index_id = b.index_id
+
+-- fragmetation per % for the current database
+
 select TableName, max(avg_fragmentation_in_percent) HigherPercentofFragmentation from (
 SELECT a.object_id, object_name(a.object_id) AS TableName,
     a.index_id, b.name AS IndedxName, avg_fragmentation_in_percent,b.type_desc, b.fill_factor,   b.is_disabled
@@ -88,6 +104,7 @@ ON ips.object_id = i.object_id
    ips.index_id = i.index_id
 ORDER BY page_count DESC;
 
+-- different ways to maintain index
 ALTER INDEX ALL ON Production.Product REBUILD WITH (FILLFACTOR = 80, SORT_IN_TEMPDB = ON, STATISTICS_NORECOMPUTE = ON)
 
 ALTER INDEX PK_Employee_BusinessEntityID ON HumanResources.Employee REBUILD;
