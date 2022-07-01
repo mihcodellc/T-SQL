@@ -89,7 +89,7 @@ from @t
 order by LogDate desc;
 
 if  @proceed = ''Yes''
-     EXECUTE msdb..sp_send_dbmail  @Profile_Name = ''DataServicesProfile'' , @From_Address = ''NoReply@revmansolutions.com'',  @Recipients = ''mbello@rmsweb.com'',  @BODY = ''Ready to proceed ?''
+     EXECUTE msdb..sp_send_dbmail  @Profile_Name = ''MyProfile'' , @From_Address = ''NoReply@mitiri.com'',  @Recipients = ''mbello@mitiri.com'',  @BODY = ''Ready to proceed ?''
 
 
 ', 
