@@ -55,7 +55,9 @@ select '*******a job info and status : uncomment the lines below **************'
 ---- job Executing
 --exec msdb.dbo.sp_help_job @execution_status=1 --- running
 
+--EXEC msdb.dbo.sp_help_jobactivity 
 
+--EXEC sp_help_jobhistory @job_name = 'BackupKrankyKranesDB', @mode = 'FULL';
 
 
 
