@@ -28,7 +28,7 @@ CAST(SUM(row_count)*100 AS float)/SUM(estimate_row_count) as EST_COMPLETE_PERCEN
 FROM sys.dm_exec_query_profiles eqp
 join sys.sysprocesses sp on sp.spid=eqp.session_id
 join sys.databases db on db.database_id=sp.dbid
--- WHERE session_id in (select spid from sys.sysprocesses sp where sp.cmd like '%INDEX%')
+-- WHERE session_id in (select spid from sys.sysprocesses sp where sp.cmd like '%INDEX%') -- --select distinct cmd  from sys.sysprocesses order by cmd
 WHERE session_id=1508
 GROUP BY session_id, node_id, physical_operator_name, sp.cmd, sp.hostname, db.name, sp.last_batch
 ORDER BY session_id, node_id desc;
