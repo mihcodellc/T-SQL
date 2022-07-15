@@ -89,3 +89,30 @@ WHERE bs.type = 'L' -- D = Full, I = Differential, L = Log, F = File or filegrou
 AND bs.database_name IN('MedRx') -- specify your databases here
 
 ORDER BY BackupFinishDate DESC
+
+--- below inspired by https://social.msdn.microsoft.com/Forums/sqlserver/en-US/abf50e00-c9b0-4809-9e61-43ed8a53e968/the-media-set-has-2-media-families-but-only-1-are-provided?forum=sqltools
+--full
+set statistics profile on
+RESTORE DATABASE MedRx FROM 
+DISK = 'D:\FULL_20220708_221753_01.bak',
+DISK = 'D:\FULL_20220708_221753_02.bak',
+DISK = 'D:\FULL_20220708_221753_03.bak',
+DISK = 'D:\FULL_20220708_221753_04.bak',
+DISK = 'D:\FULL_20220708_221753_05.bak',
+DISK = 'D:\FULL_20220708_221753_06.bak',
+DISK = 'D:\FULL_20220708_221753_07.bak',
+DISK = 'D:\FULL_20220708_221753_08.bak',
+DISK = 'D:\FULL_20220708_221753_09.bak',
+DISK = 'D:\FULL_20220708_221753_10.bak',
+DISK = 'D:\FULL_20220708_221753_11.bak',
+DISK = 'D:\FULL_20220708_221753_12.bak',
+DISK = 'D:\FULL_20220708_221753_13.bak',
+DISK = 'D:\FULL_20220708_221753_14.bak',
+DISK = 'D:\FULL_20220708_221753_15.bak',
+DISK = 'D:\FULL_20220708_221753_16.bak'
+ WITH STATS = 10, REPLACE, NORECOVERY
+ -- diff
+set statistics profile on
+RESTORE DATABASE MedRx FROM 
+DISK = 'D:\DIFF_20220713_210646.bak'
+ WITH STATS = 10, REPLACE, NORECOVERY
