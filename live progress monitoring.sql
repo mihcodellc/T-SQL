@@ -32,3 +32,19 @@ join sys.databases db on db.database_id=sp.dbid
 WHERE session_id=1508
 GROUP BY session_id, node_id, physical_operator_name, sp.cmd, sp.hostname, db.name, sp.last_batch
 ORDER BY session_id, node_id desc;
+
+
+-- other way of progress from dm_exec_requests
+SELECT session_id AS SPID
+	,command
+	,a.TEXT AS Query
+	,start_time
+	,percent_complete
+	,dateadd(second, estimated_completion_time / 1000, getdate()) AS estimated_completion_time
+FROM sys.dm_exec_requests r
+CROSS APPLY sys.dm_exec_sql_text(r.sql_handle) a
+WHERE r.command IN (
+		'BACKUP DATABASE'
+		,'RESTORE DATABASE'
+		,'BACKUP LOG'
+		)
