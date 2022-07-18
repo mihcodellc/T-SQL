@@ -1,3 +1,4 @@
+-- script out mail profile
 -- https://www.sqlservercentral.com/scripts/script-out-existing-database-mail-profiles-settings
 USE msdb 
 GO 
