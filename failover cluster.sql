@@ -1,0 +1,2 @@
+https://techcommunity.microsoft.com/t5/failover-clustering/how-to-properly-shutdown-a-failover-cluster-or-a-node/ba-p/371857#:~:text=1%20Open%20Failover%20Cluster%20Manager%20%28CluAdmin.msc%29%202%20Click,moved%20off%20this%20node%2C%20it%20...%20See%20More.
+https://docs.microsoft.com/en-us/sql/sql-server/failover-clusters/install/add-or-remove-nodes-in-a-sql-server-failover-cluster-setup?view=sql-server-ver16
