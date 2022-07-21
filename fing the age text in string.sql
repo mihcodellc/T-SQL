@@ -1,7 +1,35 @@
 
+-- ***sp_FindStringInTable By: Greg Robidoux
+-- https://www.mssqltips.com/sqlservertip/1522/searching-and-finding-a-string-value-in-all-columns-in-a-sql-server-table/?utm_source=dailynewsletter&utm_medium=email&utm_content=headline&utm_campaign=20220721
+
+CREATE PROCEDURE dbo.sp_FindStringInTable @stringToFind VARCHAR(max), @schema sysname, @table sysname 
+AS
+
+SET NOCOUNT ON
+
+--run example: EXEC sp_FindStringInTable 'Irv%', 'Person', 'Address'
+
+BEGIN TRY
+   DECLARE @sqlCommand varchar(max) = 'SELECT * FROM [' + @schema + '].[' + @table + '] WHERE ' 
+	   
+   SELECT @sqlCommand = @sqlCommand + '[' + COLUMN_NAME + '] LIKE ''' + @stringToFind + ''' OR '
+   FROM INFORMATION_SCHEMA.COLUMNS 
+   WHERE TABLE_SCHEMA = @schema
+   AND TABLE_NAME = @table 
+   AND DATA_TYPE IN ('char','nchar','ntext','nvarchar','text','varchar')
+
+   SET @sqlCommand = left(@sqlCommand,len(@sqlCommand)-3)
+   EXEC (@sqlCommand)
+   PRINT @sqlCommand
+END TRY
+
+BEGIN CATCH 
+   PRINT 'There was an error. Check to make sure object exists.'
+   PRINT error_message()
+END CATCH 
 
 
-
+-- ***find in value
 select PATINDEX('%stringToFindAge%','je viendrai chercher mon enfant a 20il a voulu stringToFindAge = 29 est la. je t en prie ne pose pas  de resistance')
 select SUBSTRING('je viendrai chercher mon enfant a 20il a voulu stringToFindAge = 29 est la. je t en prie ne pose pas  de resistance',PATINDEX('%stringToFindAge%','je viendrai chercher mon enfant a 20il a voulu stringToFindAge = 29 est la. je t en prie ne pose pas  de resistance')+16,2) -- 10 ie len(stringToFindAge = ) -- 2 is enough to hold the comparison operator
 
