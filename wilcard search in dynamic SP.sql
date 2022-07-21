@@ -1,5 +1,6 @@
 -- notepad++ regular expressions search
 ---- https://npp-user-manual.org/docs/searching/#regular-expressions
+---- https://docs.microsoft.com/en-us/sql/ssms/scripting/search-text-with-wildcards?view=sql-server-ver16
 ---- .* ?/storedprocedures/ => return everything before "/storedprocedures/"
 ---- copy text on webpage to notepad++ and search using regular expression
 --notepad++ plugin: 
