@@ -3,7 +3,7 @@
 
 --- below inspired by https://social.msdn.microsoft.com/Forums/sqlserver/en-US/abf50e00-c9b0-4809-9e61-43ed8a53e968/the-media-set-has-2-media-families-but-only-1-are-provided?forum=sqltools
 --full
-RESTORE DATABASE MedRx FROM 
+RESTORE DATABASE MyDB FROM 
 DISK = 'D:\FULL_20220708_221753_01.bak',
 DISK = 'D:\FULL_20220708_221753_02.bak',
 DISK = 'D:\FULL_20220708_221753_03.bak',
@@ -22,8 +22,7 @@ DISK = 'D:\FULL_20220708_221753_15.bak',
 DISK = 'D:\FULL_20220708_221753_16.bak'
  WITH STATS = 10, REPLACE, NORECOVERY
  -- diff
-set statistics profile on
-RESTORE DATABASE MedRx FROM 
+RESTORE DATABASE MyDB FROM 
 DISK = 'D:\DIFF_20220713_210646.bak'
  WITH STATS = 10, REPLACE, NORECOVERY
 
@@ -74,7 +73,7 @@ FROM msdb.dbo.backupset bs JOIN msdb.dbo.backupmediafamily bmf
 
 WHERE bs.type = 'D' -- D = Full, I = Differential, L = Log, F = File or filegroup
 
-AND bs.database_name IN('MedRx') -- specify your databases here
+AND bs.database_name IN('MyDB') -- specify your databases here
 
 ORDER BY BackupFinishDate DESC
 
@@ -114,7 +113,7 @@ FROM msdb.dbo.backupset bs JOIN msdb.dbo.backupmediafamily bmf
 
 WHERE bs.type = 'L' -- D = Full, I = Differential, L = Log, F = File or filegroup
 
-AND bs.database_name IN('MedRx') -- specify your databases here
+AND bs.database_name IN('MyDB') -- specify your databases here
 
 ORDER BY BackupFinishDate DESC
 
