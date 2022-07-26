@@ -28,7 +28,8 @@ with standby = 'C:\Backup\testBelloStandBy.tuf'
 -- needs standby file to move from standby to norecovery or vice-versa
 --
 
-
+-- make available for user
 restore database TestBello with norecovery
 
+--return to standBy 
 restore database TestBello with standby = 'G:\MSSQL\Backup\testBelloStandBy.tuf'
