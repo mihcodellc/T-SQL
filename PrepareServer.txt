@@ -1,0 +1,31 @@
+****install 2017 developer edition 
+	https://blog.sqlauthority.com/2017/12/22/download-install-sql-server-2017-developer-edition-free/
+	
+	from powershell admin
+	
+1. have the config by used installer through ready to install 
+	> open location and save it
+2. Change/add in config file
+	QUIETSIMPLE="True"
+	IACCEPTROPENLICENSETERMS="True"
+	IAcceptSQLServerLicenseTerms="True"
+	and others that you judje necessary
+	; QUIET="True"
+	; UIMODE="Normal"
+	; SECURITYMODE="SQL"	
+3. run 	.\Setup.exe /ConfigurationFile=ConfigurationFile.INI
+
+**** install PSKoans interactive to learn powershell
+		https://github.com/vexx32/PSKoans#prerequisites
+		https://github.com/vexx32/PSKoans
+1. Install-Module Pester -Force -SkipPublisherCheck -MinimumVersion 5.0.2
+2. Install-Module PSKoans -Scope CurrentUser
+3. Show-Karma
+		
+****install dbatools step
+	https://dbatools.io/download/
+	
+1.	Install-Module dbatools
+2.  Import-Module dbatools
+
+	
