@@ -1,4 +1,4 @@
--- switch the database’s recovery model to simple as 
+-- switch the databaseâ€™s recovery model to simple as 
 -- shown in Books Online.  
 -- This empties out the transaction log, 
 -- thereby letting the DBA run a DBCC SHRINKFILE
