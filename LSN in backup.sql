@@ -116,6 +116,14 @@ and l.database_backup_lsn = 9133726000051979900492 -- compare to full checkpoint
 and 9135946000016147900001+1 between l.first_lsn and l.last_lsn  -- compare to diff last_lsn +1 
 order by l.backup_start_date desc
 
+-- find the first log knowing the full and diff
+select  l.backup_set_id as Logbackup_set_id, l.backup_start_date , m.physical_device_name as FirstLogBackUp 
+FROM msdb.dbo.backupset l 
+INNER JOIN msdb.dbo.backupmediafamily m ON l.media_set_id = m.media_set_id
+where database_name = @db_name and l.[type] = 'L' and is_copy_only = 0
+and l.backup_set_id >= 914131 -- backup_set_id of  first log or the one you want 
+order by l.backup_start_date asc
+
 
 --DECLARE @db_name VARCHAR(100)
 SELECT @db_name = 'MyDB'
