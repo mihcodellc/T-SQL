@@ -111,7 +111,7 @@ and m.physical_device_name = 'D:\DIFF_20220718_210311.bak'
 select top 1 l.backup_set_id as Logbackup_set_id, l.backup_start_date , m.physical_device_name as FirstLogBackUp 
 FROM msdb.dbo.backupset l 
 INNER JOIN msdb.dbo.backupmediafamily m ON l.media_set_id = m.media_set_id
-where database_name = @db_name and l.[type] = 'I' and is_copy_only = 0
+where database_name = @db_name and l.[type] = 'L' and is_copy_only = 0
 and l.database_backup_lsn = 9133726000051979900492 -- compare to full checkpoint_lsn column
 and 9135946000016147900001+1 between l.first_lsn and l.last_lsn  -- compare to diff last_lsn +1 
 order by l.backup_start_date desc
