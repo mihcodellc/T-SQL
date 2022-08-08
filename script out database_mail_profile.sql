@@ -1,5 +1,6 @@
 -- script out mail profile
 -- https://www.sqlservercentral.com/scripts/script-out-existing-database-mail-profiles-settings
+-- if you are going to apply it to new server, make sure to review the names and disabled the advanced options 
 USE msdb 
 GO 
  
