@@ -171,6 +171,7 @@ cross apply sys.dm_exec_sql_text(s.plan_handle)p order by total_worker_time desc
 ---********************************** Disk pressure
 -- https://docs.microsoft.com/en-us/azure-stack/hci/manage/diskspd-overview
 -- https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/dn894707(v=ws.11)
+-- go to "Step 3: Run DiskSpd trial runs, and tune DiskSpd parameters" in above link to see action,meaning, how to decide
 -- in powershell:  .\DiskSpd.exe /? #from its folder
 -- in bat file, put : 
 -- 	rem warm up 300 run for 30s
