@@ -99,6 +99,9 @@ set  noexec off
 
 set showplan_text on
 
+-- https://www.brentozar.com/pastetheplan/
+-- https://statisticsparser.com/
+
 select * from sys.dm_os_performance_counters 
 --order by counter_name
 where counter_name in ('Batch Requests/sec', 'SQL Compilations/sec' , 'SQL Re-Compilations/sec') --and 
