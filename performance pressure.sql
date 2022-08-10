@@ -169,6 +169,10 @@ cross apply sys.dm_exec_sql_text(s.plan_handle)p order by total_worker_time desc
 
 
 ---********************************** Disk pressure
+-- https://docs.microsoft.com/en-us/azure-stack/hci/manage/diskspd-overview
+-- https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/dn894707(v=ws.11)
+-- in powershell:  .\DiskSpd.exe /? #from its folder
+
 select * from sys.dm_os_waiting_tasks 
 where wait_type in (N'PAGEIOLATCH_XX', N'WRITELOG', N'ASYNC_NETWORK_IO')
 
