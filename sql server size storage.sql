@@ -19,9 +19,9 @@ insert into @t
 EXEC sp_spaceused @oneresultset = 1 
 --EXEC sp_MSforeachdb N'USE [?]; EXEC sp_spaceused @oneresultset = 1'
 select database_name,   
-cast(substring(database_Data_Log,0,CHARINDEX(' ', database_Data_Log)) as float) database_Data_Log_MB,
+cast(substring(database_Data_Log,0,CHARINDEX(' ', database_Data_Log)) as float) [database_Data_Log_MB = orig assigned size],
 convert(float,(substring(unallocated_space,0,CHARINDEX(' ', unallocated_space)))) unallocated_MB,
-cast(substring(reserved,0,CHARINDEX(' ', reserved)) as float)/1000 reserved_MB,
+cast(substring(reserved,0,CHARINDEX(' ', reserved)) as float)/1000 [reserved_MB /*= data + Index + Unused*/],
 cast(substring(data,0,CHARINDEX(' ', data)) as float)/1000 data_MB,
 convert(float,(substring(index_size,0,CHARINDEX(' ', index_size))))/1000 index_size_MB,
 cast(substring(unused,0,CHARINDEX(' ', unused)) as float)/1000 unused_MB, GETDATE() as Whe_n 
@@ -66,7 +66,7 @@ end catch
 --Insert into DBA_DB.Tables_growth
 select name_table,
 cast(rows as bigint) rows,
-cast(substring(reserved,0,CHARINDEX(' ', reserved)) as bigint)/128 reserved_MB,
+cast(substring(reserved,0,CHARINDEX(' ', reserved)) as bigint)/128 [reserved_MB /*= data + Index + Unused*/],
 cast(substring(data,0,CHARINDEX(' ', data)) as bigint)/128 data_MB,
 cast(substring(index_size,0,CHARINDEX(' ', index_size))/128 as bigint) index_size_MB,
 cast(substring(unused,0,CHARINDEX(' ', unused)) as bigint)/128 unused_MB, GETDATE() 
