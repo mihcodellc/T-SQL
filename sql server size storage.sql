@@ -10,7 +10,7 @@ SELECT available_physical_memory_kb/1024 as "Total Memory MB available_physical"
 FROM sys.dm_os_sys_memory WITH (NOLOCK) OPTION (RECOMPILE);
 
 
-select  'space of database SUMMARY'
+select  'space of database level SUMMARY'
 --EXEC sp_spaceused @updateusage = N'TRUE'; 
 declare @t table (database_name nvarchar(128), database_Data_Log nvarchar(128), unallocated_space nvarchar(128), reserved nvarchar(128), 
 data nvarchar(128), index_size nvarchar(128), unused nvarchar(128))
@@ -27,6 +27,10 @@ convert(float,(substring(index_size,0,CHARINDEX(' ', index_size))))/1000 index_s
 cast(substring(unused,0,CHARINDEX(' ', unused)) as float)/1000 unused_MB, GETDATE() as Whe_n 
  from @t
 
+select  'space of database files SUMMARY'
+ SELECT name ,size/128.0 - CAST(FILEPROPERTY(name, 'SpaceUsed') AS int)/128.0 AS AvailableSpaceInMB, CAST(FILEPROPERTY(name, 'SpaceUsed') AS int)/128.0 as UsedSpace,
+size/128.0 AS OriginalSizeMB_sum_eq_database_Data_Log, getdate()
+FROM sys.database_files
 
 
 select 'space use per table + index size : need extra to show. refer to #t'
