@@ -176,6 +176,7 @@ cross apply sys.dm_exec_sql_text(s.plan_handle)p order by total_worker_time desc
 -- in bat file, put : 
 -- 	rem warm up 300 run for 30s
 --	diskspd.exe -c100G -t24 -si64K -b64K -w70 -d600 -W300 -L -o12 -D -h u:\bello\testfile.dat > 64KB_Concurent_Write_24Threads_12OutstandingIO.txt
+-- go look "diskPerformanceTested.ps1" in powershell directory
 
 select * from sys.dm_os_waiting_tasks 
 where wait_type in (N'PAGEIOLATCH_XX', N'WRITELOG', N'ASYNC_NETWORK_IO')
