@@ -70,10 +70,10 @@ end catch
 --Insert into DBA_DB.Tables_growth
 select name_table,
 cast(rows as bigint) rows,
-cast(substring(reserved,0,CHARINDEX(' ', reserved)) as bigint)/128 [reserved_MB /*= data + Index + Unused*/],
-cast(substring(data,0,CHARINDEX(' ', data)) as bigint)/128 data_MB,
-cast(substring(index_size,0,CHARINDEX(' ', index_size))/128 as bigint) index_size_MB,
-cast(substring(unused,0,CHARINDEX(' ', unused)) as bigint)/128 unused_MB, GETDATE() 
+cast(substring(reserved,0,CHARINDEX(' ', reserved)) as bigint)/1024/1024 [reserved_MB /*= data + Index + Unused*/],
+cast(substring(data,0,CHARINDEX(' ', data)) as bigint)/1024/1024 data_MB,
+cast(substring(index_size,0,CHARINDEX(' ', index_size))/1024/1024 as bigint) index_size_MB,
+cast(substring(unused,0,CHARINDEX(' ', unused)) as bigint)/1024/1024 unused_MB, GETDATE() 
  from #t
 where rows > 0 order by data_MB desc, name_table   
 --Step 4
@@ -198,7 +198,7 @@ order by A.TYPE desc, A.NAME;
 --where avg_fragmentation_in_percent > 80 and b.name is not null
 --order by avg_fragmentation_in_percent desc
 
-----RmsAdmin
+----dba db
 --object_id	TableName	index_id	IndedxName	avg_fragmentation_in_percent	type_desc	fill_factor	is_disabled
 --1213247377	BlitzFirst_WaitStats_History	2	IX_BlitzFirst_WaitStats_History_Svr_Wait_Date	99.6789727126806	NONCLUSTERED	95	0
 --884198200	BlitzFirst_WaitStats	2	IX_ServerName_wait_type_CheckDate_Includes	98.5716935633463	NONCLUSTERED	95	0
