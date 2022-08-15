@@ -19,6 +19,27 @@ INNER JOIN sys.indexes AS b
     ON a.object_id = b.object_id
     AND a.index_id = b.index_id
 
+-- Returning information about a specified table
+DECLARE @db_id SMALLINT;  
+DECLARE @object_id INT;  
+  
+SET @db_id = DB_ID(N'AdventureWorks2012');  
+SET @object_id = OBJECT_ID(N'AdventureWorks2012.Person.Address');  
+  
+IF @db_id IS NULL  
+BEGIN;  
+    PRINT N'Invalid database';  
+END;  
+ELSE IF @object_id IS NULL  
+BEGIN;  
+    PRINT N'Invalid object';  
+END;  
+ELSE  
+BEGIN;  
+    SELECT * FROM sys.dm_db_index_physical_stats(@db_id, @object_id, NULL, NULL , 'LIMITED');  
+END;  
+GO      
+
 -- fragmetation per % for the current database
 
 select TableName, max(avg_fragmentation_in_percent) HigherPercentofFragmentation from (
