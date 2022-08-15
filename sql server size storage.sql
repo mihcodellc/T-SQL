@@ -1,3 +1,6 @@
+-- convert data unit online
+-- https://www.gbmb.org/megabytes
+
 --** OS memory state included free
 SELECT available_physical_memory_kb/1024 as "Total Memory MB available_physical",
  available_physical_memory_kb/(total_physical_memory_kb*1.0)*100 AS "% Memory Free",
@@ -28,9 +31,17 @@ cast(substring(unused,0,CHARINDEX(' ', unused)) as float)/1000 unused_MB, GETDAT
  from @t
 
 select  'space of database files SUMMARY'
- SELECT name ,size/128.0 - CAST(FILEPROPERTY(name, 'SpaceUsed') AS int)/128.0 AS AvailableSpaceInMB, CAST(FILEPROPERTY(name, 'SpaceUsed') AS int)/128.0 as UsedSpace,
+-- https://www.mssqltips.com/sqlservertip/4345/understanding-how-sql-server-stores-data-in-data-files/
+-- size of each data page is 8KB and eight continuous pages equals one extent, so the size of an extent would be approximately 64KB
+-- size = # of 8 KB pages
+ SELECT name ,size/128.0 /* ie (size * 8.0/1024) */ - CAST(FILEPROPERTY(name, 'SpaceUsed') AS int)/128.0 AS AvailableSpaceInMB, CAST(FILEPROPERTY(name, 'SpaceUsed') AS int)/128.0 as UsedSpace,
 size/128.0 AS OriginalSizeMB_sum_eq_database_Data_Log, getdate()
 FROM sys.database_files
+
+select  'space of database extents = 64KB SUMMARY'
+-- size of each data page is 8KB and eight continuous pages equals one extent, so the size of an extent would be approximately 64KB
+-- where the 64k block for hard drives likely come from
+DBCC showfilestats
 
 
 select 'space use per table + index size : need extra to show. refer to #t'
@@ -68,14 +79,22 @@ end catch
 --*******************
 -- Step 3
 --Insert into DBA_DB.Tables_growth
-select name_table,
-cast(rows as bigint) rows,
-cast(substring(reserved,0,CHARINDEX(' ', reserved)) as bigint)/1024/1024 [reserved_MB /*= data + Index + Unused*/],
-cast(substring(data,0,CHARINDEX(' ', data)) as bigint)/1024/1024 data_MB,
-cast(substring(index_size,0,CHARINDEX(' ', index_size))/1024/1024 as bigint) index_size_MB,
-cast(substring(unused,0,CHARINDEX(' ', unused)) as bigint)/1024/1024 unused_MB, GETDATE() 
+select 'order by data size',name_table,
+convert(bigint,rows)  rows,
+convert(bigint,substring(reserved,0,CHARINDEX(' ', reserved)))/1024 [reserved_MB /*= data + Index + Unused*/],
+convert(bigint,substring(data,0,CHARINDEX(' ', data)))/1024 data_MB,
+convert(bigint,substring(index_size,0,CHARINDEX(' ', index_size)))/1024 index_size_MB,
+convert(bigint,substring(unused,0,CHARINDEX(' ', unused)))/1024 unused_MB, GETDATE(), DB_NAME()  
  from #t
 where rows > 0 order by data_MB desc, name_table   
+select 'order by reserved size',name_table,
+convert(bigint,rows)  rows,
+convert(bigint,substring(reserved,0,CHARINDEX(' ', reserved)))/1024 [reserved_MB /*= data + Index + Unused*/],
+convert(bigint,substring(data,0,CHARINDEX(' ', data)))/1024 data_MB,
+convert(bigint,substring(index_size,0,CHARINDEX(' ', index_size)))/1024 index_size_MB,
+convert(bigint,substring(unused,0,CHARINDEX(' ', unused)))/1024 unused_MB, GETDATE(), DB_NAME()  
+ from #t
+where rows > 0 order by [reserved_MB /*= data + Index + Unused*/] desc, name_table  
 --Step 4
 if object_id('tempdb..#t') is not null
     drop table #t
