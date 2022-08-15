@@ -1,5 +1,10 @@
 --aimed rebuild reorganize indexes.sql
 
+-- https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-db-index-physical-stats-transact-sql?view=sql-server-ver16
+--The modes are progressively slower from LIMITED to DETAILED, because more work is performed in each mode. 
+--To quickly gauge the size or fragmentation level of a table or index, use the LIMITED mode. 
+--It is the fastest and will not return a row for each nonleaf level in the IN_ROW_DATA allocation unit of the index.
+
 set transaction isolation level read uncommitted
 set nocount on
 
