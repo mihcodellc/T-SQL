@@ -14,14 +14,20 @@ LOG ON (Name = FileTableDBLog, FILENAME = 'c:\test\FTDBLog.ldf')
 WITH FILESTREAM (NON_TRANSACTED_ACCESS = FULL,DIRECTORY_NAME = N'FileTableDB');
 GO
 
-
+ -- CREATE FILEGROUP > PARTITION FUNCTION > PARTITION SCHEME(partition to filegroup ) 	> INDEX OR TABLE.
+ 
 -- partition switch table 
 https://www.cathrinewilhelmsen.net/2015/04/19/table-partitioning-in-sql-server-partition-switching/
--- Create the Partition Function 
-CREATE PARTITION FUNCTION pfSales (DATE) AS RANGE RIGHT FOR VALUES ('2013-01-01', '2014-01-01', '2015-01-01');
+-- Create the Partition Function : col1 <= '2013-01-01' 
+--								   col1 > '2013-01-01' AND col1 <= '2014-01-01' 
+--								   col1 > '2014-01-01'
+-- for range right the strict '<' will be on right
+CREATE PARTITION FUNCTION pfSales (DATE) AS RANGE LEFT FOR VALUES ('2013-01-01', '2014-01-01');
  
--- Create the Partition Scheme 
+-- Create the Partition Scheme : partition to filegroup
 CREATE PARTITION SCHEME psSales AS PARTITION pfSales ALL TO ([Primary]);
+ -- or
+CREATE PARTITION SCHEME psSales AS PARTITION pfSales TO (test1fg, test2fg, test3fg, test4fg); -- test1fg ... are filegroups 
 
 --ALTER TABLE Source SWITCH PARTITON 1 TO Target PARTITION 1
 
