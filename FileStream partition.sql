@@ -15,6 +15,8 @@ WITH FILESTREAM (NON_TRANSACTED_ACCESS = FULL,DIRECTORY_NAME = N'FileTableDB');
 GO
 
  -- CREATE FILEGROUP > PARTITION FUNCTION > PARTITION SCHEME(partition to filegroup ) 	> INDEX OR TABLE.
+ -- requirements
+ -- https://docs.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms191160(v=sql.105)
  
 -- partition switch table 
 https://www.cathrinewilhelmsen.net/2015/04/19/table-partitioning-in-sql-server-partition-switching/
