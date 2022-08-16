@@ -16,6 +16,10 @@
 --https://sqlserverupdates.com/
 --https://www.brentozar.com/archive/2021/06/how-to-patch-sql-server/
 
+-- samples code from MIcrosoft
+--https://docs.microsoft.com/en-us/samples/browse/?redirectedfrom=TechNet-Gallery&languages=tsql
+
+
 --*****Server Performance and Activity Monitoring
 --https://docs.microsoft.com/en-us/sql/relational-databases/performance/server-performance-and-activity-monitoring?view=sql-server-ver15
 
