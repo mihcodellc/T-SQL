@@ -34,12 +34,11 @@ select  'space of database files SUMMARY'
 -- https://www.mssqltips.com/sqlservertip/4345/understanding-how-sql-server-stores-data-in-data-files/
 -- size of each data page is 8KB and eight continuous pages equals one extent, so the size of an extent would be approximately 64KB
 -- size = # of 8 KB pages
- SELECT name ,size/128.0 /* ie (size * 8.0/1024) */ - CAST(FILEPROPERTY(name, 'SpaceUsed') AS int)/128.0 AS AvailableSpaceInMB,
+ SELECT name , state_desc,size/128.0 /* ie (size * 8.0/1024) */ - CAST(FILEPROPERTY(name, 'SpaceUsed') AS int)/128.0 AS AvailableSpaceInMB,
 		  CAST(FILEPROPERTY(name, 'SpaceUsed') AS int)/128.0 as UsedSpace,
 		  ((CAST(FILEPROPERTY(name, 'SpaceUsed') AS int)/128.0)/(size/128.0 ))*100 as UsedPercent,
-size/128.0 AS OriginalSizeMB_sum_eq_Available_Used, getdate()
+size/128.0 AS OriginalSizeMB_sum_eq_Available_Used, getdate(), max_size, growth, is_percent_growth, physical_name 
 FROM sys.database_files
-
 
 select  'space of database extents = 64KB SUMMARY'
 -- size of each data page is 8KB and eight continuous pages equals one extent, so the size of an extent would be approximately 64KB
