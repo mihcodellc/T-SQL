@@ -14,6 +14,17 @@ LOG ON (Name = FileTableDBLog, FILENAME = 'c:\test\FTDBLog.ldf')
 WITH FILESTREAM (NON_TRANSACTED_ACCESS = FULL,DIRECTORY_NAME = N'FileTableDB');
 GO
 
+-- data on partition
+SELECT partition_id, index_id, partition_number, Rows, OBJECT_NAME(OBJECT_ID) 
+FROM sys.partitions
+WHERE OBJECT_NAME(OBJECT_ID)='Orders_P' -- source table
+GO
+
+SELECT partition_id, index_id, partition_number, Rows, OBJECT_NAME(OBJECT_ID) 
+FROM sys.partitions
+WHERE OBJECT_NAME(OBJECT_ID)='Orders' -- target table
+GO
+
  -- CREATE FILEGROUP > PARTITION FUNCTION > PARTITION SCHEME(partition to filegroup ) 	> INDEX OR TABLE.
  -- requirements
  -- https://docs.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms191160(v=sql.105)
