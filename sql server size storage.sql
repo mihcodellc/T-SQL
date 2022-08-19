@@ -37,8 +37,10 @@ select  'space of database files SUMMARY'
  SELECT name , state_desc,size/128.0 /* ie (size * 8.0/1024) */ - CAST(FILEPROPERTY(name, 'SpaceUsed') AS int)/128.0 AS AvailableSpaceInMB,
 		  CAST(FILEPROPERTY(name, 'SpaceUsed') AS int)/128.0 as UsedSpace,
 		  ((CAST(FILEPROPERTY(name, 'SpaceUsed') AS int)/128.0)/(size/128.0 ))*100 as UsedPercent,
-size/128.0 AS OriginalSizeMB_sum_eq_Available_Used, getdate(), max_size, growth, is_percent_growth, physical_name 
+size/128.0 AS CurrentSizeOnDik_MB_sum_eq_Available_Used, getdate(), max_size/128 as max_size_MB
+, case when is_percent_growth =1 then growth else growth/128 end as growth_MB, is_percent_growth, physical_name 
 FROM sys.database_files
+
 
 select  'space of database extents = 64KB SUMMARY'
 -- size of each data page is 8KB and eight continuous pages equals one extent, so the size of an extent would be approximately 64KB
