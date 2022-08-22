@@ -1,0 +1,98 @@
+--Product Key valid for SQL Server and reporting services
+-- https://docs.microsoft.com/en-us/sql/reporting-services/install-windows/find-reporting-services-product-key-ssrs?view=sql-server-ver16
+-- https://docs.microsoft.com/en-us/sql/reporting-services/install-windows/install-reporting-services?view=sql-server-ver16
+-- https://docs.microsoft.com/en-us/sql/reporting-services/install-windows/migrate-a-reporting-services-installation-native-mode?view=sql-server-ver16
+-- https://docs.microsoft.com/en-us/sql/reporting-services/security/create-the-rsexecrole?view=sql-server-ver16
+-- https://www.mssqltips.com/sqlservertip/6323/move-sql-reporting-services-to-another-server/
+
+1. install report services 2017 downloaded on microsoft website
+2. Backup ReportServer, ReportServerTempDB databases
+EXECUTE [dbo].[DatabaseBackup]
+@Databases = 'ReportServer, ReportServerTempDB',
+@Directory = N'C:\Dba\xfer\Reporting\',
+@BackupType = 'FULL',
+@CopyOnly = 'Y',
+@BufferCount = 50,
+@MaxTransferSize = 4194304,
+@BlockSize = 65536,  -- 512,1024,2048,4096,8192,16384,32768,6553
+@NumberOfFiles = 1,
+@Verify = 'Y',
+@CleanupTime = 336,
+@CheckSum = 'Y',
+@LogToTable = 'Y'
+3. Back up encryption keys on source server by opening the Reporting Services Configuration Manager
+	Encryption Keys
+	Backup
+	Enter directory "C:\Dba\xfer\Reporting\" and file name "SourceSsrsEncryptionKey.snk"
+	Give it a password that meets your domain requirement
+	Confirm password
+	Click OK
+
+4. On target server,
+   >Create the role "RSExecRole" in the master system database
+	Owner:dbo
+	Securables: specific objects > Extended Stored Procedures
+		xp_sqlagent_enum_jobs
+		xp_sqlagent_is_starting
+		xp_sqlagent_notify
+	Grant "Execute" permission on 3 extended SPs
+   >Create the role "RSExecRole" in the MSDB database
+	Owner: dbo
+	Securables: specific objects > Stored Procedures
+		sp_add_category
+		sp_add_job
+		sp_add_jobschedule
+		sp_add_jobserver
+		sp_add_jobstep
+		sp_delete_job
+		sp_help_category
+		sp_help_job
+		sp_help_jobschedule
+		sp_verify_job_identifiers
+	Grant "Execute" permission on 10 SPs
+	Securables: specific objects > Tables
+		syscategories
+		sysjobs
+	Grant "Select" permission on 2 tables
+same using T-SQL
+--USE master;
+--GO
+--IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE [type] = 'R' AND [name] = 'RSExecRole') BEGIN
+--    CREATE ROLE [RSExecRole];
+--END
+--GRANT EXECUTE ON dbo.xp_sqlagent_enum_jobs TO [RSExecRole];
+--GRANT EXECUTE ON dbo.xp_sqlagent_is_starting TO [RSExecRole];
+--GRANT EXECUTE ON dbo.xp_sqlagent_notify TO [RSExecRole];
+--GO
+--USE msdb;
+--GO
+--IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE [type] = 'R' AND [name] = 'RSExecRole') BEGIN
+--    CREATE ROLE [RSExecRole];
+--END
+--GRANT EXECUTE ON dbo.sp_add_category TO [RSExecRole];
+--GRANT EXECUTE ON dbo.sp_add_job TO [RSExecRole];
+--GRANT EXECUTE ON dbo.sp_add_jobschedule TO [RSExecRole];
+--GRANT EXECUTE ON dbo.sp_add_jobserver TO [RSExecRole];
+--GRANT EXECUTE ON dbo.sp_add_jobstep TO [RSExecRole];
+--GRANT EXECUTE ON dbo.sp_delete_job TO [RSExecRole];
+--GRANT EXECUTE ON dbo.sp_help_category TO [RSExecRole];
+--GRANT EXECUTE ON dbo.sp_help_job TO [RSExecRole];
+--GRANT EXECUTE ON dbo.sp_help_jobschedule TO [RSExecRole];
+--GRANT EXECUTE ON dbo.sp_verify_job_identifiers TO [RSExecRole];
+--GRANT SELECT ON dbo.syscategories TO [RSExecRole];
+--GRANT SELECT ON dbo.sysjobs TO [RSExecRole];
+--GO
+
+5. restore ReportServer, ReportServerTempDB
+6. make SA the owner of these 2 databases
+7. Run Reporting Services Configuration Manager On target server
+	Databases: Choose an existing ReportServer
+	Credential: use RMS-ASP\sqlsvcssrs
+	Encryption Keys: restore with the same pass used to back it up
+Restore Encryption keys by opening the Reporting Services Configuration Manager On target server
+	Encryption Keys
+	Restore
+	Fully qualified file name of Encryption Key backup from the source server
+	Password
+	Click OK
+
