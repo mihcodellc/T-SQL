@@ -5,5 +5,5 @@ exec xp_cmdshell 'netstat -a | findstr ":1433 :50694" | findstr "ESTABLISHED"  '
 
 exec xp_cmdshell 'netstat -b | findstr ":1433 :50694" | findstr "ESTABLISHED"  '
 
-in cmd prompt windows, run:
+in cmd prompt windows,if a port is open, run:
    netstat -ab
