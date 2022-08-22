@@ -87,9 +87,9 @@ same using T-SQL
 6. make SA the owner of these 2 databases
 7. Run Reporting Services Configuration Manager On target server
 	Databases: Choose an existing ReportServer
-	Credential: use domain\userReportSVC
+	Credential: use domain\userReportSVC -- if login exists on sql server drop it first
 	Encryption Keys: restore with the same pass used to back it up
-	Subscription settings: enter the domain account domain\userReportSVC
+	Subscription settings: enter the domain account domain\userReportSVC -- if login exists on sql server drop it first
 Restore Encryption keys by opening the Reporting Services Configuration Manager On target server
 	Encryption Keys
 	Restore
