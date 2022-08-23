@@ -4,6 +4,7 @@
 -- https://docs.microsoft.com/en-us/sql/reporting-services/install-windows/migrate-a-reporting-services-installation-native-mode?view=sql-server-ver16
 -- https://docs.microsoft.com/en-us/sql/reporting-services/security/create-the-rsexecrole?view=sql-server-ver16
 -- https://www.mssqltips.com/sqlservertip/6323/move-sql-reporting-services-to-another-server/
+-- https://docs.microsoft.com/en-us/sql/reporting-services/install-windows/configure-report-server-urls-ssrs-configuration-manager?view=sql-server-ver16
 
 1. install report services 2017 downloaded on microsoft website
 2. Backup ReportServer, ReportServerTempDB databases
@@ -88,12 +89,17 @@ same using T-SQL
 7. Run Reporting Services Configuration Manager On target server
 	Databases: Choose an existing ReportServer
 	Credential: use domain\userReportSVC -- if login exists on sql server drop it first
-	Encryption Keys: restore with the same pass used to back it up
+	Encryption Keys: restore with the same pass used to back it up from step 3	
+		Fully qualified file name of Encryption Key backup from the source server
 	Subscription settings: enter the domain account domain\userReportSVC -- if login exists on sql server drop it first
-Restore Encryption keys by opening the Reporting Services Configuration Manager On target server
-	Encryption Keys
-	Restore
-	Fully qualified file name of Encryption Key backup from the source server
-	Password
-	Click OK
+	Email settings: 
+		Sender: svc@domain.com
+		SMTP Server: xxx.xxx.xxx.xxx
+	Web Service URL: Accept default by hitting "Apply"
+			on web service site identification, Added Host header after the server name(not IP) on port 80
+	Web Portal URL: Accept default by hitting "Apply"
+			in "Advanced.." Added Host header after the server name(not IP) on port 80
+8. Restart SQL Service and Reporting Service
+		
+	
 
