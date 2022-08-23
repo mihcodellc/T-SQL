@@ -7,3 +7,6 @@ exec xp_cmdshell 'netstat -b | findstr ":1433 :50694" | findstr "ESTABLISHED"  '
 
 in cmd prompt windows,if a port is open, run:
    netstat -ab
+ 
+command to return a list of TCP ports that are being used:
+netstat -anp tcp
