@@ -65,7 +65,7 @@ SELECT 'EXEC sp_delete_job @job_name = N'' ' + job.name + ''' '
   from [msdb].[dbo].[sysjobs] as job 
   WHERE  enabled = 0
 
--- delete all report server
+-- delete all report server jobs
   SELECT 'EXEC sp_delete_job @job_name = N'' ' + job.name + ''' '
   from [msdb].[dbo].[sysjobs] as job 
   WHERE description like 'This job is owned by a report server process%' --category_id = 100
