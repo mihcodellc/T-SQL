@@ -90,14 +90,16 @@ same using T-SQL
 5. restore ReportServer, ReportServerTempDB
 6. make SA the owner of these 2 databases
 7. Run Reporting Services Configuration Manager On target server
-	Databases: Choose an existing ReportServer
+	Databases: Choose an existing ReportServer till last apply/OK
 	Credential: use use windows Authentification with domain\userReportSVC -- if login exists on sql server drop it first
 	Encryption Keys: restore with the same pass used to back it up from step 3	
 		Fully qualified file name of Encryption Key backup from the source server
+		till last apply/OK
 	Subscription settings: enter the domain account domain\userReportSVC 
 	Email settings: 
 		Sender: svc@domain.com
 		SMTP Server: xxx.xxx.xxx.xxx
+		till last apply/OK
 	Web Service URL: Accept default by hitting "Apply"
 			on web service site identification, Added Host header after the server name(not IP) on port 80
 	Web Portal URL: Accept default by hitting "Apply"
