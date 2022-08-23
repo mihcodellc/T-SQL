@@ -100,10 +100,11 @@ same using T-SQL
 		Sender: svc@domain.com
 		SMTP Server: xxx.xxx.xxx.xxx
 		till last apply/OK
-	Web Service URL: Accept default by hitting "Apply"
-			on web service site identification, Added Host header after the server name(not IP) on port 80
+	Web Service URL: Accept default by hitting "Apply"			
 	Web Portal URL: Accept default by hitting "Apply"
 			in "Advanced.." Added Host header after the server name(not IP) on port 80
+			back to Web Service URL, on web service site identification, Added Host header after the server name(not IP) on port 80
+
 8. Restart SQL Service and Reporting Service
 9. In browser, type serverIP:80/Reports; eg: 172.153.12.147:80/reports
 		
