@@ -1,3 +1,6 @@
+Author: Monktar Bello 8/23/2022
+**********Migrate Reporting Services********************
+
 --Product Key valid for SQL Server and reporting services
 -- https://docs.microsoft.com/en-us/sql/reporting-services/install-windows/find-reporting-services-product-key-ssrs?view=sql-server-ver16
 -- https://docs.microsoft.com/en-us/sql/reporting-services/install-windows/install-reporting-services?view=sql-server-ver16
