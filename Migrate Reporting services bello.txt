@@ -94,7 +94,7 @@ same using T-SQL
 	Credential: use use windows Authentification with domain\userReportSVC -- if login exists on sql server drop it first
 	Encryption Keys: restore with the same pass used to back it up from step 3	
 		Fully qualified file name of Encryption Key backup from the source server
-	Subscription settings: enter the domain account domain\userReportSVC -- if login exists on sql server drop it first
+	Subscription settings: enter the domain account domain\userReportSVC 
 	Email settings: 
 		Sender: svc@domain.com
 		SMTP Server: xxx.xxx.xxx.xxx
