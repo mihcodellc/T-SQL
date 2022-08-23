@@ -60,4 +60,12 @@ select '*******a job info and status : uncomment the lines below **************'
 --EXEC sp_help_jobhistory @job_name = 'BackupKrankyKranesDB', @mode = 'FULL';
 
 
+-- delete all disabled jobs
+SELECT 'EXEC sp_delete_job @job_name = N'' ' + job.name + ''' '
+  from [msdb].[dbo].[sysjobs] as job 
+  WHERE  enabled = 0
 
+-- delete all report server
+  SELECT 'EXEC sp_delete_job @job_name = N'' ' + job.name + ''' '
+  from [msdb].[dbo].[sysjobs] as job 
+  WHERE description like 'This job is owned by a report server process%' --category_id = 100
