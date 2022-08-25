@@ -1,4 +1,5 @@
 -- notepad++ regular expressions search
+---- https://www.exeideas.com/2020/08/guide-and-common-regex-with-notepad.html
 ---- https://npp-user-manual.org/docs/searching/#regular-expressions
 ---- https://docs.microsoft.com/en-us/sql/ssms/scripting/search-text-with-wildcards?view=sql-server-ver16
 ---- .* ?/storedprocedures/ => return everything before "/storedprocedures/"
