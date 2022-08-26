@@ -300,7 +300,8 @@ BEGIN CATCH
     IF @@TRANCOUNT <> 0 
     BEGIN
 	   ROLLBACK TRAN
-	   RAISERROR ( 'Deleting Billing Scrubber Rules failed', 16, 1 )
+	   --RAISERROR ( 'msg', 16, 1 )
+	   THROW; -- re raise error from begin try
 	   RETURN -1
     END
     ELSE
@@ -308,3 +309,4 @@ BEGIN CATCH
 END CATCH
 
 SET XACT_ABORT OFF --auto rollback disabled
+
