@@ -1,0 +1,25 @@
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE; 
+--set transaction isolation level read uncommitted
+
+-- SET LOCK_TIMEOUT 2000 -- in milliseconds -- If another query does not release the lock in 2000 => error msg 1222
+-- SELECT @@LOCK_TIMEOUT
+
+SET XACT_ABORT ON --rollback is certain
+BEGIN TRY
+    BEGIN TRAN
+		  EXEC(@query)
+    COMMIT TRAN
+END TRY
+BEGIN CATCH
+    IF @@TRANCOUNT <> 0 
+    BEGIN
+	   ROLLBACK TRAN
+	   --RAISERROR ( 'msg', 16, 1 )
+	   THROW; -- re raise error from begin try
+	   RETURN -1
+    END
+    ELSE
+	   RETURN 0
+END CATCH
+
+SET XACT_ABORT OFF --auto rollback disabled
