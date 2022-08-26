@@ -9,6 +9,6 @@ INNER JOIN [sys].[database_files] [df] ON [ds].[data_space_id] = [df].[data_spac
 INNER JOIN [sys].[indexes] [si] ON [si].[data_space_id] = [ds].[data_space_id]
     AND [si].[index_id] < 2
 INNER JOIN [sys].[objects] [so] ON [si].[object_id] = [so].[object_id]
-WHERE [so].[type] = 'U'
+WHERE [so].[type] = 'U' and OBJECT_NAME([si].[object_id]) like '%Orders%'
     AND [so].[is_ms_shipped] = 0
 ORDER BY [tablename] ASC;
