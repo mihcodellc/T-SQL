@@ -1,5 +1,6 @@
-
+-- take a log backup; it will reduce the size of indexes while the full operation is going on
  
+ --or
 --change the recovery model from to full to simple then back to full
 
 -- switch the database’s recovery model to simple as 
@@ -15,8 +16,6 @@
 --use TestBello
 --DBCC SHRINKFILE (4, TRUNCATEONLY); 
 
---or
--- take a log backup
 
 -- No confusion with 
 -- BACKUP LOG dbname WITH TRUNCATE_ONLY -- details here https://www.brentozar.com/archive/2009/08/backup-log-with-truncate-only-in-sql-server-2008/
