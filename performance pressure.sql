@@ -180,6 +180,18 @@ cross apply sys.dm_exec_sql_text(s.plan_handle)p order by total_worker_time desc
 
 
 ---********************************** Disk pressure
+
+-- https://blog.purestorage.com/purely-technical/what-is-sql-servers-io-block-size/
+--*****Operation -> IO Block size
+-- ----log 512bytes  -> 60 KB
+-- ----checkpoint/Lazywriter -> 8K-1MB
+-- ----Read-Ahead scans -> 128KB-512KB
+-- ----Bulk Loads -> 256 KB
+-- ----Backup/Restore -> 1MB
+-- ----Columnstore Read-Ahead -> 8MB
+-- ----File Initizialization -> 8MB
+-- ----In memory checkpoint 1MB
+
 -- https://docs.microsoft.com/en-us/azure-stack/hci/manage/diskspd-overview
 -- https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/dn894707(v=ws.11)
 -- go to "Step 3: Run DiskSpd trial runs, and tune DiskSpd parameters" in above link to see action,meaning, how to decide
