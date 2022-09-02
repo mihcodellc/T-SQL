@@ -1,6 +1,7 @@
 -- https://www.mssqltips.com/sqlservertip/5832/move-sql-server-tables-to-different-filegroups/
 -- https://docs.microsoft.com/en-us/sql/relational-databases/indexes/move-an-existing-index-to-a-different-filegroup?view=sql-server-ver16
 
+-- delete
 -- https://www.mssqltips.com/sqlservertip/5921/delete-data-from-large-sql-server-tables-with-minimal-logging/
 
 --add file group
