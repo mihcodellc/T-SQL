@@ -13,7 +13,7 @@ EXEC [dbo].[DatabaseBackup] @Databases='TestBello', @Directory='C:\Backups', @Ba
 
 
 --Using SQL statement 
-BACKUP DATABASE TestBello TO DISK = 'C:\Backups\TestBello.BAK' WITH COMPRESSION, CHECKSUM  -- FULL
+BACKUP DATABASE TestBello TO DISK = 'C:\Backups\TestBello.BAK' WITH COMPRESSION, CHECKSUM, COPY_ONLY  -- FULL
 BACKUP DATABASE TestBello TO DISK = 'C:\Backups\TestBello.DIF' WITH DIFFERENTIAL,COMPRESSION, CHECKSUM  --DIFF
 BACKUP LOG TestBello TO DISK = 'C:\Backups\TestBello.TRN' WITH COMPRESSION, CHECKSUM --LOG
 
