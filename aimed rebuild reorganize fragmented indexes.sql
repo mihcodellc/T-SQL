@@ -12,16 +12,9 @@ EXECUTE maintenance.dbo.IndexOptimize
 @FragmentationHigh = 'INDEX_REBUILD_ONLINE,INDEX_REBUILD_OFFLINE',
 @FragmentationLevel1 = 5,
 @FragmentationLevel2 = 30,
-@indexes = 'Medrx.dbo.Table1,
+@indexes = 'Sales.dbo.Table1,
 Sales.dbo.Table2,
-Sales.dbo.LockboxDocumentTracking,
-Sales.dbo.LockBoxServiceLineDetailHistory,
-Sales.dbo.LockboxClaimDetail,
-Sales.dbo.ArchivedFile,
-Sales.dbo.Exceptions,
-Sales.dbo.PaymentsHistory,
-Sales.dbo.Payments,
-Sales.dbo.LockboxClaimDetailArchive
+Sales.dbo.Table3
 ',
 @MaxDOP = 4,
 --@FillFactor - fill factor in sys.indexes is used.
