@@ -1,6 +1,52 @@
 --use IndexOptimize.sql from
 -- https://ola.hallengren.com/downloads.html
+
+-- https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-db-index-physical-stats-transact-sql?view=sql-server-ver16
+--The modes are progressively slower from LIMITED to DETAILED, because more work is performed in each mode. 
+--To quickly gauge the size or fragmentation level of a table or index, use the LIMITED mode. 
+--It is the fastest and will not return a row for each nonleaf level in the IN_ROW_DATA allocation unit of the index.
+EXECUTE maintenance.dbo.IndexOptimize
+@Databases = 'Sales',
+@FragmentationLow = NULL,
+@FragmentationMedium = NULL,
+@FragmentationHigh = 'INDEX_REBUILD_ONLINE,INDEX_REBUILD_OFFLINE',
+@FragmentationLevel1 = 5,
+@FragmentationLevel2 = 30,
+@indexes = 'Medrx.dbo.Table1,
+Sales.dbo.Table2,
+Sales.dbo.LockboxDocumentTracking,
+Sales.dbo.LockBoxServiceLineDetailHistory,
+Sales.dbo.LockboxClaimDetail,
+Sales.dbo.ArchivedFile,
+Sales.dbo.Exceptions,
+Sales.dbo.PaymentsHistory,
+Sales.dbo.Payments,
+Sales.dbo.LockboxClaimDetailArchive
+',
+@MaxDOP = 4,
+--@FillFactor - fill factor in sys.indexes is used.
+--@UpdateStatistics - Do not perform statistics maintenance.
+@Resumable = 'Y', -- online index operation is resumable
+@WaitAtLowPriorityMaxDuration = 5,  -- in minutes 
+@WaitAtLowPriorityAbortAfterWait = 'SELF', -- Abort the online index rebuild operation after 5min
+@TimeLimit = 4000, -- in seconds ie  1350s = 45min -- ie no commands are executed
+@LogToTable = 'Y',
+@Execute = 'Y'
+--or
+--ALTER INDEX IX_anIndex_name ON dbo.ordersTable REBUILD;
+--ALTER INDEX ALL ON dbo.ordersTable REORGANIZE;
+
+
+
+
 -- instead of the one below
+
+
+
+
+
+
+
 
 -- http://www.sqlmusings.com
 USE SUSDB  -- <databasename> statement has been executed first.
