@@ -3,9 +3,11 @@ use [SSISDB]
 -- OR  
 --change the @mydate using the first query 
 --then on the 4th table use the event_message_id on 3rd - 3
-declare @mydate datetime = convert(DATETIME, convert(CHAR(10), dateadd(dd,-1,GETDATE()), 110), 110)
+declare @mydate datetime = convert(DATETIME, convert(CHAR(10), dateadd(dd,-3,GETDATE()), 110), 110) -- -3 to cover weekend error
+declare @EndDate datetime = convert(DATETIME, convert(CHAR(10), dateadd(dd,+1,GETDATE()), 110), 110) --dateadd(dd,2,@mydate)
 
-select @mydate as [start], dateadd(dd,2,@mydate) [end]
+
+select @mydate as [start], @EndDate [end]
 
 /****** info if no rows ie succeed ******/
 SELECT  inf.[execution_id]
@@ -23,7 +25,7 @@ SELECT  inf.[execution_id]
   FROM SSISDB.internal.execution_info inf
   join [SSISDB].catalog.executable_statistics stat 
     on inf.execution_id = stat.execution_id
-  where folder_name = 'merlin' and inf.start_time between @mydate and dateadd(dd,2,@mydate) 
+  where folder_name = 'merlin' and inf.start_time between @mydate and @EndDate 
   and stat.execution_result in (1,2,3) -- 1 Failure,  2 Completion 3 Cancelled, 0 Success
   --convert(DATETIME, convert(CHAR(10), GETDATE(), 110), 110)
   order by inf.start_time desc
@@ -38,8 +40,8 @@ SELECT [execution_result] as [1 Failure,  2 Completion 3 Cancelled, 0 Success]
       ,[execution_duration]
       ,[execution_value]
   FROM [SSISDB].[catalog].[executable_statistics] st
-  where start_time between @mydate and dateadd(dd,2,@mydate)
-	   and exists (select 1 from SSISDB.internal.execution_info inf where inf.execution_id  = st.execution_id and inf.start_time between @mydate and dateadd(dd,2,@mydate))
+  where start_time between @mydate and @EndDate
+	   and exists (select 1 from SSISDB.internal.execution_info inf where inf.execution_id  = st.execution_id and inf.start_time between @mydate and @EndDate)
 	   --and st.execution_result in (1,2,3)
   order by start_time desc
 
@@ -66,5 +68,5 @@ SELECT [execution_result] as [1 Failure,  2 Completion 3 Cancelled, 0 Success]
    event_name in ('OnTaskFailed', 'OnError', 'OnWarning') 
    and  
    exists (select 1 from SSISDB.internal.execution_info inf 
-		  where inf.execution_id  = msg.operation_id and inf.start_time between @mydate and dateadd(dd,2,@mydate))
+		  where inf.execution_id  = msg.operation_id and inf.start_time between @mydate and @EndDate)
 order by message_time desc
