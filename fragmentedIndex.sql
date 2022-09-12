@@ -1,3 +1,8 @@
+-- Fragmentation????
+-- https://www.brentozar.com/?s=fragmentation
+-- https://www.brentozar.com/archive/2016/01/should-i-worry-about-index-fragmentation/
+-------rebuild indexes help THEN try to updating stats instead
+
 --aimed rebuild reorganize indexes.sql
 
 -- https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-db-index-physical-stats-transact-sql?view=sql-server-ver16
