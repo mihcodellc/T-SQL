@@ -48,3 +48,14 @@ WHERE r.command IN ( -- /* SELECT distinct r.command FROM sys.dm_exec_requests r
 		,'RESTORE DATABASE'
 		,'BACKUP LOG'
 		)
+
+-- seems to track in auto running jobs. need to confirm
+SELECT session_id AS SPID
+	,command
+	,a.TEXT AS Query
+	,start_time
+	,percent_complete
+	,dateadd(second, estimated_completion_time / 1000, getdate()) AS estimated_completion_time, r.reads, r.writes, r.logical_reads, r.cpu_time, r.blocking_session_id, total_elapsed_time, is_resumable
+FROM sys.dm_exec_requests r
+CROSS APPLY sys.dm_exec_sql_text(r.sql_handle) a
+order by command		
