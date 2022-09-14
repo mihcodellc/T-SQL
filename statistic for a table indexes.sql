@@ -1,5 +1,12 @@
+-- Returning all statistics properties for a table without fragmentation or full histogram  
+SELECT sp.stats_id, name, filter_definition, last_updated, rows, rows_sampled, steps, unfiltered_rows, modification_counter   
+FROM sys.stats AS stat   
+CROSS APPLY sys.dm_db_stats_properties(stat.object_id, stat.stats_id) AS sp  
+WHERE stat.object_id = object_id('MySchema.Mytable');
 
--- ****** for the table
+
+
+-- ****** for the table +  fragmentation + full histogram per index
 declare @table nvarchar(128), @index  nvarchar(128), 
 @db nvarchar(128), @searchTable nvarchar(128), @tableSchema nvarchar(128),
 @indexID int
@@ -13,7 +20,7 @@ DECLARE MyStats CURSOR FOR
 	join sys.indexes ix on st.object_id = ix.object_id
 	where DB_NAME(database_id) = @db 
 	and OBJECT_NAME(st.object_id) = @searchTable
-	and ix.name='x'
+	--and ix.name='x'
 
 OPEN MyStats  
   
