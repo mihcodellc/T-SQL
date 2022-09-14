@@ -1,6 +1,12 @@
 --use IndexOptimize.sql from
 -- https://ola.hallengren.com/downloads.html
 
+
+-- https://docs.microsoft.com/en-us/sql/relational-databases/indexes/reorganize-and-rebuild-indexes?view=sql-server-ver16#index-maintenance-strategy
+-- If you observe that rebuilding indexes improves performance, try replacing it with updating statistics
+-- In that case, you may not need to rebuild indexes as frequently, or at all
+
+
 -- https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-db-index-physical-stats-transact-sql?view=sql-server-ver16
 --The modes are progressively slower from LIMITED to DETAILED, because more work is performed in each mode. 
 --To quickly gauge the size or fragmentation level of a table or index, use the LIMITED mode. 
