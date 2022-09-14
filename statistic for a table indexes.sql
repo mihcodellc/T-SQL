@@ -1,8 +1,10 @@
+
 -- Returning all statistics properties for a table without fragmentation or full histogram  
-SELECT sp.stats_id, name, filter_definition, last_updated, rows, rows_sampled, steps, unfiltered_rows, modification_counter   
+SELECT sp.stats_id, name, filter_definition, last_updated, rows, rows_sampled, steps, unfiltered_rows, modification_counter, stat.*   
 FROM sys.stats AS stat   
 CROSS APPLY sys.dm_db_stats_properties(stat.object_id, stat.stats_id) AS sp  
-WHERE stat.object_id = object_id('MySchema.Mytable');
+WHERE stat.object_id = object_id('MySchema.Mytable')
+	   and auto_created = 0
 
 
 -- as above + columns involved 
@@ -22,8 +24,9 @@ cross apply (
 where  
 stat.object_id = object_id('MySchema.Mytable')  
 and 
-keyColumns is not null
+auto_created = 0 -- keyColumns is not null
 order by 2 
+
 
 
 -- ****** for the table +  fragmentation + full histogram per index
