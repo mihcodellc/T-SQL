@@ -5,6 +5,26 @@ CROSS APPLY sys.dm_db_stats_properties(stat.object_id, stat.stats_id) AS sp
 WHERE stat.object_id = object_id('MySchema.Mytable');
 
 
+-- as above + columns involved 
+select  distinct ix.index_id, keyColumns, sp.*, stat.name idx_name, stat.*
+from sys.index_columns ix
+join sys.stats AS stat on ix.index_id = stat.stats_id
+CROSS APPLY sys.dm_db_stats_properties(stat.object_id, stat.stats_id) AS sp 
+cross apply (
+	   select isnull(convert(varchar(128), c.name),'') + ', '
+	   from sys.index_columns i
+	   join sys.columns AS c on  c.object_id = i.object_id and c.column_id = i.column_id
+	   where is_included_column = 0
+		      and i.index_id = ix.index_id and stat.object_id = c.object_id
+	   order by i.key_ordinal asc
+    FOR XML PATH('') 
+) AS li (keyColumns)
+where  
+stat.object_id = object_id('MySchema.Mytable')  
+and 
+keyColumns is not null
+order by 2 
+
 
 -- ****** for the table +  fragmentation + full histogram per index
 declare @table nvarchar(128), @index  nvarchar(128), 
