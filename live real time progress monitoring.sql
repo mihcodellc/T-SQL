@@ -50,6 +50,20 @@ WHERE r.command IN ( -- /* SELECT distinct r.command FROM sys.dm_exec_requests r
 		)
 
 -- seems to track in auto running jobs. need to confirm
+-- for sure for these
+--ALTER INDEX REORGANIZE
+--AUTO_SHRINK option with ALTER DATABASE
+--BACKUP DATABASE
+--DBCC CHECKDB
+--DBCC CHECKFILEGROUP
+--DBCC CHECKTABLE
+--DBCC INDEXDEFRAG
+--DBCC SHRINKDATABASE
+--DBCC SHRINKFILE
+--RECOVERY
+--RESTORE DATABASE
+--ROLLBACK
+--TDE ENCRYPTION
 SELECT session_id AS SPID
 	,command
 	,a.TEXT AS Query
