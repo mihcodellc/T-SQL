@@ -6,8 +6,8 @@ SELECT sp.stats_id, name, filter_definition, last_updated, rows, rows_sampled, s
 FROM sys.stats AS stat   
 CROSS APPLY sys.dm_db_stats_properties(stat.object_id, stat.stats_id) AS sp  
 --CROSS APPLY sys.dm_db_stats_histogram(stat.[object_id], stat.stats_id) AS histo
-WHERE stat.object_id = object_id('dbo.Payments')
- and name like '%dteffectiv%'
+WHERE stat.object_id = object_id('a_table')
+ and name like '%index_name%'
 	   and auto_created = 0
 
 
