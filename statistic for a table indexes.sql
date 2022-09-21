@@ -1,9 +1,13 @@
 
 -- Returning all statistics properties for a table without fragmentation or full histogram  
-SELECT sp.stats_id, name, filter_definition, last_updated, rows, rows_sampled, steps, unfiltered_rows, modification_counter, stat.*   
+SELECT sp.stats_id, name, filter_definition, last_updated, rows, rows_sampled, steps, unfiltered_rows, modification_counter
+--, histo.* 
+--, stat.*   
 FROM sys.stats AS stat   
 CROSS APPLY sys.dm_db_stats_properties(stat.object_id, stat.stats_id) AS sp  
-WHERE stat.object_id = object_id('MySchema.Mytable')
+--CROSS APPLY sys.dm_db_stats_histogram(stat.[object_id], stat.stats_id) AS histo
+WHERE stat.object_id = object_id('dbo.Payments')
+ and name like '%dteffectiv%'
 	   and auto_created = 0
 
 
