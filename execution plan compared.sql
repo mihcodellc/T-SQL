@@ -144,16 +144,32 @@ WHERE p.objtype = 'Adhoc' AND p.usecounts = 1  --t.objectid = OBJECT_ID(N'SLID_H
  and a.attribute = N'set_options'
 GROUP BY p.plan_handle, p.usecounts, p.size_in_bytes, t.objectid
 
+--**** causes of multiples plans for a query 
+-- ###causes -- https://www.brentozar.com/archive/2018/03/why-multiple-plans-for-one-query-are-bad/
 --    literal of 8Kilobytes or more in the query
 --non full qualified named names where referring to an object SP, tables ...
 --the query is not the same due to the white space, literals used, or different size(KB) of the query 
 --the batch of the queries (sql_handle) is different
 --partial parameterization(markers) of the query
 
+--**** solution if developers won't make the changes
+--  is to turn on "Forced Parameterization" on the Databse level
+USE master;
+GO
+ALTER DATABASE MyDatabase
+SET PARAMETERIZATION FORCED; -- SIMPLE
+GO 
+
+
 -- https://sqlperformance.com/2014/11/t-sql-queries/multiple-plans-identical-query
 -- https://www.red-gate.com/hub/product-learning/sql-monitor/investigating-problems-ad-hoc-queries-using-sql-monitor
+-- https://www.brentozar.com/blitz/forced-parameterization/
+-- https://www.brentozar.com/archive/2018/03/why-multiple-plans-for-one-query-are-bad/
 
--- determining the ratio between the multi-use and single-use query execution plans cached
+
+
+
+--**** determining the ratio between the multi-use and single-use query execution plans cached
 SELECT Db_Name(QueryText.dbid) AS database_name,
   Sum(CASE WHEN ExecPlans.usecounts = 1 THEN 1 ELSE 0 END) AS Single,
   Sum(CASE WHEN ExecPlans.usecounts > 1 THEN 1 ELSE 0 END) AS Reused,
