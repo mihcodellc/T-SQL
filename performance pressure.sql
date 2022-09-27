@@ -181,6 +181,7 @@ cross apply sys.dm_exec_sql_text(s.plan_handle)p order by total_worker_time desc
 
 ---********************************** Disk pressure
 
+-- disk peformance:diskspd, Crystal Mark, IOmeter
 -- https://blog.purestorage.com/purely-technical/what-is-sql-servers-io-block-size/
 --*****Operation -> IO Block size
 -- ----log 512bytes  -> 60 KB
