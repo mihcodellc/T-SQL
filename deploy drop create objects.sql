@@ -1,4 +1,5 @@
-USE [MedRxAnalytics]
+-- https://www.mssqltips.com/sqlservertip/4402/new-drop-if-exists-syntax-in-sql-server-2016/
+USE MyDBName
 GO
 
 /****** Object:  Table [DBO].[AtABLE]    Script Date: 9/21/2022 12:37:46 PM ******/
