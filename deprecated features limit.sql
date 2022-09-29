@@ -10,8 +10,8 @@ https://learn.microsoft.com/en-us/sql/sql-server/editions-and-components-of-sql-
 https://learn.microsoft.com/en-us/sql/sql-server/maximum-capacity-specifications-for-sql-server?view=sql-server-ver16
 
 
-Hard Disk	                             +6 GB of available hard-disk space
-All Features	                         8030 MB
+Hard Disk	                           +6 GB of available hard-disk space
+All Features	                       8030 MB
 Database Engine and data files,        1480 MB
     Replication, Full-Text Search, 
     and Data Quality Services	
