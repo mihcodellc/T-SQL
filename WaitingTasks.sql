@@ -384,3 +384,13 @@ ORDER BY Wait_Time_Seconds DESC
 
 
 
+Lower CXPACKET ie parallelism during query execution
+
+by tuning parallelism
+            tuning Maxdop = 4 on server 0 on database
+            threshold for parallelism 250 on server N/A on DB level
+by Resolving Skewed Workloads  
+            distribution of Actual Number of Rows between thread
+            if not even, look outdate stats
+        CXCONSUMER ie consumer thread is waiting for producer
+ref: Pro SQL Server 2019 Wait Statistics: A Practical Guide to Analyzing Performance in SQL Server by Enrico van de Laar
