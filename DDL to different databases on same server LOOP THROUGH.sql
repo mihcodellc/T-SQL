@@ -2,20 +2,14 @@ DECLARE @ToCreate varchar(1000)
 DECLARE @command varchar(2000) 
 															 
 
-SELECT @ToCreate = '
-												  
- 
-					   
-
-			
-						  
+SELECT @ToCreate = '		  
 			 
-CREATE FUNCTION [APPS].[F_GetThinkHealthBaseName](@ArchiveType int)
+CREATE FUNCTION [APPS].[F_GetCompanyBaseName](@ArchiveType int)
 RETURNS VARCHAR(75)	
 AS
 BEGIN
-	/*--Last Changed -- Date: 11/16/2020 -- By: Monktar Bello - initial version - get the Thinkhealth database from archive db s name*/
-	/*--Example Run --  select [APPS].[F_GetThinkHealthBaseName](1)*/
+	/*--Last Changed -- Date: 11/16/2020 -- By: Monktar Bello - initial version - get the Company database from archive db s name*/
+	/*--Example Run --  select [APPS].[F_GetCompanyBaseName](1)*/
 
 	DECLARE @ArchiveDBName varchar(100)
 	DECLARE @BaseName varchar(75)
@@ -41,5 +35,3 @@ END'
 --SELECT @command
 
 EXEC sp_MSforeachdb @command
-
-					   
