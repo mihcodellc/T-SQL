@@ -24,6 +24,7 @@
 -- SQLIOSim (ex SQLIOStress) to perform reliability and integrity tests on disk subsystems
 
 
---***get block size in powershell
+--***get block size in powershell -- https://blog.purestorage.com/purely-technical/what-is-sql-servers-io-block-size/
+-- https://social.technet.microsoft.com/wiki/contents/articles/33812.sql-server-storage-checking-volumes-block-sizes.aspx
 $wmiQuery = "SELECT Name, Label, Blocksize FROM Win32_Volume WHERE FileSystem='NTFS'"
 Get-WmiObject -Query $wmiQuery -ComputerName '.' | Sort-Object Name | Select-Object Name, Label, Blocksize
