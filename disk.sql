@@ -22,3 +22,8 @@
 
 --***2.to perform reliability and integrity tests on disk subsystems
 -- SQLIOSim (ex SQLIOStress) to perform reliability and integrity tests on disk subsystems
+
+
+--***get block size in powershell
+$wmiQuery = "SELECT Name, Label, Blocksize FROM Win32_Volume WHERE FileSystem='NTFS'"
+Get-WmiObject -Query $wmiQuery -ComputerName '.' | Sort-Object Name | Select-Object Name, Label, Blocksize
