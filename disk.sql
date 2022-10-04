@@ -1,4 +1,5 @@
--- disk peformance:diskspd, Crystal Mark, IOmeter
+--***1.perform benchmark tests and determine the I/O capacity
+-- disk performance:diskspd, Crystal Mark, IOmeter
 -- https://blog.purestorage.com/purely-technical/what-is-sql-servers-io-block-size/
 --*****Operation -> IO Block size
 -- ----log 512bytes  -> 60 KB
@@ -18,3 +19,6 @@
 -- 	rem warm up 300 run for 30s
 --	diskspd.exe -c100G -t24 -si64K -b64K -w70 -d600 -W300 -L -o12 -D -h u:\bello\testfile.dat > 64KB_Concurent_Write_24Threads_12OutstandingIO.txt
 -- go look "diskPerformanceTested.ps1" in powershell directory
+
+--***2.to perform reliability and integrity tests on disk subsystems
+-- SQLIOSim (ex SQLIOStress) to perform reliability and integrity tests on disk subsystems
