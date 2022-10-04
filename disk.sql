@@ -2,7 +2,7 @@
 -- disk performance:diskspd, Crystal Mark, IOmeter
 -- https://blog.purestorage.com/purely-technical/what-is-sql-servers-io-block-size/
 --*****Operation -> IO Block size
--- ----log 512bytes  -> 60 KB
+-- ----log  -> 512bytes - 60 KB
 -- ----checkpoint/Lazywriter -> 8K-1MB
 -- ----Read-Ahead scans -> 128KB-512KB
 -- ----Bulk Loads -> 256 KB
@@ -24,7 +24,7 @@
 -- SQLIOSim (ex SQLIOStress) to perform reliability and integrity tests on disk subsystems
 
 
---***get block size in powershell -- https://blog.purestorage.com/purely-technical/what-is-sql-servers-io-block-size/
+--***get block size in powershell 
 -- https://social.technet.microsoft.com/wiki/contents/articles/33812.sql-server-storage-checking-volumes-block-sizes.aspx
 $wmiQuery = "SELECT Name, Label, Blocksize FROM Win32_Volume WHERE FileSystem='NTFS'"
 Get-WmiObject -Query $wmiQuery -ComputerName '.' | Sort-Object Name | Select-Object Name, Label, Blocksize
