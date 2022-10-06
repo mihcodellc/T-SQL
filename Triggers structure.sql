@@ -9,7 +9,10 @@ BEGIN
 	-- Prevent recursively calling yourself.
 	IF trigger_nestlevel() > 1 RETURN;
 
-	select 1
+        -- prevent unnecessary trip 
+	IF (@@ROWCOUNT = 0)  RETURN;
+	
+	/**YOUR statements**/
 end
 GO
 --Specifies the AFTER triggers that are fired first or last after @stmttype
