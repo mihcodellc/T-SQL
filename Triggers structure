@@ -1,0 +1,21 @@
+create TRIGGER [dbo].[Tr_History]
+ON [dbo].[LockboxDocumentTracking]
+AFTER INSERT, UPDATE, DELETE
+AS
+BEGIN
+	------------------------------------------------------------------------------------------
+	
+
+	-- Prevent recursively calling yourself.
+	IF trigger_nestlevel() > 1 RETURN;
+
+	select 1
+end
+GO
+--Specifies the AFTER triggers that are fired first or last after @stmttype
+EXEC sp_settriggerorder @triggername=N'[dbo].[Tr_History]', @order=N'Last', @stmttype=N'DELETE'
+GO
+EXEC sp_settriggerorder @triggername=N'[dbo].[Tr_History]', @order=N'Last', @stmttype=N'INSERT'
+GO
+EXEC sp_settriggerorder @triggername=N'[dbo].[Tr_History]', @order=N'Last', @stmttype=N'UPDATE'
+
