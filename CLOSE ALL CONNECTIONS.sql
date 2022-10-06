@@ -4,7 +4,7 @@
 -- **********CLOSE ALL CONNECTIONS ON THE DATABASE  
 DECLARE @dbid INT, @KillStatement char(30), @SysProcId smallint
 --define the targeted database 
-SELECT @dbid = dbid FROM sys.sysdatabases WHERE name = 'iThinkHealth' 
+SELECT @dbid = dbid FROM sys.sysdatabases WHERE name = 'MydataBase' 
 IF EXISTS (SELECT spid FROM sys.sysprocesses WHERE dbid = @dbid)
   BEGIN
     PRINT '*********CREATE WOULD FAIL -DROPPING ALL CONNECTIONS*********'
