@@ -191,11 +191,16 @@ SELECT Db_Name(QueryText.dbid) AS database_name,
               ) as 'Ad-hoc query %'
   FROM sys.dm_exec_cached_plans AS a
 
--- session running on adhoc plan
-SELECT st.text, c.sql_handle as '/* sql_handle uniq for a batch and 1,N with plan_handle */', p.plan_handle, db_name(st.dbid) databse, sdec.session_id, sdec.client_net_address,sdec.local_net_address    ,sdes.login_name
+ --session running on adhoc plan
+SELECT st.text
+, sdes.login_name 
 , sdes.host_name 
-    ,sdes.program_name
-    ,sdes.login_name, a.value AS set_options, p.size_in_bytes, p.usecounts
+,sdes.program_name
+,c.creation_time
+,c.query_hash /*query_hash ie with similar logic, may differ by literal */, 
+c.sql_handle as '/* sql_handle uniq for a batch and 1,N with plan_handle */', p.plan_handle, db_name(st.dbid) databse, 
+sdec.session_id, sdec.client_net_address,sdec.local_net_address    
+, a.value AS set_options, p.size_in_bytes, p.usecounts
  --, p.
 FROM sys.dm_exec_cached_plans p
 join sys.dm_exec_query_stats c on c.plan_handle = p.plan_handle
@@ -203,11 +208,14 @@ join sys.dm_exec_connections sdec on sdec.most_recent_sql_handle = c.sql_handle
 JOIN sys.dm_exec_sessions AS sdes on sdes.session_id = sdec.session_id
 cross apply sys.dm_exec_sql_text(p.plan_handle) st
 cross apply sys.dm_exec_plan_attributes(c.plan_handle) a
-WHERE p.objtype = 'Adhoc' AND  p.usecounts = 1  AND a.attribute = 'set_options'
-group by c.sql_handle, st.text, p.plan_handle, db_name(st.dbid) , sdec.session_id, sdec.client_net_address,sdec.local_net_address    ,sdes.login_name
+WHERE p.objtype = 'Adhoc' 
+AND  p.usecounts = 1  
+AND a.attribute = 'set_options'
+group by c.sql_handle, st.text, p.plan_handle, db_name(st.dbid) , sdec.session_id, sdec.client_net_address,sdec.local_net_address    ,sdes.login_name, c.query_hash
 , sdes.host_name 
     ,sdes.program_name
-    ,sdes.login_name, a.value , p.size_in_bytes, p.usecounts
+    ,sdes.login_name, a.value , p.size_in_bytes, p.usecounts, c.creation_time
+order by query_hash
 
 
 SELECT st.text, memory_object_address, cp.objtype, refcounts, usecounts, 
