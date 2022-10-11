@@ -68,7 +68,7 @@ WHERE b.type ='U' and t.name in ('int','smallint', 'bigint', 'tinyint')
  and a.is_identity = @checkIdentityCol 
  and a.name not in( 'SysProcessID')
  and ((len(@Mytable) > 0 and OBJECT_NAME(a.object_id) = @Mytable) or @Mytable='')
- --and OBJECT_NAME(a.object_id) not in (xxx', 'xxxx')
+ and OBJECT_NAME(a.object_id) not in ('MasterPayerHistory_OLD', 'LockboxDocumentTrackingArchive_OLD')
  
 DECLARE @query NVARCHAR(3000), @obj_id int, @col_id int
 
@@ -125,7 +125,7 @@ join #FillUp2 u
 --where (number_rows/maxNumber * 100) > @FillUpPercent
 )
 select top 10 aschema, aTable, case when HasEarlyWall =1 and ValueAtWall > 0  then (CountBeforeWall/ValueAtWall) else (CountBeforeWall/maxNumber) end * 100 PercentLeft, PercentageOfUse,
-	   CountBeforeWall, ValueAtWall, MinValue,maxNumber,  HasEarlyWall, [last-generated identity], IsMaxAllowedUsed, table_id_name, typeName, CountOfUnusedValues, number_rows
+	   CountBeforeWall, ValueAtWall, MinValue, HasEarlyWall, maxNumber,  [last-generated identity], IsMaxAllowedUsed, table_id_name, typeName, CountOfUnusedValues, number_rows
 from cte
 order by PercentLeft asc
 --where   
