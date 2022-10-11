@@ -1,21 +1,21 @@
 declare @sql nvarchar(max)
 set @sql = '
-USE ' + (select [APPS].[F_GetThinkHealthArchiveName](1)) + ';
+USE ' + (select [APPS].[F_GetArchiveName](1)) + ';
 
-IF  EXISTS (SELECT 1 FROM sys.objects WHERE object_id = OBJECT_ID(N''[APPS].[F_GetThinkHealthBaseName]'') AND type in (N''FN'', N''IF'', N''TF'', N''FS'', N''FT''))
-			DROP FUNCTION [APPS].[F_GetThinkHealthBaseName]
+IF  EXISTS (SELECT 1 FROM sys.objects WHERE object_id = OBJECT_ID(N''[APPS].[F_GetBaseName]'') AND type in (N''FN'', N''IF'', N''TF'', N''FS'', N''FT''))
+			DROP FUNCTION [APPS].[F_GetBaseName]
 '
 exec sp_executesql @sql
 
 set @sql = '
 declare @sql nvarchar(max)
 set @sql = ''
-CREATE FUNCTION [APPS].[F_GetThinkHealthBaseName](@ArchiveType int)
+CREATE FUNCTION [APPS].[F_GetBaseName](@ArchiveType int)
 RETURNS VARCHAR(75)	
 AS
 BEGIN
-	/*--Last Changed -- Date: 11/16/2020 -- By: Monktar Bello - initial version - get the Thinkhealth database from archive db s name*/
-	/*--Example Run --  select [APPS].[F_GetThinkHealthBaseName](1)*/
+	/*--Last Changed -- Date: 11/16/2020 -- By: Monktar Bello - initial version - get the  database from archive db s name*/
+	/*--Example Run --  select [APPS].[F_GetBaseName](1)*/
 
 	DECLARE @ArchiveDBName varchar(100)
 	DECLARE @BaseName varchar(75)
@@ -31,6 +31,6 @@ BEGIN
 
 END
 ''
-exec ' + (select [APPS].[F_GetThinkHealthArchiveName](1)) + '..sp_executesql  @sql'
+exec ' + (select [APPS].[F_GetArchiveName](1)) + '..sp_executesql  @sql'
 
 exec sp_executesql @sql
