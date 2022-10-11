@@ -128,6 +128,7 @@ FROM    sys.dm_os_wait_stats OS
 WHERE   S.session_id = 56
 
 ------ https://www.sqlskills.com/blogs/paul/updated-sys-dm_os_waiting_tasks-script-to-correctly-parse-nodeid/
+-- with queries and waits
 
 SELECT
     [owt].[session_id] AS [SPID],
@@ -171,7 +172,7 @@ ORDER BY
 GO
 
 
-
+-- waits summary
 -- Last updated February 26, 2019
 ;WITH [Waits] AS
     (SELECT
