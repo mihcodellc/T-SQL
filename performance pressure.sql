@@ -38,6 +38,9 @@
 -- start here > https://docs.microsoft.com/en-us/troubleshoot/sql/performance/blocked-column-populated-latch-waits
 --https://docs.microsoft.com/en-us/troubleshoot/sql/welcome-sql-server ---you have to find your way to troubleshoot
 --https://docs.microsoft.com/en-us/troubleshoot/sql/performance/understand-resolve-blocking
+--understand row Row Versioning https://learn.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms175492(v=sql.105)?redirectedfrom=MSDN
+Read Committed Snapshot Isolation RCSI “Readers don’t block writers, writers don’t block readers, but writers still block writers.” -- https://www.brentozar.com/archive/2013/01/implementing-snapshot-or-read-committed-snapshot-isolation-in-sql-server-a-guide/
+
 
 --query processing
 --https://docs.microsoft.com/en-us/sql/relational-databases/query-processing-architecture-guide?view=sql-server-ver15
@@ -303,7 +306,7 @@ SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
 -- SET LOCK_TIMEOUT 2000 -- in milliseconds -- If another query does not release the lock in 2000 => error msg 1222
 -- SELECT @@LOCK_TIMEOUT
 
-SET XACT_ABORT ON --rollback is certain
+SET XACT_ABORT ON --rollback the tran is certain, batch stop (ON) vs statement stop (OFF)
 BEGIN TRY
     BEGIN TRAN
 		  EXEC(@query)
