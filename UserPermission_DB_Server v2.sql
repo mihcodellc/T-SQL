@@ -1,7 +1,7 @@
 --permissions, privileges
-EXEC rmsAdmin.dbo.sp_MIHCode_Permission 
-@LoginUser = [gsikes]
---,@UserDB = MedRxAnalytics
+EXEC sp_MIHCode_Permission 
+@LoginUser = [mbello]
+--,@UserDB = Master
 ----@permission = 'update' 
 
 
@@ -67,22 +67,12 @@ set @query = ''
 
 --SET @permission = '%execute%';
 SET @LoginUser = 'svc-datascientist'
---SET @UserDB = 'RmsAdmin' sdonaldson@rmsweb.com
---grant alter on schema::dbo to data_science
---CREATE USER zfesler FOR LOGIN zfesler
---EXEC sp_addrolemember 'devops_jr', 'zfesler'
---revoke select on database::RmsAdmin to gsikes
+--SET @UserDB = 'Master' 
 
---use RMSOCR
---create role data_science
---EXEC sp_addrolemember 'data_science', 'zfesler'
---CREATE USER gsikes FOR LOGIN gsikes 
---EXEC sp_addrolemember 'data_science', 'gsikes'
---grant SHOWPLAN on database::RMSOCR to data_science
 
---EXEC sp_droprolemember 'devops_jr', 'zfesler' 
---EXEC sp_droprolemember 'devops_jr', 'gsikes' 
---use archive
+
+
+
 
 
 --if @UserDB is not null and @LoginUser is not null
