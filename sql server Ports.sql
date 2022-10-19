@@ -41,3 +41,6 @@ EXEC master.dbo.xp_readerrorlog
      @searchString4, --warning
      @start, 
      @end;
+	 
+***run AS
+runas.exe /noprofile /netonly /user:rms-asp\mbello "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\devenv.exe"	 
