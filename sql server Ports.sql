@@ -16,7 +16,9 @@ C:\> NETSH advFirewall firewall add rule name="Allow: Inbound: TCP: SQL Server S
 
 http://www.sql2developers.com/2014/09/how-to-check-port-is-open-in-sql-server.html#:~:text=How%20to%20check%20the%20port%20is%20open%20in,search%20for%20the%20text%20%22Server%20is%20listening%20on%22.
 
-check open port 
+***check open port 
+--in powershell
+test-netconnection asp-sql003.rms-asp.com -p 1433 -- https://phoenixnap.com/kb/ping-specific-port#:~:text=Ping%20a%20Specific%20Port%20Using%20Telnet%201%201.,Ctrl%20%2B%20%5D%20and%20run%20the%20q%20command.
 
 --search using xp_readErrorLog
 DECLARE @logFileType SMALLINT= 1;
