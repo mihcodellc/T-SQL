@@ -9,6 +9,10 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
+--functions
+IF  EXISTS (SELECT 1 FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[AtABLE]') AND type in ('FN','IF', 'FS'))
+    DROP TABLE dbo.[AtABLE]
+
 --table
 IF  EXISTS (SELECT 1 FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[AtABLE]') AND type in (N'U'))
     DROP TABLE dbo.[AtABLE]
@@ -25,5 +29,5 @@ IF EXISTS(select '1' from msdb.dbo.sysjobs_view WHERE name='Ajob')
     EXEC msdb.dbo.sp_delete_job @job_name=N'Ajob'
 GO
 
-USE [MedRxAnalytics]
+USE [database]
 GO
