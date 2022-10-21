@@ -75,6 +75,7 @@ optionValues.name,
 optionValues.description,
 row_number() over (partition by 1 order by id) as bitNum
 from (values
+-- https://learn.microsoft.com/en-us/sql/t-sql/functions/options-transact-sql?view=sql-server-ver16
 (1, 'DISABLE_DEF_CNST_CHK', 'Controls interim or deferred constraint checking.'),
 (2, 'IMPLICIT_TRANSACTIONS', 'For dblib network library connections, controls whether a transaction is started implicitly when a statement is executed. The IMPLICIT_TRANSACTIONS setting has no effect on ODBC or OLEDB connections.'),
 (4, 'CURSOR_CLOSE_ON_COMMIT', 'Controls behavior of cursors after a commit operation has been performed.'),
