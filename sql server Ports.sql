@@ -18,7 +18,7 @@ http://www.sql2developers.com/2014/09/how-to-check-port-is-open-in-sql-server.ht
 
 ***check open port 
 --in powershell
-test-netconnection asp-sql003.rms-asp.com -p 1433 -- https://phoenixnap.com/kb/ping-specific-port#:~:text=Ping%20a%20Specific%20Port%20Using%20Telnet%201%201.,Ctrl%20%2B%20%5D%20and%20run%20the%20q%20command.
+test-netconnection server01.mih-store.com -p 1433 -- https://phoenixnap.com/kb/ping-specific-port#:~:text=Ping%20a%20Specific%20Port%20Using%20Telnet%201%201.,Ctrl%20%2B%20%5D%20and%20run%20the%20q%20command.
 
 --search using xp_readErrorLog
 DECLARE @logFileType SMALLINT= 1;
