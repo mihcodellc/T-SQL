@@ -6,7 +6,9 @@
 
 
 -- consider sp_help_permissions instead if don't have impersonate permission
---Last update 10/25/2022 : Monktar Bello - permissions attached to only database - sysname(schema,object) replaced with varchar because it doesn't allow null in #objectPermission
+
+--Last update 10/31/2022 : Monktar Bello - a select for denied permission and and filter #objectPermission with @permission
+-- 10/25/2022 : Monktar Bello - permissions attached to only database - sysname(schema,object) replaced with varchar because it doesn't allow null in #objectPermission
 -- 10/19/2022 : Monktar Bello - fixed not return objects' permission on @userDB 
 -- 4/5/2022 : Monktar Bello - put in @UserDB and filtered with @LoginUser  
 
@@ -64,14 +66,19 @@ set nocount on;
 set transaction isolation level read uncommitted
 go
 
+--revoke execute on schema::billingrevamp to accounting
+------grant execute on schema::billingrevamp to billing_new
+--revoke execute on object::dbo.[Billing_UpdateBtrRecord] to billing_new
+
+
 declare @LoginUser sysname, @canImpersonate int, @permission sysname, @type char(1), @db sysname, @UserDB sysname; 
 declare @query nvarchar(2000)
 declare @clause nvarchar(2000)
 
 set @query = ''
 
---SET @permission = '%execute%';
-SET @LoginUser = 'sacquaye'
+--SET @permission = '%deny%'; --apickens@rmsweb.com
+SET @LoginUser = 'aaycock'
 --SET @UserDB = 'RmsAdmin' 
 --grant alter on schema::dbo to data_science
 --CREATE USER zfesler FOR LOGIN zfesler
@@ -404,9 +411,14 @@ BEGIN
     ----order by principalName, permission_name
 
     select * from  #objectPermission
-    where CurrentDatabase = @UserDB OR  @UserDB IS NULL
+    where (permission_name like '%'+@permission+'%' OR  @permission IS NULL) and (CurrentDatabase = @UserDB OR  @UserDB IS NULL)
 	order by principalName
 
+    select '*********denied permission **********'
+    select * from  #objectPermission
+    where (permission_name like '%'+@permission+'%' OR  @permission IS NULL) and (CurrentDatabase = @UserDB OR  @UserDB IS NULL)
+		  and state_desc = 'DENY'
+    order by principalName
 
 
 select '*********hidden permission from public commented **********'

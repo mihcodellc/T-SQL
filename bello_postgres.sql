@@ -66,16 +66,16 @@ postgres(1) ~~ mssql(2)
 	MSSQL default by TSQL
 	postgres:  
 DO --required
-$$ --required
-declare a_name TEXT;
-begin --required
+$$ --required or $aText$
+declare a_name TEXT; -- ACTUAL PLACE FOR DECLARATION
+begin --required 
 	--statements
 	SELECT name INTO a_name
 	FROM pg_available_extensions -- from dual in oracle doesn't work here
 	LIMIT 3 OFFSET 5;
 	RAISE NOTICE '%', a_name;
 end;  --required
-$$ --required
+$$ --required or $aText$
 
 
 *************ADMIN
@@ -123,8 +123,10 @@ Select table_name, columns.column_name, columns.is_nullable, columns.data_type, 
 
 
 --search though postgre
--- You can do the same for views by changing "routines" to "views"
-SELECT * FROM information_schema.routines where routine_definition like '%MYSTRING%'; --routines, tables, views, triggers, 
+-- You can do the same for views by changing "routines" to "views" or "tables"
+SELECT routine_name,* FROM information_schema.routines -- 
+where routine_definition like '%MYSTRING%' or  --routines(function, proc)
+	  routine_name like '%MYSTRING%'
 
 -- proc definition
 select pg_catalog.pg_get_functiondef('copy_remit_service_lines'::regproc::oid); 
@@ -163,3 +165,8 @@ each connection can have
 	SELECT current_database();
 	SELECT inet_server_addr(), inet_server_port();
 	SELECT version();
+	
+-- roles
+create view role_routine_grants (grantor, grantee, specific_catalog, specific_schema, specific_name, routine_catalog, routine_schema,routine_name, privilege_type, is_grantable)
+	SELECT * FROM information_schema.role_routine_grants
+    SELECT * FROM information_schema.table_privileges 	
