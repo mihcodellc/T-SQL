@@ -9,18 +9,27 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
+--trigger
+IF OBJECT_ID('Sales.tr_SalesOrderDetailsDML', 'TR') IS NOT NULL
+    DROP TRIGGER Sales.tr_SalesOrderDetailsDML;
+
 --functions
-IF  EXISTS (SELECT 1 FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[AtABLE]') AND type in ('FN','IF', 'FS'))
+IF OBJECT_ID('dbo].[AFunction]', 'FN') IS NOT NULL --'FN','IF', 'FS'
+--IF  EXISTS (SELECT 1 FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[AFunction]') AND type in ('FN','IF', 'FS'))
     DROP TABLE dbo.[AtABLE]
 
 --table
-IF  EXISTS (SELECT 1 FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[AtABLE]') AND type in (N'U'))
+IF OBJECT_ID('dbo].[AtABLE]', 'U') IS NOT NULL
+--IF  EXISTS (SELECT 1 FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[AtABLE]') AND type in (N'U'))
     DROP TABLE dbo.[AtABLE]
 GO
+
 --proc
-IF  EXISTS (SELECT 1 FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_aStore_Proc]') AND type in (N'P'))
-    DROP PROCEDURE dbo.[AtABLE]
+IF OBJECT_ID('dbo].[usp_aStore_Proc]', 'F') IS NOT NULL
+--IF  EXISTS (SELECT 1 FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_aStore_Proc]') AND type in (N'P'))
+    DROP PROCEDURE dbo.[usp_aStore_Proc]
 GO
+
 --job
 USE [msdb]
 GO
