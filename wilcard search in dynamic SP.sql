@@ -1,8 +1,21 @@
 -- notepad++ regular expressions search
+---- https://www.linguisticsweb.org/doku.php?id=linguisticsweb:tutorials:basics:regex:regex-notepad
 ---- https://www.exeideas.com/2020/08/guide-and-common-regex-with-notepad.html
 ---- https://npp-user-manual.org/docs/searching/#regular-expressions
+	* ⇒ This matches 0 or more instances of the previous character
+	*? ⇒ Zero or more of the previous group, but minimally: the shortest matching string, rather than the longest string
+	+ ⇒ This matches 1 or more instances of the previous character, as many as it can. 
+	+? ⇒ One or more of the previous group, but minimally.
+	all above are in "Multiplying operators", we do have others like: 
+	          "Character Properties" or 
+		  "Anchors" (match a zero-length position in the line)
+		  "Assertions" consume no characters and , matching starts over where it left. 
+		  "Substitutions"
+		  ...		  
 ---- https://docs.microsoft.com/en-us/sql/ssms/scripting/search-text-with-wildcards?view=sql-server-ver16
 ---- .* ?/storedprocedures/ => return everything before "/storedprocedures/"
+---- @ClaimID.{1,15}int.{15,4000}?
+----------look for @claimID any caracter within 1 to 15 range then match int then any caracter within 15 and 4000 range but keep it minimal
 ---- copy text on webpage to notepad++ and search using regular expression
 --notepad++ plugin: 
 ---- poor manTsql formatter - Compare Plugin
