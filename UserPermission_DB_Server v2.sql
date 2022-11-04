@@ -7,7 +7,8 @@
 
 -- consider sp_help_permissions instead if don't have impersonate permission
 
---Last update 10/31/2022 : Monktar Bello - a select for denied permission and and filter #objectPermission with @permission
+--Last update 11/01/2022 : Monktar Bello - added comment to get from public account not listed  because of principal_id > 0 /*0 ie public */
+--10/31/2022 : Monktar Bello - a select for denied permission and and filter #objectPermission with @permission
 -- 10/25/2022 : Monktar Bello - permissions attached to only database - sysname(schema,object) replaced with varchar because it doesn't allow null in #objectPermission
 -- 10/19/2022 : Monktar Bello - fixed not return objects' permission on @userDB 
 -- 4/5/2022 : Monktar Bello - put in @UserDB and filtered with @LoginUser  
@@ -78,8 +79,13 @@ declare @clause nvarchar(2000)
 set @query = ''
 
 --SET @permission = '%deny%'; --apickens@rmsweb.com
-SET @LoginUser = 'aaycock'
---SET @UserDB = 'RmsAdmin' 
+SET @LoginUser = 'jfranco'
+SET @UserDB = 'MedRx_test' 
+
+--grant execute on database::MedRx_test to DOA
+--create role DOA
+--alter role DOA add member jfranco
+
 --grant alter on schema::dbo to data_science
 --CREATE USER zfesler FOR LOGIN zfesler
 --EXEC sp_addrolemember 'devops_jr', 'zfesler'
@@ -388,7 +394,7 @@ BEGIN
 	   from sys.database_principals principals
 	   join sys.database_permissions permissionst
 	   on permissionst.grantee_principal_id = principals.principal_id
-	   WHERE principal_id > 0 AND EXISTS(SELECT 1 FROM #uROLES r where r.rolename = principals.name COLLATE DATABASE_DEFAULT )
+	   WHERE  EXISTS(SELECT 1 FROM #uROLES r where r.rolename = principals.name COLLATE DATABASE_DEFAULT )
 	   --and OBJECT_SCHEMA_NAME(permissionst.major_id) is not null
 	   order by principalName, permission_name
 	   '
@@ -405,7 +411,7 @@ BEGIN
     --from sys.database_principals principals
     --join sys.database_permissions permissionst
     --on permissionst.grantee_principal_id = principals.principal_id
-    --WHERE principal_id > 0 --AND EXISTS(SELECT 1 FROM #uROLES r where r.rolename = principals.name and (r.PrincipalName = @LoginUser OR  @LoginUser IS NULL))
+    --principal_id > 0 /*0 ie public */ --AND EXISTS(SELECT 1 FROM #uROLES r where r.rolename = principals.name and (r.PrincipalName = @LoginUser OR  @LoginUser IS NULL))
     --AND principals.name in ('devdba')
     ------and permission_name ='UPDATE'
     ----order by principalName, permission_name
