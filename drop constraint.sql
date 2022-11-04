@@ -9,7 +9,7 @@ ALTER TABLE dbo.orderDetails DROP CONSTRAINT DF_UnikID
 GO
 ALTER TABLE dbo.orderDetails DROP COLUMN UnikID  
 
-
+-- drop without knowing constraint name
 BEGIN TRAN
 IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'orderDetails' AND COLUMN_NAME = 'UnikID')
 BEGIN
