@@ -10,6 +10,51 @@
 --To quickly gauge the size or fragmentation level of a table or index, use the LIMITED mode. 
 --It is the fastest and will not return a row for each nonleaf level in the IN_ROW_DATA allocation unit of the index.
 
+--ola defragmentation
+EXECUTE maintenance.dbo.IndexOptimize
+@Databases = 'MedRx',
+@FragmentationLow = NULL,
+@FragmentationMedium = NULL,
+@FragmentationHigh = 'INDEX_REBUILD_OFFLINE',
+@FragmentationLevel1 = 5,
+@FragmentationLevel2 = 30,
+@indexes = 'db.schema.table.ix_name',
+@MaxDOP = 0,
+@Resumable = 'Y', -- online index operation is resumable
+@WaitAtLowPriorityMaxDuration = 2,  -- in minutes
+@WaitAtLowPriorityAbortAfterWait = 'SELF', -- Abort the online index rebuild operation after 2min
+@TimeLimit = 900, -- 15min  -- ie no commands are executed
+@LogToTable = 'Y',
+@Execute = 'Y'
+
+--truncate table maintenance.dbo.indexFragmentation
+
+insert into maintenance.dbo.indexFragmentation
+SELECT OBJECT_SCHEMA_NAME(ips.object_id) AS schema_name,
+       OBJECT_NAME(ips.object_id) AS object_name,
+       i.name AS index_name,
+       i.type_desc AS index_type,
+       ips.avg_fragmentation_in_percent,
+       ips.avg_page_space_used_in_percent as 'Average_page_density', --  low, more pages are required to store the same amount of data
+       ips.page_count,
+       ips.alloc_unit_type_desc,
+	   getdate()
+FROM sys.dm_db_index_physical_stats(DB_ID(), default, default, default, 'LIMITED') AS ips --objectid, indID
+INNER JOIN sys.indexes AS i 
+ON ips.object_id = i.object_id
+   AND
+   ips.index_id = i.index_id
+--where ips.avg_fragmentation_in_percent > 70
+ORDER BY page_count DESC;
+
+-- read before and after defragmentation 
+--select ObjectName, index_name, avg_fragmentation_in_percent, TimeChecked,page_count,alloc_unit_type_desc,Average_page_density, 
+--	   page_count * 8.0*0.00000095367432 as Size --1KB = 0.00000095367432 and a page = 8KB
+--	   , (select sum(row_count) from sys.dm_db_partition_stats st where st.object_id = object_id('schema.table') and st.index_id < 2) numberOfRows
+--from maintenance.dbo.indexFragmentation
+--where index_name in('ix_name') --and alloc_unit_type_desc = 'IN_ROW_DATA'
+--order by index_name, TimeChecked desc
+
 set transaction isolation level read uncommitted
 set nocount on
 
