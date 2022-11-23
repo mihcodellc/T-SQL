@@ -16,6 +16,8 @@
 ---- .* ?/storedprocedures/ => return everything before "/storedprocedures/"
 ---- @ClaimID.{1,15}int.{15,4000}?
 ----------look for @claimID any caracter within 1 to 15 range then match int then any caracter within 15 and 4000 range but keep it minimal
+---- @.[a-z]{1,5}status.{10,50}?FileLoadStatus
+----------look for text start with @ followed by alpha kracters in 5 range then status in range of 50 keep minimal THEN find bELLO in any range
 ---- copy text on webpage to notepad++ and search using regular expression
 --notepad++ plugin: 
 ---- poor manTsql formatter - Compare Plugin
