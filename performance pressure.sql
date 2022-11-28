@@ -10,6 +10,8 @@
 -- https://www.microsoft.com/en-us/sql-server/sql-server-2019-comparison
 -- https://download.microsoft.com/download/2/9/0/290f991b-5971-42e5-bb2c-81f700622b2e/SQL%20Server%202019%20Editions%20Datasheet.pdf
 
+-- deprecated features limit.sql
+
 -- ***sql server max capacities
 -- https://docs.microsoft.com/en-us/sql/sql-server/maximum-capacity-specifications-for-sql-server?redirectedfrom=MSDN&view=sql-server-ver16
 
