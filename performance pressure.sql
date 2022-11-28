@@ -3,9 +3,10 @@
 -- SQL SERVER CONFIGURATION MANAGER to activate your sql agent or start db engine ...
 
 --*** SQL News
--- https://cloudblogs.microsoft.com/sqlserver/?product%5B%5D=azure-data-lake&product%5B%5D=azure-data-studio&product%5B%5D=azure-sql-database&product%5B%5D=sql-server-2012&product%5B%5D=sql-server-2016&product%5B%5D=sql-server-2017&product%5B%5D=sql-server-2019&product%5B%5D=sql-server-2022
+-- https://cloudblogs.microsoft.com/sqlserver
 
 -- ***sql server editions compared
+-- https://www.microsoft.com/en-us/sql-server/sql-server-2022-comparison
 -- https://www.microsoft.com/en-us/sql-server/sql-server-2019-comparison
 -- https://download.microsoft.com/download/2/9/0/290f991b-5971-42e5-bb2c-81f700622b2e/SQL%20Server%202019%20Editions%20Datasheet.pdf
 
