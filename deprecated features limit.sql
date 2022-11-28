@@ -1,4 +1,6 @@
--- datatypes and other => https://learn.microsoft.com/en-us/sql/database-engine/deprecated-database-engine-features-in-sql-server-2016?view=sql-server-ver16
+-- datatypes, deprecated and other => 
+    https://learn.microsoft.com/en-us/sql/database-engine/deprecated-database-engine-features-in-sql-server-2016?view=sql-server-ver16
+    https://learn.microsoft.com/en-us/sql/database-engine/deprecated-database-engine-features-in-sql-server-2022?view=sql-server-ver16
 -- https://learn.microsoft.com/en-us/sql/database-engine/discontinued-database-engine-functionality-in-sql-server?view=sql-server-ver16
 
 SELECT * FROM sys.dm_os_performance_counters
