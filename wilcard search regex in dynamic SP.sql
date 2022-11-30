@@ -6,6 +6,14 @@
 	*? ⇒ Zero or more of the previous group, but minimally: the shortest matching string, rather than the longest string
 	+ ⇒ This matches 1 or more instances of the previous character, as many as it can. 
 	+? ⇒ One or more of the previous group, but minimally.
+		some ANCHORS
+	^ ⇒ This matches the start of a line (except when used inside a set).
+	$ ⇒ This matches the end of a line.
+	\b ⇒ Matches either the start or end of a word.
+	\B ⇒ Not a word boundary. It represents any location between two word characters or between two non-word characters.
+	\A or \` ⇒ Matches the start of the file.
+	\z or \' ⇒ Matches the end of the file.
+
 	all above are in "Multiplying operators", we do have others like: 
 	          "Character Properties" or 
 		  "Anchors" (match a zero-length position in the line)
