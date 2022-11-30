@@ -13,7 +13,7 @@
 	\B ⇒ Not a word boundary. It represents any location between two word characters or between two non-word characters.
 	\A or \` ⇒ Matches the start of the file.
 	\z or \' ⇒ Matches the end of the file.
-
+	Join/Split line > Ctrl+I / Ctrl+J 9Shortcut Mapper in NotePad++)  
 	all above are in "Multiplying operators", we do have others like: 
 	          "Character Properties" or 
 		  "Anchors" (match a zero-length position in the line)
