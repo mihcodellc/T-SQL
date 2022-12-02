@@ -1,4 +1,5 @@
 -- **Transparent Database Encrytion - TDE
+-- https://azure.microsoft.com/en-us/blog/transparent-data-encryption-or-always-encrypted/
 
 USE master;
 GO
