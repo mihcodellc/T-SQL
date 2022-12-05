@@ -2,8 +2,9 @@
 
 BULK INSERT db_name.dbo.table_name FROM 'C:\Sample.csv'  
    WITH (  
-      DATAFILETYPE = 'char',  
+      DATAFILETYPE = 'char',  -- 'char' | 'native' | 'widechar' | 'widenative'
       FIELDTERMINATOR = ',',  
+      -- FIELDQUOTE = 'quote_characters'
       ROWTERMINATOR = '\n'  
 );  
 
