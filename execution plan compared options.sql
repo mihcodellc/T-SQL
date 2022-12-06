@@ -1,6 +1,7 @@
 --your execution plan attributes to know which settings is used by your execution plan
 --this is beside comparing the graph in ssms
 
+-- https://statisticsparser.com/
 
 --https://www.mssqltips.com/sqlservertip/4318/sql-server-stored-procedure-runs-fast-in-ssms-and-slow-in-application/
 
