@@ -22,6 +22,7 @@ select distinct OBJECT_NAME(object_id) nom,name  from sys.columns where name lik
 select distinct OBJECT_NAME(object_id) nom,name  from sys.columns where name like '%sign%' order by nom
 
 -- search table or column through the database
+-- better used sp_ineachdb instead of sp_MSforeachdb
 EXEC sp_MSforeachdb N'USE [?]; SELECT DB_NAME()  SELECT * FROM SYS.tables WHERE NAME LIKE ''%E835Claim%'' order by name;'
 
 EXEC sp_MSforeachdb N'USE [?]; SELECT DB_NAME(); select distinct OBJECT_NAME(object_id) nom,name  
@@ -31,6 +32,43 @@ from sys.columns where name like ''%CodeId%'' order by nom'
 EXEC sp_MSforeachdb N'USE [?]; SELECT DB_NAME(); SELECT ROUTINE_SCHEMA, ROUTINE_NAME
 FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_TYPE = ''PROCEDURE'' and ROUTINE_NAME = ''IndexOptimize''; '
 
+--link servers
+EXEC sp_linkedservers
+
+-- FIND text in SP OR use management studio to script out the object and search with notepad++/regex
+SELECT DB=DB_NAME(), [schema] = OBJECT_SCHEMA_NAME(o.[object_id]), o.name,o.type, o.type_desc, m.definition
+FROM sys.objects AS o
+INNER JOIN sys.sql_modules AS m
+ON o.[object_id] = m.[object_id]
+WHERE 
+--m.[definition] LIKE '%OPENQUERY%'
+--AND 
+o.[type] IN ('V')
+ORDER BY O.name
+
+--all object types
+select distinct  o.type, o.type_desc from sys.objects o
+order by o.type
+
+--FORMAT VERSION OF THE BODY OF THE OBJECT 
+exec sp_helptext 'syncobj_0x4537354141434343'
+
+-- FKs and tables refrencing, referenced
+	           select  name FK_name, schema_name(fk.schema_id) + '.' + object_name(fk.parent_object_id) + '.' +col_name(fk.parent_object_id,fkc.parent_column_id) InColName,  object_name(fk.referenced_object_id) refTable ,
+			 fk.is_disabled, fk.is_not_trusted, 
+			 fk.delete_referential_action_desc d_action, fk.update_referential_action_desc u_action 
+			 from sys.foreign_keys fk
+			 join sys.foreign_key_columns fkc on fk.object_id = fkc.constraint_object_id
+			 where --fk.is_disabled = 0 and 
+			 object_name(fk.referenced_object_id) = parsename(quotename('MyTable'),1)
+			 union all
+			 select  name FK_name, schema_name(fk.schema_id) + '.' + object_name(fk.parent_object_id) + '.' +col_name(fk.parent_object_id,fkc.parent_column_id) InColName,  object_name(fk.referenced_object_id) refTable ,
+			 fk.is_disabled, fk.is_not_trusted, 
+			 fk.delete_referential_action_desc d_action, fk.update_referential_action_desc u_action 
+			 from sys.foreign_keys fk
+			 join sys.foreign_key_columns fkc on fk.object_id = fkc.constraint_object_id
+			 where --fk.is_disabled = 0 and 
+			 object_name(fk.parent_object_id) = parsename(quotename('MyTable'),1)
 
 -- https://dataedo.com/kb/query/sql-server/list-of-foreign-keys-with-columns
 --Query below returns foreign key constrant columns defined in a database.
@@ -68,7 +106,7 @@ JOIN sys.types t on a.user_type_id = t.user_type_id
 WHERE a.name like '%lo%' and b.type ='U' and t.name in ('int','smallint', 'numeric', 'bigint')
 
 
--- identity column and how close to the max number
+-- identity column and how close to the max number. PERHAPS BETTER USE IndexFill_Up.sql
 ;with cte as(
 SELECT OBJECT_SCHEMA_NAME(a.object_id) as aschema, OBJECT_NAME(a.object_id) aTable, a.name aColumn,b.type_desc,  b.type, t.name as typeName
 , (select sum(row_count) from sys.dm_db_partition_stats st where st.object_id = a.object_id and st.index_id < 2) as number_rows
