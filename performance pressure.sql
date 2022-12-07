@@ -4,6 +4,7 @@
 
 --*** SQL News
 -- https://cloudblogs.microsoft.com/sqlserver
+-- https://sqlblog.org/
 
 -- ***sql server editions compared
 -- https://www.microsoft.com/en-us/sql-server/sql-server-2022-comparison
