@@ -2,6 +2,7 @@
 ---- https://www.linguisticsweb.org/doku.php?id=linguisticsweb:tutorials:basics:regex:regex-notepad
 ---- https://www.exeideas.com/2020/08/guide-and-common-regex-with-notepad.html
 ---- https://npp-user-manual.org/docs/searching/#regular-expressions
+	{N,P} ⇒ Matches N to P copies of the element
 	. or \C ⇒ Matches any character
 	* ⇒ This matches 0 or more instances of the previous character
 	*? ⇒ Zero or more of the previous group, but minimally: the shortest matching string, rather than the longest string
