@@ -2,6 +2,7 @@
 --https://www.brentozar.com/archive/2015/01/reporting-log-shipping-secondary-standby-mode/
 
 -- DatabaseRestore_OLA.sql
+-- "DatabaseRestore OK.sql" in orion repository a change to the above
 
 USE [master]
 
