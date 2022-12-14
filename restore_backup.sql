@@ -1,7 +1,8 @@
 --log shipping and restore
 --https://www.brentozar.com/archive/2015/01/reporting-log-shipping-secondary-standby-mode/
 
--- DatabaseRestore_OLA.sql
+-- DatabaseRestore_OLA.sql part now of BrentOzar FirstResponderKit
+-- https://www.brentozar.com/archive/2017/03/databaserestore-open-source-database-restore-stored-procedure/
 -- "DatabaseRestore OK.sql" in orion repository a change to the above
 
 USE [master]
