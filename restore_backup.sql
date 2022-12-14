@@ -1,6 +1,8 @@
 --log shipping and restore
 --https://www.brentozar.com/archive/2015/01/reporting-log-shipping-secondary-standby-mode/
 
+-- DatabaseRestore_OLA.sql
+
 USE [master]
 
 RESTORE DATABASE AdventureWorks2014
