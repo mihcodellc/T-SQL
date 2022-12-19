@@ -10,7 +10,7 @@
 	+? ⇒ One or more of the previous group, but minimally.
 		some ANCHORS
 	^ ⇒ This matches the start of a line (except when used inside a set).
-	$ ⇒ This matches the end of a line.
+	$ ⇒ This matches the end of a line. alternative \r\n in extended search mode in notepad++
 	\b ⇒ Matches either the start or end of a word.
 	\B ⇒ Not a word boundary. It represents any location between two word characters or between two non-word characters.
 	\A or \` ⇒ Matches the start of the file.
