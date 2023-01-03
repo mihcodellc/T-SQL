@@ -127,9 +127,7 @@ FROM    sys.dm_os_wait_stats OS
         INNER JOIN sys.dm_exec_session_wait_stats S ON OS.wait_type = S.wait_type
 WHERE   S.session_id = 56
 
------- https://www.sqlskills.com/blogs/paul/updated-sys-dm_os_waiting_tasks-script-to-correctly-parse-nodeid/
--- https://www.brentozar.com/sql/wait-stats/
--- solve a wait type https://app.spotlightcloud.io/waitopedia/waits/CXPACKET
+
 -- with queries and waits
 
 SELECT
@@ -174,8 +172,11 @@ ORDER BY
 GO
 
 
--- https://support.solarwinds.com/SuccessCenter/s/article/SQL-Server-Wait-Types?language=en_US
--- waits summary
+------ https://www.sqlskills.com/blogs/paul/updated-sys-dm_os_waiting_tasks-script-to-correctly-parse-nodeid/
+-- https://www.brentozar.com/sql/wait-stats/
+-- solve a wait type https://app.spotlightcloud.io/waitopedia/waits/CXPACKET
+
+-- waits summary -- 
 -- Last updated February 26, 2019
 ;WITH [Waits] AS
     (SELECT
