@@ -172,6 +172,7 @@ ORDER BY
 GO
 
 
+-- https://support.solarwinds.com/SuccessCenter/s/article/SQL-Server-Wait-Types?language=en_US
 -- waits summary
 -- Last updated February 26, 2019
 ;WITH [Waits] AS
