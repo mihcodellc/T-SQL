@@ -40,6 +40,7 @@
 
 -- sql troubleshooting
 -- start here > https://docs.microsoft.com/en-us/troubleshoot/sql/performance/blocked-column-populated-latch-waits
+--  https://support.solarwinds.com/SuccessCenter/s/article/SQL-Server-Wait-Types?language=en_US
 --https://docs.microsoft.com/en-us/troubleshoot/sql/welcome-sql-server ---you have to find your way to troubleshoot
 --https://docs.microsoft.com/en-us/troubleshoot/sql/performance/understand-resolve-blocking
 --understand row Row Versioning https://learn.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms175492(v=sql.105)?redirectedfrom=MSDN
@@ -126,7 +127,7 @@ select * from sys.dm_os_performance_counters
 where counter_name in ('Batch Requests/sec', 'SQL Compilations/sec' , 'SQL Re-Compilations/sec') --and 
 --where counter_name like '%time%'
 
---select * FROM sys.dm_os_performance_counters order by wait_type
+--select * FROM sys.dm_os_performance_counters order by wait_type -- https://support.solarwinds.com/SuccessCenter/s/article/SQL-Server-Wait-Types?language=en_US
 ----------------------------------------------------------------------------------------------------------------
 -- all your query wait or not, set options, reads, transactions_isolation_level, deadlock_priority, memory, plan
 select * from sys.dm_exec_requests
@@ -134,7 +135,7 @@ select * from sys.dm_exec_requests
 
 
 ---********************************** CPU pressure
-select * from sys.dm_os_waiting_tasks 
+select * from sys.dm_os_waiting_tasks  ---https://support.solarwinds.com/SuccessCenter/s/article/SQL-Server-Wait-Types?language=en_US
 where wait_type in (N'CXPACKET', N'SOS_SCHEDULER_YIELD', N'THREADPOOL', N'CMEMTHREAD')
 
 
