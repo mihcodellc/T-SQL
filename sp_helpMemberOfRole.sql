@@ -17,12 +17,13 @@ CREATE PROCEDURE sp_helpMemberOfRole
 
 AS
 begin
--- Last update: 4/12/2022 - Monktar Bello: combined existing MS supposed to be removed in new releases
-
+-- Last update: 1/9/2022 - Monktar Bello: added db_name() to the ouput
+-- 4/12/2022 - Monktar Bello: combined existing MS supposed to be removed in new releases
 CREATE TABLE #ROLES (
 	RoleON VARCHAR(15)
 	,rolename SYSNAME
 	,PrincipalName SYSNAME
+	, CurrentDB sysname
 	)
 
 IF @srvrolename IS NOT NULL
@@ -51,6 +52,7 @@ BEGIN
 	SELECT 'server' AS RoleON
 		,'ServerRole' = SUSER_NAME(rm.role_principal_id)
 		,'MemberName' = lgn.name --, 'MemberSID' = lgn.sid  
+		, db_name() CurrentDB
 	FROM sys.server_role_members rm
 		,sys.server_principals lgn
 	WHERE rm.role_principal_id = SUSER_ID(@srvrolename)
@@ -66,6 +68,7 @@ BEGIN
 		  ,'ServerRole' = SUSER_NAME(rm.role_principal_id)
 		,'MemberName' = lgn.name
 		--,'MemberSID' = lgn.sid
+		, db_name() CurrentDB
 	FROM sys.server_role_members rm
 		,sys.server_principals lgn
 	WHERE rm.role_principal_id >= 3
@@ -100,6 +103,7 @@ BEGIN
 	SELECT 'database' AS RoleON
 		,DbRole = g.name
 		,MemberName = u.name --, MemberSID = u.sid  
+		, db_name() CurrentDB
 	FROM sys.database_principals u
 		,sys.database_principals g
 		,sys.database_role_members m
@@ -116,7 +120,8 @@ BEGIN
 	-- RESULT SET FOR ALL ROLES  
 	SELECT 'database' AS RoleON
 		,DbRole = g.name
-		,MemberName = u.name --, MemberSID = u.sid  
+		,MemberName = u.name --, MemberSID = u.sid
+		, db_name() CurrentDB
 	FROM sys.database_principals u
 		,sys.database_principals g
 		,sys.database_role_members m
@@ -126,11 +131,12 @@ BEGIN
 	ORDER BY 1,2
 END
 
-SELECT RoleON, rolename, PrincipalName
+SELECT RoleON, rolename, PrincipalName, CurrentDB
 FROM #ROLES
 ORDER BY 3, 1
 
 RETURN (0) -- sp_helpMemberOfRole  
+ 
 
 end
 
