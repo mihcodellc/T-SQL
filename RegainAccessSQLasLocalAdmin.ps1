@@ -11,3 +11,7 @@ net stop $service_name
 net start $service_name /f /mSQLCMD
 
 sqlcmd.exe -E -S $sql_server_instance -Q "CREATE LOGIN $login_to_be_granted_access FROM WINDOWS; ALTER SERVER ROLE sysadmin ADD MEMBER $login_to_be_granted_access; "
+
+#Stop and restart your SQL Server instance in multi-user mode
+net stop $service_name
+net start $service_name
