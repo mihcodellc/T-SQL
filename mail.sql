@@ -1,3 +1,10 @@
+-- check status after Mail not queued. Database Mail is stopped
+------ EXECUTE msdb.dbo.sysmail_help_status_sp;
+-- sysmail_start_sp : This stored procedure does not activate Service Broker message delivery
+-- start only the queues for Database Mail
+EXECUTE msdb.dbo.sysmail_start_sp ;  
+
+
 USE msdb ;  
 GO  
   
