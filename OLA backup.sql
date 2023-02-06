@@ -38,3 +38,16 @@ EXECUTE [dbo].[DatabaseBackup]
 @CleanupTime = 336,
 @CheckSum = 'Y',
 @LogToTable = 'Y'
+
+
+
+-- diff
+EXECUTE maintenance.[dbo].[DatabaseBackup]
+@Databases = 'USER_DATABASES',
+@Directory = N'G:\MSSQL\Backup',
+@BackupType = 'DIFF',
+@Verify = 'Y',
+@CleanupTime = 48,
+@CheckSum = 'Y',
+@LogToTable = 'Y',
+@DatabaseOrder = 'DATABASE_SIZE_ASC'
