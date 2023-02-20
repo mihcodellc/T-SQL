@@ -31,6 +31,15 @@
 ---- @.[a-z]{1,5}status.{10,50}?FileLoadStatus
 ----------look for text start with @ followed by alpha kracters in 5 range then status in range of 50 keep minimal THEN find bELLO in any range
 ---- copy text on webpage to notepad++ and search using regular expression
+\//*\*\*.?.*?ALTER
+matches
+
+/** ****************************************************************************************************
+    Move paid to prepaid on all service lines, except the one equaling the total paid footer.
+    Rule task: BOA-13447
+    
+ */
+ALTER
 --notepad++ plugin: 
 ---- poor manTsql formatter - Compare Plugin
 
