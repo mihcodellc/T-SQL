@@ -21,7 +21,8 @@
 		  "Anchors" (match a zero-length position in the line)
 		  "Assertions" consume no characters and , matching starts over where it left. 
 		  "Substitutions"
-		  ...		  
+		  ...
+\//*\*\*  to find /**		  
 ---- https://docs.microsoft.com/en-us/sql/ssms/scripting/search-text-with-wildcards?view=sql-server-ver16
 ---- .* ?/storedprocedures/ => return everything before "/storedprocedures/"
 ---- @ClaimID.{1,15}int.{15,4000}?
