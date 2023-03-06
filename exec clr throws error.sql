@@ -1,7 +1,7 @@
 -- https://docs.microsoft.com/en-us/troubleshoot/sql/admin/error-run-clr-object-create-assembly
 --An error occurred in the Microsoft .NET Framework while trying to load assembly id ...
 
-USE iThinkHealth;
+USE mydb;
 
 EXEC sp_configure 'clr enabled', 1;  
 RECONFIGURE;  
