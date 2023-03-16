@@ -14,6 +14,14 @@ cast(substring(unused,0,CHARINDEX(' ', unused)) as float)/1000 unused_MB, GETDAT
  from @t
  order by [database_Data_Log_MB = CurrentSizeOnDisk] desc
 
+--files space used
+ SELECT name , state_desc,size/128.0 /* ie (size * 8.0/1024) */ - CAST(FILEPROPERTY(name, 'SpaceUsed') AS int)/128.0 AS AvailableSpaceInMB,
+		  CAST(FILEPROPERTY(name, 'SpaceUsed') AS int)/128.0 as UsedSpace,
+		  ((CAST(FILEPROPERTY(name, 'SpaceUsed') AS int)/128.0)/(size/128.0 ))*100 as UsedPercent,
+size/128.0 AS CurrentSizeOnDik_MB_sum_eq_Available_Used,  max_size/128 as max_size_MB
+, case when is_percent_growth =1 then growth else growth/128 end as growth_MB, is_percent_growth, physical_name 
+FROM sys.database_files
+order by UsedPercent desc
 
 --db property
 SELECT Edition = DATABASEPROPERTYEX('MyDatabase', 'EDITION'),
