@@ -8,7 +8,7 @@ SELECT Edition = DATABASEPROPERTYEX('MyDatabase', 'EDITION'),
 
 -- Modifies certain configuration options of a database.
 --https://learn.microsoft.com/en-us/sql/t-sql/statements/alter-database-transact-sql?view=azuresqldb-current&preserve-view=true&tabs=sqlpool
---alter max_size
+--alter max_size not sure if size itself can be resize
 --ALTER DATABASE [RemitHub_Production] MODIFY (EDITION = 'Standard', MAXSIZE = 1024GB, SERVICE_OBJECTIVE = 'S7');
 
 
