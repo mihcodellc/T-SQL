@@ -22,3 +22,6 @@ https://learn.microsoft.com/en-us/azure/azure-sql/database/resource-limits-dtu-s
 1 - create the job in local instance and its SQL Agent
 2 - use sqlcmd or powershell script
 3 - sqlcmd - U daniel -d sqlcentralazure -S sqlservercentralserver.database.windows.net -P "YourAzurePassword" -i c:\script\todaysales.sql -o c:\script\azureoutput.txt
+
+--automate tasks using elastic jobs
+-- https://learn.microsoft.com/en-us/azure/azure-sql/database/job-automation-overview?view=azuresql
