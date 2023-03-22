@@ -77,3 +77,6 @@ go
 
 --5-put back db to full recovery
 ALTER DATABASE MedRx  SET RECOVERY full; 
+
+
+--6 claim back the space you think you gain by analyzing the size before and after
