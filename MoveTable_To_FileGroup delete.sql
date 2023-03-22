@@ -4,12 +4,12 @@
 -- delete
 -- https://www.mssqltips.com/sqlservertip/5921/delete-data-from-large-sql-server-tables-with-minimal-logging/
 
---add file group
+--1-add file group
 ALTER DATABASE WideWorldImporters ADD FILEGROUP [FG_Orders]
 GO
 
 
---add file
+--2-add file
 ALTER DATABASE WideWorldImporters ADD FILE (
 	NAME = N'FG_File_Orders'
 	,FILENAME = N'E:\MSSQL\Data\Order_File.mdf'
@@ -24,7 +24,11 @@ GO
 SET STATISTICS PROFILE ON
 GO
 
---Moving table with a clustered index 
+--Moving table with a clustered index then move the nc clustered indexes
+-- ************PK and others indexes
+-- ************make sure to use : DROP_EXISTING = ON, ONLINE = ON both for NC -- DROP_EXISTING = ON only for PK
+--*************replace [FG_Orders] by the new Filegroup
+--some nc indexes need to be build offline, create on similar environment to time them then decide when to run them
 --description:
 --https://docs.microsoft.com/en-us/sql/t-sql/statements/create-index-transact-sql?view=sql-server-ver16
 --this portion
