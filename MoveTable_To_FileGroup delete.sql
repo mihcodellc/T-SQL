@@ -81,3 +81,6 @@ ALTER DATABASE MedRx  SET RECOVERY full;
 
 --6 claim back the space you think you gain by analyzing the size before and after
 DBCC SHRINKFILE (MyDB_Data, 2097152) -- 2TB
+and maybe
+DBCC SHRINKFILE (1, TRUNCATEONLY); 
+DBCC SHRINKFILE (2, TRUNCATEONLY); 
