@@ -232,6 +232,17 @@ BEGIN
     select objname,index_id, is_disabled, index_description, index_keys, inc_columns, [type], TypeDescription, create_date from  #ListIndexInfo
     WHERE is_disabled = 1
 
+   --list all index no filter
+    SELECT distinct 'no filter' as group_ini, @SchemaName, objname, index_id, index_keys, inc_columns, PARSENAME(index_name, 1) Indname,
+		  'ALTER INDEX ' + PARSENAME(index_name, 1) + ' ON ' +  @SchemaName + '.' + ObjName + ' DISABLE; ' as Tsql_Disable,
+		  'DROP INDEX '  + PARSENAME(index_name, 1) + ' ON ' +  @SchemaName + '.' + ObjName as Tsql_DROP,
+		  'ALTER INDEX '  + PARSENAME(index_name, 1) + ' ON ' +  @SchemaName + '.' + ObjName + ' REBUILD WITH (FILLFACTOR=?, ONLINE=?, SORT_IN_TEMPDB=?, DATA_COMPRESSION=?) ' as Tsql_Enable,
+		  CASE WHEN [TYPE] = 2 THEN 'CREATE NONCLUSTERED INDEX '  + PARSENAME(index_name, 1) + ' ON ' +  @SchemaName + '.' + ObjName + ' ( ' + index_keys +  CASE WHEN inc_columns IS NOT NULL THEN ' ) INCLUDE (' + inc_columns + ' )   ' ELSE ' )' END + ' WITH (FILLFACTOR=?, ONLINE=?, SORT_IN_TEMPDB=?, DATA_COMPRESSION=?); ' 
+		  ELSE 
+		  'CREATE ' + TypeDescription +' INDEX '  + index_description + ' ON ' +  @SchemaName + '.' + ObjName + ' ( ' + index_keys +  CASE WHEN inc_columns IS NOT NULL THEN ' ) INCLUDE (' + inc_columns + ' )   ' ELSE ' )' END + ' WITH (FILLFACTOR=?, ONLINE=?, SORT_IN_TEMPDB=?, DATA_COMPRESSION=?); '
+		  END as Tsql_Definition
+    FROM #ListIndexInfo
+    ORDER BY ObjName, index_id, inc_columns ;
  
     if @excludeRatioReadWrite > 0 and @indnameKey is null
     begin
