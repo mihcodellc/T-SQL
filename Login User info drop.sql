@@ -1,25 +1,26 @@
 ---- drop an user from all db on the instance
-IF OBJECT_ID('tempdb..#temp') IS NOT NULL
+IF OBJECT_ID('tempdb..#temp') IS NOT NULL--
     drop table #temp
 
 create table #temp(cmd nvarchar(400))
 -- drop an user from all db on the instance
 exec sp_MSforeachdb N'use [?] ; 
-IF  EXISTS (SELECT 1 FROM sys.database_principals WHERE name like N''testbello'')
+IF  EXISTS (SELECT 1 FROM sys.database_principals WHERE name like N''%mbello%'')
     insert into #temp 
-    select ''USE ''+db_name()+ Char(13)  +'' DROP USER '' + name + '';'' FROM sys.database_principals WHERE name like N''testbello''  ;'
+    select ''USE ''+db_name()+ Char(13)  +'' DROP USER ['' + name + ''];'' FROM sys.database_principals WHERE name like N''%mbello%''  ;'
 
     select * from #temp
     
 -- for azure sql
- select  'DROP USER ' + name + ';' FROM sys.database_principals WHERE name like N'testbello'  ;
+ select  'DROP USER [' + name + '];' FROM sys.database_principals WHERE name like N'%mbello%'  ;
 
---drop user really
+ --drop user really
 exec sp_MSforeachdb N'use [?] ; 
-    IF  EXISTS (SELECT 1 FROM sys.database_principals WHERE name = N''testbello'')
-        DROP USER [testbello] ;'
+    IF  EXISTS (SELECT 1 FROM sys.database_principals WHERE name like N''%mbello%'')
+        DROP USER [mbello] ;'
 --drop login
-Drop login [testbello];
+Drop login [mbello];
+
 -- Alter login testbello disable; 
 -- revoke connect from testbello
 
