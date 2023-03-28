@@ -12,7 +12,7 @@
 
 --ola defragmentation
 EXECUTE maintenance.dbo.IndexOptimize
-@Databases = 'MedRx',
+@Databases = 'MyDB',
 @FragmentationLow = NULL,
 @FragmentationMedium = NULL,
 @FragmentationHigh = 'INDEX_REBUILD_OFFLINE',
