@@ -4,6 +4,24 @@ EXECUTE msdb.dbo.sysmail_help_status_sp;
 -- start only the queues for Database Mail
 -------EXECUTE msdb.dbo.sysmail_start_sp ;  
 
+-- By Monktar Bello 3/29/2023: DBA: Restarted Mail If stopped
+declare   @t table (avalue nvarchar(7))
+insert into @t
+EXECUTE msdb.dbo.sysmail_help_status_sp;
+
+--debug
+select * from @t
+
+if (select top 1 avalue from @t) <> 'STARTED'
+    EXECUTE msdb.dbo.sysmail_start_sp
+
+--https://learn.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sysmail-help-queue-sp-transact-sql?view=sql-server-ver16
+--two queues in Database Mail: the mail queue and status queue. 
+--The mail queue stores mail items that are waiting to be sent. The status queue stores the status of items that have already been sent.
+-- State = state of the monitor. 
+exec msdb.dbo.sysmail_help_queue_sp  
+
+
 
 USE msdb ;  
 GO  
