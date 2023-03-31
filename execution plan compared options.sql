@@ -5,8 +5,14 @@
 
 --https://www.mssqltips.com/sqlservertip/4318/sql-server-stored-procedure-runs-fast-in-ssms-and-slow-in-application/
 
+-- Get the full text of a long request
+-- https://dba.stackexchange.com/questions/245590/get-the-full-text-of-a-long-request
+declare @sql_handle   varbinary(64) = 0x02000000DD7D4A1A64B697EB08E3668D024EBEC76A6A8F510000000000000000000000000000000000000000;
+select text from sys.dm_exec_sql_text(@sql_handle)
+FOR XML RAW, ELEMENTS;
 
---get the plan_handle for next query
+
+--get the plan_handle for next query OR better query the XML from "get the full text of long quey"
 select DB_NAME(st.dbid) as DbName, qs.execution_count,  OBJECT_NAME(st.objectid) as obj--, st.* , creation_time, qp.query_plan, plan_handle
 from sys.dm_exec_query_stats as qs 
 cross apply sys.dm_exec_sql_text(qs.sql_handle) st
