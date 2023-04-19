@@ -27,9 +27,11 @@ EXECUTE maintenance.dbo.IndexOptimize
 @LogToTable = 'Y',
 @Execute = 'Y'
 
---if above didn't work, it may due to ONLINE not possible for the index 
+--if above didn't work, use of the options below according to % of fragmentation and table or index
 -- different ways to maintain index
 ALTER INDEX ALL ON Production.Product REBUILD WITH (FILLFACTOR = 80, SORT_IN_TEMPDB = ON, STATISTICS_NORECOMPUTE = ON)
+
+ALTER INDEX index_name ON schema.table_name REBUILD WITH (FILLFACTOR = 80, SORT_IN_TEMPDB = ON, STATISTICS_NORECOMPUTE = ON)
 
 ALTER INDEX PK_Employee_BusinessEntityID ON HumanResources.Employee REBUILD;
 
