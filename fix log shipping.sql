@@ -10,6 +10,7 @@
 --2-a if missing here
   select * from [msdb].[dbo].[log_shipping_secondary_databases] 
 --2-b replace secondary_database and secondary_id in below insert accordingly to step 1  
+--2-c make sure that the db in "where secondary_database ='mydb_good_shipped'" has the right config
 --insert into msdb.dbo.log_shipping_secondary_databases
 -- SELECT 'mydb_'
 --      ,'5703DFAD-35AA-4FD3-A5BB-B29179F70E2C' 
@@ -30,6 +31,7 @@
 --3-a if missing here
 	select * from msdb.dbo.log_shipping_monitor_secondary
 --3-b replace secondary_database and secondary_id, and primary database in below insert accordingly to step 1  
+--3-c make sure that the db in "where secondary_database ='mydb_good_shipped'" has the right config
 --insert into [msdb].[dbo].[log_shipping_monitor_secondary]
 --SELECT [secondary_server]
 --      ,'mydb_'
@@ -52,3 +54,5 @@
 
 
 --4- make sure the others columns in query 2 and 3 have values,if they exist, matching the query 1
+
+--5- run the copy job and restore job: they shouldn't return errors
