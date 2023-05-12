@@ -19,12 +19,18 @@ exec sp_help_log_shipping_alert_job
 SELECT secondary_database,restore_mode as [restore/*1 ie standby 0 no recovery*],disconnect_users,last_restored_file
  FROM msdb.dbo.log_shipping_secondary_databases
 
---Last success of restore from job's message
-SELECT top 14/* 14 ie # dbs in logshpping*/ sj.name as job_name, substring(sh.message,PATINDEX('%LOGSHIPPING_COPY%', sh.message)+17, PATINDEX('%.trn%', sh.message)+4) as last_Restore
+ --Last success of restore from job's message 
+ ;with cte as  (
+SELECT sj.name as job_name, 
+	 substring(sh.message,1,23) + ' -- FileName: ' +substring(sh.message,PATINDEX('%LOGSHIPPING_COPY%', sh.message)+17, PATINDEX('%.trn%', sh.message)+4) as last_Restore,
+	 row_number() over(partition by sj.name order by run_date desc, run_time desc) rnk
 FROM msdb.dbo.sysjobs sj
 JOIN msdb.dbo.sysjobhistory sh ON sj.job_id = sh.job_id
 where  sj.name like 'LSRestore%' and sh.message like '%restored log%'
-order by run_date, run_time,  run_duration
+)
+select top 14/* 14 ie # dbs in logshpping*/ job_name, last_Restore from cte where rnk = 1
+order by job_name
+
 
 
 -- ****Monitoring ON PRIMARY: 
