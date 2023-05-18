@@ -1,4 +1,10 @@
- 
+ --stop and run a job
+EXEC msdb.dbo.sp_stop_job    N'Loader: LoaderState Populate (YEAR AGO)' ;  
+GO
+WAITFOR DELAY '00:00:05'; -- delay 5 seconds 
+EXEC msdb.dbo.sp_start_job   N'Loader: LoaderState Populate (YEAR AGO)' ;  
+GO
+
  -- https://sqlperformance.com/2014/12/sql-maintenance/proactive-sql-server-health-checks-2
 
  select ' emails not set properly '
