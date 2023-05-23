@@ -18,3 +18,8 @@ GO
 -- You can specify -1 to return the severity value associated with the error as shown in the following example.
 -- shown in the following example.
 RAISERROR (15600, -1, -1, 'mysp_CreateCustomer');
+
+
+--Logs the error in the error log and the application log for the instance
+RAISERROR(N'Oops! No, don''t just hit F5. Run these demos one at a time.', 20, 1) WITH LOG;
+GO
