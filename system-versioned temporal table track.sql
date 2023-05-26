@@ -108,3 +108,9 @@ ON
 WHERE P.MyTableID in (168979638, 168989653) 
 
 
+--track using computed columns
+alter table MyTable add  Dateupdated_correct as getdate() 
+--use system_user_trace & system_app_trace during maitenance windows and add them as computed column
+alter table MyTable add  system_user_trace as suser_sname() 
+alter table MyTable add  system_user_trace as suser_sname()  
+
