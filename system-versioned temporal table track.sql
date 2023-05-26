@@ -58,3 +58,28 @@ FOR SYSTEM_TIME ALL
 -- hierarchyid
 DECLARE @hid hierarchyid = '/1/2/3'
 SELECT @hid 'AS varbinary', @hid.ToString()
+
+
+-- SQL Server Change Tracking
+-- https://solutioncenter.apexsql.com/what-is-change-tracking-and-how-to-set-it-up/
+-- Enable snapshot isolation
+ALTER DATABASE AdventureWorks
+SET READ_COMMITTED_SNAPSHOT ON
+GO
+ALTER DATABASE AdventureWorks
+SET ALLOW_SNAPSHOT_ISOLATION ON
+GO
+--enable tracking on DB
+ALTER DATABASE AdventureWorks
+SET CHANGE_TRACKING = ON
+(CHANGE_RETENTION = 5 DAYS, AUTO_CLEANUP = ON)
+--To enable Change Tracking in SQL Server Management Studio
+Right click the database in Object Explorer
+Select Properties
+Select the Change Tracking tab
+--enable tracking on table
+ALTER TABLE Person.Address
+ENABLE CHANGE_TRACKING
+WITH (TRACK_COLUMNS_UPDATED = ON)
+
+
