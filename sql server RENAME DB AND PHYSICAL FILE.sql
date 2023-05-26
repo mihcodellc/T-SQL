@@ -1,5 +1,10 @@
 
-
+--rename the instance
+--https://docs.microsoft.com/en-us/sql/database-engine/install-windows/rename-a-computer-that-hosts-a-stand-alone-instance-of-sql-server?view=sql-server-ver16
+EXEC sp_dropserver 'asp-sql-new3'; 
+GO 
+EXEC sp_addserver 'asp-sql', local; 
+GO
 
 ALTER DATABASE belloTest SET ONLINE;
 --change the name
