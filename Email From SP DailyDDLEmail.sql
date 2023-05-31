@@ -1,3 +1,10 @@
+server trigger: [utr_LoginEvents] where events tracked are the mentioned in the declaration of the trigger
+if not exists already database trigger: utr_DDLEvents where events tracked are the mentioned in the declaration of the trigger
+if not exists create a role roleInsertDDL and grant it Execute privilege then add the users with priv to alter the database to it. The role roleInsertDDL  is just useful in case a user of this database, doesn't have the permission to execute p_RMSInsertDDL
+MedRx.dbo.p_RMSInsertDDL, the Store Procedure in charge of logging the events caught by the trigger in the table USerDB.dbo.RMSDDLTracker
+if not exists create "DBA: DDL Daily Temp Purge": Copy every 15mn to DBA database and clean up USerDB.dbo.RMSDDLTracker
+RmsAdmin.dbo.RMSDDLTracker, table or log of events caught by the triggers
+DDL Emails originating from the stored procedure DBA.dbo.p_RMSDailyDDLEmail
 
 create PROCEDURE [dbo].[DailyDDLEmail]
 
