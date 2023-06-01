@@ -112,5 +112,18 @@ same using T-SQL
 8. Restart SQL Service and Reporting Service(optional)
 9. In browser, type serverIP:80/Reports; eg: 172.153.12.147:80/reports
 		
+		
+		
+ - DBA updates Reporting Services: the server name
+Open RSReportServer.config at this location C:\Program Files\Microsoft SQL Server Reporting Services\SSRS\ReportServer and modify the UrlRoot setting to reflect the new server name.
+Start the Reporting Services Configuration tool and connect to the report server that uses the report server database on the renamed server.
+Open the Database Setup page.
+In Server Name, type or select the SQL Server name, and then click Connect.
+Click Apply.
+Update Web Service URL and Web Portal URL if needed
+test the new name is working. In browser, type serverIP:80/Reports;     
+ref: https://docs.microsoft.com/en-us/sql/reporting-services/report-server/rename-a-report-server-computer?view=sql-server-ver16
+
+
 	
 
