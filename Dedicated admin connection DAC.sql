@@ -12,7 +12,7 @@ RECONFIGURE;
 GO  
 
 
--- Who’s using the Dedicated Admin Connection.
+-- Whoâ€™s using the Dedicated Admin Connection.
 -- https://www.brentozar.com/archive/2011/08/dedicated-admin-connection-why-want-when-need-how-tell-whos-using/
 SELECT CASE
 		 WHEN ses.session_id = @@SPID THEN 'It''s me! ' ELSE ''
@@ -20,3 +20,9 @@ SELECT CASE
 FROM sys.endpoints AS en
 JOIN sys.dm_exec_sessions ses ON en.endpoint_id = ses.endpoint_id
 WHERE en.name = 'Dedicated Admin Connection';
+
+--login valid but default db not available -> login failed
+-- with dbatools in powershell
+$wincred = Get-Credential mbello
+$sqlCn = Connect-DbaInstance -SqlInstance MyInstanceName -SqlCredential $wincred -Database master -TrustServerCertificate
+Invoke-DbaQuery -SqlInstance $sqlCn -Query "ALTER LOGIN [mbello] WITH DEFAULT_DATABASE = master"
