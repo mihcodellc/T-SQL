@@ -5,6 +5,8 @@
 -- note
 -- read header of backups file
 RESTORE HEADERONLY FROM DISK = N'C:\MSSQL\Backup\MyDatabase_20230605124500.trn' -- of each set of backups in text output and searcch the LSN
+or run
+db backups overview below
 
 --The transaction log LSN chain is NOT AFFECTED by a full or differential database backup
 -- When planning which transaction log backup to use to roll forward, the LastLSN + 1 of the Full/Diff database backup 
