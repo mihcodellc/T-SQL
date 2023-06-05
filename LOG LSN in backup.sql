@@ -3,9 +3,13 @@
 -- run the server where the @db_name
 
 -- note
+-- read header of backups file
+RESTORE HEADERONLY FROM DISK = N'C:\MSSQL\Backup\MyDatabase_20230605124500.trn' -- of each set of backups in text output and searcch the LSN
+
 --The transaction log LSN chain is NOT AFFECTED by a full or differential database backup
 -- When planning which transaction log backup to use to roll forward, the LastLSN + 1 of the Full/Diff database backup 
 --		  will fall in between the FirstLSN and LastLSN of its subsequent transaction log backup
+-- last LSN of log_backup_1 = First LSN of the next log_backup_2
 
 -- need a version to read heads of backup files 
 
