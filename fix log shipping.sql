@@ -56,3 +56,5 @@
 --4- make sure the others columns in query 2 and 3 have values,if they exist, matching the query 1
 
 --5- run the copy job and restore job: they shouldn't return errors
+
+--6-review the settings on primary for this database, it shouldn't error
