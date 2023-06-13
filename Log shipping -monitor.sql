@@ -16,8 +16,9 @@ select * from msdb.dbo.log_shipping_monitor_secondary
 -- alert job id
 exec sp_help_log_shipping_alert_job  
 -- mode, user, last restore
-SELECT secondary_database,restore_mode as [restore/*1 ie standby 0 no recovery*/],restore_delay,disconnect_users,last_restored_file
+SELECT secondary_database,restore_mode as [restore/*1 ie standby 0 no recovery*/],restore_delay as delayInMin,disconnect_users,last_restored_file
  FROM msdb.dbo.log_shipping_secondary_databases
+
 
  --Last success of restore from job's message 
  ;with cte as  (
