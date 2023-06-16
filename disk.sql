@@ -11,6 +11,7 @@
 -- ----File Initizialization -> 8MB
 -- ----In memory checkpoint 1MB
 
+--https://www.altaro.com/hyper-v/storage-performance-baseline-diskspd/#Example_%C2%A0SQL_Server_Performance%C2%A0Baselining
 -- https://docs.microsoft.com/en-us/azure-stack/hci/manage/diskspd-overview
 -- https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/dn894707(v=ws.11)
 -- go to "Step 3: Run DiskSpd trial runs, and tune DiskSpd parameters" in above link to see action,meaning, how to decide
