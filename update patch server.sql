@@ -19,3 +19,45 @@ Confirm the SQL Server Agent service is started again, and kick off your next lo
 Start client apps back up and make sure they function.
 
 Over the coming days, keep a much closer eye than normal on monitoring tools looking for unexpected failures. 
+
+***************************************************HOW-TO*****************************************************
+## https://desertdba.com/how-i-applied-13-cumulative-updates-in-12-minutes/
+##it will restart the physical box
+
+$ServerName = "SQL-TEST001","SQL-TEST002"
+
+
+$KeyPath = 'C:\DBA\'
+
+$UserName = 'rms-asp\mbello'
+
+$CredFile = $KeyPath+'mbello.cred'
+
+##store password encrypted in file: it is OS specific. one created on os1 won't work on os2
+#$Credential = Get-Credential -Message "Enter the Credentials:" -UserName $UserName
+#$Credential.Password | ConvertFrom-SecureString | Out-File $CredFile -Force
+
+#Get encrypted password from the file
+$SecureString = Get-Content $CredFile | ConvertTo-SecureString # Unlike a secure string, an encrypted standard string can be saved in a file for later use
+$Credential = New-Object System.Management.Automation.PSCredential -ArgumentList $Username, $SecureString
+
+
+#has to be shared folder accessable by all servers involved
+$PathCU = '\\sql-test001\Sql_Backup\download'
+
+#don't remane the download file
+$VersionCU = 'SQLServer2017-KB5016884-x64'
+
+#write-host "get build before" 
+#Get-DbaInstanceProperty -SqlInstance "SQL-TEST001","SQL-TEST002"  -InstanceProperty BuildNumber, edition, ErrorLogPath 
+Get-DbaInstanceProperty -SqlInstance "SQL-TEST001","SQL-TEST002"  -InstanceProperty BuildNumber #, edition, ErrorLogPath
+
+#tested the update to CU31 - omit version will update to the lastest of files find in download folder
+# can update different versions of sql server if CU is found in the downlad folder
+#Update-DbaInstance -ComputerName $ServerName -Restart -Version CU31 -Path $PathCU -Credential $Credential -Confirm:$false -whatif 
+#Update-DbaInstance -ComputerName $ServerName -Restart -Path $PathCU -Credential $Credential -Confirm:$false -whatif
+Update-DbaInstance -ComputerName $ServerName -Restart -Path $PathCU -Credential $Credential -Confirm:$false -verbose | out-file sqlpatch.log -force
+
+#write-host "get build after" 
+Get-DbaInstanceProperty -SqlInstance "SQL-TEST001","SQL-TEST002"  -InstanceProperty BuildNumber #, edition, ErrorLogPath
+
