@@ -1,6 +1,16 @@
 --before restore disconnect every body
 --https://thesitedoctor.co.uk/blog/dropkill-all-connections-to-a-sql-database/
 
+--user still connected
+SELECT 'kill ' +cast(session_id as varchar(25))
+FROM sys.dm_exec_sessions
+WHERE login_name = 'mbello'
+	
+-- owner of a job
+SELECT name,* 
+FROM msdb..sysjobs
+WHERE owner_sid = SUSER_SID('mbello')
+
 -- **********CLOSE ALL CONNECTIONS ON THE DATABASE  
 DECLARE @dbid INT, @KillStatement char(30), @SysProcId smallint
 --define the targeted database 
