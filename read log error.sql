@@ -9,7 +9,7 @@
 			 char(10) + char(10) 
 			+ ISNULL(ERROR_MESSAGE(),'') 
 
-	RAISERROR ( @msg, 16, 1 ) with LOG; 
+	RAISERROR ( @msg, 16, 1 ) with LOG; -- Logs the error in the error log and the application log for the instance of the Microsoft SQL Server Database
 	--Logs a user-defined message in the SQL Server log file and in the Windows Event Viewer. ie eventvwr.msc
 	-- xp_logevent can be used to send an alert without sending a message to the client
 	-- https://docs.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/xp-logevent-transact-sql?view=sql-server-ver15#result-sets
