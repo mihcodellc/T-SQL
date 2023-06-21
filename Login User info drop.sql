@@ -27,7 +27,9 @@ Drop login [mbello];
 --orphan in database ie user but no login
 exec sp_change_users_login @Action='Report'
 
----- orphan user from all db on the instance
+---- orphan user from all db on the instance' this can be error: 
+	--Cannot execute as the database principal because the principal, this type of principal cannot be impersonated, or you do not have permission.
+
 create table #tempUser(cmd nvarchar(200), dbName nvarchar(200) )
 exec sp_MSforeachdb N'use [?] ; 
     insert into #tempUser
