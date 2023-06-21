@@ -13,8 +13,12 @@ GO
 ALTER DATABASE <db_name> SET TRUSTWORTHY ON;
 --who own the database
 -- SELECT suser_sname( owner_sid ), * FROM sys.databases
+-- schema owner
+-- select name,schema_name(schema_id), USER_NAME( principal_id ) from sys.schemas
 -- Deprecated EXEC sp_changedbowner 'apps'
 ALTER AUTHORIZATION ON DATABASE::MyDB TO apps;
+
+
 
 --map user in the database
 ALTER USER APPS WITH LOGIN = APPS 
