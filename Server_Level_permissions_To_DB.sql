@@ -56,6 +56,7 @@ use DBA_DB
 drop signature FROM dbo.sp_WhoIsActive BY  CERTIFICATE Certi_ForServerPermissions
 DROP CERTIFICATE Certi_ForServerPermissions
 --drop user if exists testbello -- if exists IN tsql in version 2016 and up
+--DROP PROC IF EXISTS dbo.sp_WhoIsActive
 
 
 
@@ -81,5 +82,15 @@ WHERE
 ISNULL(sc.[name], sak.[name]) = 'Certi_ForServerPermissions'
 ORDER BY [SchemaName], [ObjectType], [ObjectName], [CertOrAsymKeyName];
 
+-- objects with certificat name in the current database
+SELECT quotename(s.name) + '.' + quotename(o.name) AS Module,
+       c.name AS Cert, c.subject, dp.name AS [Username], cp.*
+FROM   sys.crypt_properties cp
+JOIN   sys.certificates c ON cp.thumbprint = c.thumbprint
+LEFT   JOIN sys.database_principals dp ON c.sid = dp.sid
+JOIN   sys.objects o ON cp.major_id = o.object_id
+JOIN   sys.schemas s ON o.schema_id = s.schema_id
 
---DROP PROC IF EXISTS dbo.sp_WhoIsActive
+
+
+-- draft Certificate permission at server level.sql
