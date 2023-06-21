@@ -49,6 +49,11 @@ ORDER BY O.name
 --all object types
 select distinct  o.type, o.type_desc from sys.objects o
 order by o.type
+-- all data types
+SELECT TYPEPROPERTY(SCHEMA_NAME(schema_id) + '.' + name, 'OwnerId') AS owner_id,
+ name, system_type_id, user_type_id, schema_id  
+FROM sys.types;
+	
 
 --FORMAT VERSION OF THE BODY OF THE OBJECT 
 exec sp_helptext 'syncobj_0x4537354141434343'
