@@ -13,6 +13,8 @@ END TRY
 BEGIN CATCH
     IF @@TRANCOUNT <> 0 
     BEGIN
+	   -- https://learn.microsoft.com/en-us/sql/t-sql/language-elements/throw-transact-sql?view=sql-server-ver16
+	   --statement before the THROW statement must be followed by the semicolon (;) statement terminator
 	   ROLLBACK TRAN
 	   --RAISERROR ( 'msg', 16, 1 )
 	   THROW; -- re raise error from begin try
