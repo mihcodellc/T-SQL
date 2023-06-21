@@ -16,7 +16,7 @@ BEGIN CATCH
 	   -- https://learn.microsoft.com/en-us/sql/t-sql/language-elements/throw-transact-sql?view=sql-server-ver16
 	   --statement before the THROW statement must be followed by the semicolon (;) statement terminator
 	   ROLLBACK TRAN
-	   --RAISERROR ( 'msg', 16, 1 )
+	   --RAISERROR ( 'msg', 16, 1 ) WITH LOG; -- Logs the error in the error log and the application log for the instance of the Microsoft SQL Server Database
 	   THROW; -- re raise error from begin try
 	   RETURN -1
     END
