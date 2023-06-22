@@ -2,6 +2,30 @@
 -- https://docs.microsoft.com/en-us/sql/t-sql/statements/create-certificate-transact-sql?view=sql-server-ver15
 --sql server 2017 compati 140
 
+-- *********** this is using certificate. A version using only roles commmented out ********************************
+--use master
+----create server role
+--create server role MIHadmin_user
+
+----grant priv
+--GRANT VIEW SERVER STATE TO MIHadmin_user
+--GRANT ALTER ANY CONNECTION TO MIHadmin_user -- can kill session
+
+----assign user to a server group
+--alter server role MIHadmin_user add member MyUser
+
+----grant priv on db object
+--Use MIHAdmin
+--grant execute on object::sp_WhoIsActive to devops_sr
+
+----assign user to db group
+--alter role devops_sr add member MyUser
+
+--******************************************************************************************************************
+
+
+
+
 
 --**1 Create the certificate in the user database.
 use DBA_DB
