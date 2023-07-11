@@ -10,6 +10,9 @@ IF  EXISTS (SELECT 1 FROM sys.database_principals WHERE name like N''%mbello%'')
     select ''USE ''+db_name()+ Char(13)  +'' DROP USER ['' + name + ''];'' FROM sys.database_principals WHERE name like N''%mbello%''  ;'
 
     select * from #temp
+--owner of schema
+	SELECT s.*, SCHEMA_NAME(schema_id)
+FROM sys.schemas s where s.principal_id = USER_ID('sacquaye');
     
 -- for azure sql
  select  'DROP USER [' + name + '];' FROM sys.database_principals WHERE name like N'%mbello%'  ;
