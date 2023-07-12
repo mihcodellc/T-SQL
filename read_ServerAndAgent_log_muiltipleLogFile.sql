@@ -1,5 +1,7 @@
 --https://www.mssqltips.com/sqlservertip/3135/search-multiple-sql-server-error-logs-at-the-same-time/
 
+--*********Description: search some texts through SQL Server & Agent logs from the last 7 days
+
 -- last update 7/10/2023 By Monktar Bello: 
 --						  used only sys.xp_enumerrorlogs
 --						  search different texts
@@ -11,6 +13,16 @@ DECLARE @maxLog      INT,
         @searchStr   VARCHAR(256),
         @startDate   DATETIME;
 
+declare @searchStrFail VARCHAR(256) = 'fail';
+declare @searchStrError VARCHAR(256) = 'error';
+declare @searchStrWarning VARCHAR(256) = 'warning';
+declare @searchStrPort VARCHAR(256) = 'Server is listening on';
+
+--parameters
+SELECT @startDate = dateadd(dd,-7,GETDATE());
+declare @LogType  int = 2 -- 1 ServerLog - 2 AgentLog
+
+
 DECLARE @errorLogs   TABLE (
     LogID    INT,
     LogDate  DATETIME,
@@ -21,16 +33,9 @@ DECLARE @logData      TABLE (
     ProcInfo    VARCHAR(64),
     LogText     VARCHAR(MAX)   );
 
-SELECT @startDate = dateadd(dd,-7,GETDATE());
-
-declare @LogType  int = 1 -- 1 ServerLog - 2 AgentLog
 
 SELECT iif(@logType = 1, 'SQL Server Logs','SQL Agent Logs') as LogType
 
-declare @searchStrFail VARCHAR(256) = 'fail';
-declare @searchStrError VARCHAR(256) = 'error';
-declare @searchStrWarning VARCHAR(256) = 'warning';
-declare @searchStrPort VARCHAR(256) = 'Server is listening on';
 
 -- get log files
 INSERT INTO @errorLogs 
@@ -41,7 +46,7 @@ EXEC sys.xp_enumerrorlogs @LogType;
 --EXEC msdb.dbo.sp_get_sqlagent_properties
 
 -- errors log files
-select * from @errorLogs
+select logId, LogDate, LogFileSizeBytes/1024 as LogFileSizeKiloBytes  from @errorLogs
 
 SELECT TOP 1 @maxLog = LogID
 FROM @errorLogs
