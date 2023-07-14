@@ -1,6 +1,7 @@
 ------ orphan user from all db on the instance' this can be error: 
 	--Cannot execute as the database principal because the principal, this type of principal cannot be impersonated, or you do not have permission.
 
+
 ----permissions, privileges
 --EXEC rmsAdmin.dbo.UserPermission_DB_Server 
 --@LoginUser = [gsikes]
@@ -83,7 +84,7 @@ declare @clause nvarchar(2000)
 set @query = ''
 
 --SET @permission = '%deny%'; --apickens@rmsweb.com
-SET @LoginUser = 'jminor'
+SET @LoginUser = 'cackerman'
 --SET @UserDB = 'MedRx_test' 
 
 --grant execute on database::MedRx_test to DOA
@@ -365,6 +366,12 @@ BEGIN
     WHERE (PrincipalName = @LoginUser OR  @LoginUser IS NULL) 
     ORDER BY CurrentDB, PrincipalName
 
+    SELECT DISTINCT PrincipalName,  rolename
+    FROM #uROLES
+    WHERE (PrincipalName = @LoginUser OR  @LoginUser IS NULL) 
+    ORDER BY PrincipalName
+
+
     set @clause = '
     insert into #members
      SELECT rol.name AS DatabaseRoleName,  
@@ -384,8 +391,46 @@ BEGIN
     --if @LoginUser is not null
 	   --delete from #members where DBUser <> @LoginUser
 
-    select 'members of the roles to which @LoginUser belongs to'
+    select ' on DB level, members of the roles to which @LoginUser belongs to'
     select * from #members order by CurrentDB, RoleName
+
+    select ' on Server level, members of the roles to which @LoginUser belongs to'
+    --server role and member
+    SELECT rol.name AS ServerRoleName,   
+       isnull (us.name, '') AS UserMemberName,SUSER_ID(us.loginname) server_principal_id   
+     FROM sys.server_principals AS rol    
+     LEFT JOIN  sys.server_role_members AS mb
+    	   ON mb.role_principal_id = rol.principal_id  
+     LEFT JOIN sys.syslogins AS us  
+    	   ON mb.member_principal_id = SUSER_ID(us.loginname)  
+    WHERE rol.type = 'R' --and rol.name = 'rmsadmin_user'
+    and (us.name = @LoginUser OR  @LoginUser IS NULL)
+    ORDER BY  rol.name;  
+
+    ----server/db ids and names
+    --select *, SUSER_NAME(member_principal_id) as login_id_or_principal_id from sys.server_role_members where member_principal_id = 789
+    --select name , denylogin, sysadmin, SUSER_SID(loginname) as security_id_or_sid, 
+		  --SUSER_ID (loginname) as server_principal_id, 
+		  --DATABASE_PRINCIPAL_ID(loginname) as db_principal_id  from sys.syslogins where loginname = 'mbello'
+    --select * from sys.server_role_members 
+
+    select ' on Server level, permissions granted to its group '
+    select principals.name principalName,permissionst.class_desc, permissionst.permission_name COLLATE DATABASE_DEFAULT as 'permission'
+		  , permissionst.state_desc
+    from sys.server_principals principals
+    join sys.server_permissions permissionst
+	   on permissionst.grantee_principal_id = principals.principal_id
+    WHERE principals.NAME in (
+		  SELECT rol.name AS ServerRoleName   
+			--,isnull (us.name, '') AS UserMemberName,SUSER_ID(us.loginname) server_principal_id   
+		   FROM sys.server_principals AS rol    
+		   LEFT JOIN  sys.server_role_members AS mb
+    			 ON mb.role_principal_id = rol.principal_id  
+		   LEFT JOIN sys.syslogins AS us  
+    			 ON mb.member_principal_id = SUSER_ID(us.loginname)  
+		  WHERE rol.type = 'R' --and rol.name = 'rmsadmin_user'
+		  and (us.name = @LoginUser OR  @LoginUser IS NULL)
+    )
 
 
      select '*********permissions get from being member of a role **********'
@@ -440,10 +485,15 @@ BEGIN
 	order by principalName
 
     select '*********denied permission **********'
-    select * from  #objectPermission
-    where (permission_name like '%'+@permission+'%' OR  @permission IS NULL) and (CurrentDatabase = @UserDB OR  @UserDB IS NULL)
-		  and state_desc = 'DENY'
-    order by principalName
+    --select * from  #objectPermission
+    --where (permission_name like '%'+@permission+'%' OR  @permission IS NULL) and (CurrentDatabase = @UserDB OR  @UserDB IS NULL)
+		  --and state_desc like '%DENY%'
+    --order by principalName
+
+     SELECT DISTINCT [User/Login],Entity_Name, SubEntity_Name, Permission_Name, case when Entity_Name='SERVER' THEN '' ELSE  db END as dbName, state_desc
+	   FROM #UserPermissions u
+	   WHERE state_desc like '%DENY%' and ([User/Login] = @LoginUser OR  @LoginUser IS NULL) and (db = @UserDB OR  @UserDB IS NULL)
+	   ORDER BY Entity_Name, dbName, [User/Login],  Permission_Name
 
 
 select '*********hidden permission from public commented **********'
