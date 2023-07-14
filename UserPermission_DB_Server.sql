@@ -1,6 +1,14 @@
 ------ orphan user from all db on the instance' this can be error: 
 	--Cannot execute as the database principal because the principal, this type of principal cannot be impersonated, or you do not have permission.
 
+--*************BEGIN with dbatools not powerfull enough as this
+--#user permission with dbatools not powerfull enough as this
+--#Get-DbaUserPermission -SqlInstance instanceName | Where-Object Member -eq 'mbello' | select-object Object, Type,Permission, State, Member | export-csv -path 'g:\UserPriv.csv'
+--#denied permission
+--#Get-DbaUserPermission -SqlInstance instanceName | Where-Object State -eq 'DENY' | export-csv -path 'g:\UserPriv.csv'
+--#user permission on DB
+--Get-DbaUserPermission -SqlInstance instanceName -Database MedRx | Where-Object Member -eq 'mbello' | select-object Object, Type,Permission, State, Member | export-csv -path 'g:\UserPriv.csv'
+--**************END with dbatools not powerfull enough as this
 
 ----permissions, privileges
 --EXEC rmsAdmin.dbo.UserPermission_DB_Server 
