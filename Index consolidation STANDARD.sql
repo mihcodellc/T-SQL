@@ -34,7 +34,14 @@ exec sp_SQLskills_ListIndexForConsolidation @ObjName = PayerProvider,  @KeysFilt
 exec sp_SQLskills_ListIndexForConsolidation @ObjName = PayerProvider, @indnameKey ='[IX_PayerProvider]' , @isShowSampleQuery = 1
 
 --hist, index isssue, read/write
-EXEC RmsAdmin.dbo.sp_BlitzIndex_new     @DatabaseName='MedRx', @SchemaName='dbo', @TableName='Payments'
+EXEC RmsAdmin.dbo.sp_BlitzIndex     @DatabaseName='MedRx', @SchemaName='dbo', @TableName='Payments'
+-- check usage from sp_BlitzIndex in a table
+select index_id id, run_datetime whe, index_usage_summary, reads_per_write, index_op_stats, * from dbaDB.dbo.BlitzIndex
+where table_name = 'KFIWork' 
+and run_datetime <='2023-07-19 19:25:00.000'
+and index_id in(37,11,17,20)
+order by run_datetime desc, index_id desc
+	
 
 CREATE INDEX [IX_PayerProvider_Lbxid_inc_20220427] ON [dbo].[PayerProvider] ( [lbxId] ) INCLUDE ( [id]) WITH (FILLFACTOR=95, ONLINE=?, SORT_IN_TEMPDB=?, DATA_COMPRESSION=?);
 
