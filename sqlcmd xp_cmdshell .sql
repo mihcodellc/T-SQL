@@ -13,3 +13,6 @@
 	SET @cmd = CONCAT( 'sqlcmd.exe -d master -o ',@FileName,' -q "exec [dba_db].[dbo].[sp_help_revlogin]"' )
 
 	EXEC master..xp_cmdshell @cmd
+
+
+exec xp_cmdshell 'C:\test.bat LOG';
