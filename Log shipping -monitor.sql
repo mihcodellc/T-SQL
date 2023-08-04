@@ -26,7 +26,7 @@ SELECT secondary_database,restore_mode as [restore/*1 ie standby 0 no recovery*/
  ;with cte as  (
 SELECT sj.name as job_name, 
 	 substring(sh.message,1,23) + ' -- FileName: ' +substring(sh.message,PATINDEX('%LOGSHIPPING_COPY%', sh.message)+17, PATINDEX('%.trn%', sh.message)+4) as last_Restore,
-	 row_number() over(partition by sj.name order by run_date desc, run_time desc) rnk
+	 	 row_number() over(partition by sj.name order by run_date desc, cast(substring(sh.message,1,19) as datetime) /*run_time leftover secs*/ desc) rnk
 FROM msdb.dbo.sysjobs sj
 JOIN msdb.dbo.sysjobhistory sh ON sj.job_id = sh.job_id
 where  sj.name like 'LSRestore%' and sh.message like '%restored log%'
