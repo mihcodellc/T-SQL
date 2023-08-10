@@ -5,6 +5,9 @@
 --From the menu select File > New > Database Engine Query
 --From the connection dialog box in the Server Name field, enter admin:<server_name> if using the default instance or admin:<server_name>\<instance_name> if using a named instance.
 
+OR simple, restart service then try to beat other by connect first(or refresh if you already connect) in management studio
+	then run your statement or ALTER DATABASE Medrx SET MULTI_USER GO;
+
 --enable
 sp_configure 'remote admin connections', 1;  
 GO  
