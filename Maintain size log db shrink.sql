@@ -38,3 +38,8 @@ USE dba_db;
 GO  
 DBCC SHRINKFILE (dba_db, 20992); –- size it to 20GB
 GO  
+
+--truncate only with SHRINKFILE	
+USE dba_db;  
+GO 
+DBCC SHRINKFILE (5, TRUNCATEONLY); -
