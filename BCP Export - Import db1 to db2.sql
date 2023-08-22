@@ -8,13 +8,26 @@ BULK INSERT db_name.dbo.table_name FROM 'C:\Sample.csv'
       ROWTERMINATOR = '\n'  
 );  
 
+--TRUNCATE TABLE myFirstImport; -- (for testing)
+BULK INSERT dbo.myFirstImport  
+   FROM 'D:\BCP\myFirstImport.bcp'  
+   WITH (FORMATFILE = 'D:\BCP\myFirstImport.xml');  
+or
+INSERT INTO dbo.myFirstImport
+SELECT *
+FROM OPENROWSET (BULK 'D:\BCP\myFirstImport.bcp', FORMATFILE = 'D:\BCP\myFirstImport.fmt') AS t1;	
+
 -- -n, -c, -w, or -N
 -- -c Performs the operation using a character data type
 -- -n Performs the bulk-copy operation using the native (database) data types
 -- -N Performs the bulk-copy operation using the native (database) data types of the data for noncharacter data, and Unicode characters for character data
 -- -w Performs the bulk copy operation using Unicode characters. 
 exec xp_cmdshell 'bcp db_name.dbo.table_name in G:\Sample.csv -c -t, -T -S asp-sql -U mbello -P xxxxx_password_xxxxx '
-
+or
+sqlcmd -S instance-name,1433 -Q "select * from db_B.schema.table1" –s "," –i "C:\Backups\doc1.csv" -E	
+sqlcmd -S 127.0.0.1 -E -i AdventureWorksDW2012.sql
+sqlcmd -S 127.0.0.1 -E -i AdventureWorksDW2012.sql -o QueryResults.txt -e -- bulk insert is used as it is in above statements
+	
 -- **************** BEGIN INSTRUCTIONS  ****************
 -- activate  xp_cmdshell: you may use the script below to activate it. Please inactivate it at the end
 -- To allow advanced options to be changed.  
@@ -47,6 +60,9 @@ exec xp_cmdshell 'bcp db_name.dbo.table_name in G:\Sample.csv -c -t, -T -S asp-s
 --export csv file 
 --doc1
 exec xp_cmdshell 'bcp db_B.schema.table1 out C:\Backups\doc1.csv -n -T -S SqlInstance -U apps -P space15form3 ', no_output
+or
+sqlcmd -S instance-name,1433 -Q "select * from db_B.schema.table1" –s "," –o "C:\Backups\doc1.csv" -E	
+	
 --Curric
 exec xp_cmdshell 'bcp db_B.schema.table3 out C:\Backups\Curric.csv -n -T -S SqlInstance -U apps -P space15form3 ', no_output
 --CurriDoc
