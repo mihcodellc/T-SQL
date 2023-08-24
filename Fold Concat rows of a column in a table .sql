@@ -33,3 +33,11 @@ declare @result varchar(max) set @result = ''
 select @result = @result + ','+id from names
 select @result
 
+
+
+---reverse comma list
+DECLARE @xml XML;
+SELECT @xml = CAST('<i>' + REPLACE('1,2,3',',','</i><i>') + '</i>' AS XML)
+
+SELECT CAST(x.i.value('.','VARCHAR(MAX)') AS BIGINT)
+	FROM @xml.nodes('//i') x(i);
