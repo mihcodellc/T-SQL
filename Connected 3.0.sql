@@ -1,16 +1,42 @@
 -- code error Timeout expired. The timeout period elapsed 
 -- prior to obtaining a connection from the pool. This may have occurred because all pooled connections were in use and max pool size was reached.
 -- https://sqlperformance.com/2017/07/sql-performance/find-database-connection-leaks
-
   
+ 
 --report on deadlock
 -- https://www.mssqltips.com/sqlservertip/6430/monitor-deadlocks-in-sql-server-with-systemhealth-extended-events/
 
 set transaction isolation level read uncommitted
+go
 set nocount on
+go
 
+--kill 257  
+  
 select 'type of connection to this server'
 SELECT distinct auth_scheme FROM sys.dm_exec_connections
+SELECT * FROM sys.dm_exec_connections
+where auth_scheme not in ('SQL','NTLM')
+
+--SELECT sdec.auth_scheme
+--    ,sdes.session_id
+--    ,sdes.host_name 
+--    ,sdes.program_name 
+--    ,sdes.login_name 
+--    ,sdes.client_interface_name
+--    ,sdes.nt_domain
+--    ,sdes.nt_user_name 
+--    ,sdec.client_net_address
+--    ,sdec.local_net_address FROM sys.dm_exec_connections sdec
+--left join
+--sys.dm_exec_sessions AS sdes ON sdec.session_id = sdes.session_id
+--where sdec.auth_scheme not in ('SQL','NTLM')
+
+  select '********************job Executing************************'
+  ---- job Executing
+exec msdb.dbo.sp_help_job @execution_status=1 --- running
+--exec msdb.dbo.sp_help_job @job_name= 'OLA - DatabaseBackup - USER DB FULL then DBCC' 
+
 
 --==============================================================================
 -- See who is connected to the database.
@@ -23,8 +49,8 @@ SELECT distinct auth_scheme FROM sys.dm_exec_connections
 -- Complement exec sp_WhoIsActive
 --==============================================================================
 select 'who is connected : Analyse what each spid is doing, reads and writes'
-SELECT
-	  DATEDIFF(MINUTE,sdes.last_request_end_time,sdes.last_request_start_time) 'elapse_time in minutes'
+SELECT 
+	  DATEDIFF(MINUTE,sdes.last_request_start_time, sdes.last_request_end_time) 'elapse_time in minutes'
     ,sdes.last_request_start_time
     ,sdes.last_request_end_time
     ,sdes.session_id
@@ -53,6 +79,8 @@ SELECT
     ,sdes.nt_user_name 
     ,sdec.client_net_address
     ,sdec.local_net_address
+    ,sdec.client_tcp_port
+    ,sdec.local_tcp_port
 FROM sys.dm_exec_sessions AS sdes
 
 INNER JOIN sys.dm_exec_connections AS sdec
@@ -70,13 +98,14 @@ CROSS APPLY (
 ) sdest
 WHERE sdes.session_id <> @@SPID --and sdes.last_request_end_time < DATEADD(hh,-12,getdate())
   --AND sdest.DatabaseName in('db1', 'db2', ...)-- and sdest.dbid IS NOT NULL
-ORDER BY  sdes.last_request_start_time DESC, sdes.session_id
+ORDER BY  1 desc,  sdes.session_id
 
 ---- maximum number of simultaneous user connections allowed
 --SELECT @@MAX_CONNECTIONS AS 'Max Connections';  
 
---kill 1588
- select 'sessions blocking other, active queries & sql text'
+
+--Previous version commented out
+select 'sessions blocking other, active queries & sql text'
  ;WITH cteBL (session_id, blocking_these) AS 
 (SELECT s.session_id, blocking_these = x.blocking_these FROM sys.dm_exec_sessions s 
 CROSS APPLY    (SELECT isnull(convert(varchar(6), er.session_id),'') + ', '  
@@ -85,20 +114,84 @@ CROSS APPLY    (SELECT isnull(convert(varchar(6), er.session_id),'') + ', '
                 AND er.blocking_session_id <> 0
                 FOR XML PATH('') ) AS x (blocking_these)
 )
-SELECT bl.session_id, blocked_by = r.blocking_session_id, bl.blocking_these
-, batch_text = t.text, input_buffer = ib.event_info,sdec.client_net_address, sdec.local_net_address,s.host_name, *
+SELECT r.wait_time / (1000.0) as WaitSec, r.total_elapsed_time / (1000.0) 'ElapsSec', bl.session_id, s.login_name,s.[host_name],s.[program_name], 
+substring(case when len(ib.event_info)> 0 then ib.event_info else '' end,0,300) Query_involved,
+blocked_by = r.blocking_session_id, bl.blocking_these
+, batch_text = st.text, r.reads, r.writes, r.logical_reads, r.wait_type, r.wait_resource, sdec.client_net_address, sdec.local_net_address--, *
 FROM sys.dm_exec_sessions s
 INNER JOIN sys.dm_exec_connections AS sdec  ON sdec.session_id = s.session_id
 LEFT OUTER JOIN sys.dm_exec_requests r on r.session_id = s.session_id
 INNER JOIN cteBL as bl on s.session_id = bl.session_id
-OUTER APPLY sys.dm_exec_sql_text (r.sql_handle) t
+OUTER APPLY sys.dm_exec_sql_text (r.sql_handle) st
 OUTER APPLY sys.dm_exec_input_buffer(s.session_id, NULL) AS ib
-WHERE blocking_these is not null or r.blocking_session_id > 0
+WHERE --r.session_id != @@SPID
+ ( --blocking over 3min
+		  (
+			 (len(bl.blocking_these) > 0 OR r.blocking_session_id <> 0)-- blocked or blocking
+			 and 
+			 (
+				r.total_elapsed_time / (1000.0)  > 180 -- 180=3*60
+				or
+				DATEDIFF(second, GETDATE(), r.start_time) > 180
+			 )
+		  )
+	       or 
+      --running over 20min
+		(
+		  r.total_elapsed_time / (1000.0)  > 1200--1200=20*60
+		  or
+		  DATEDIFF(second, GETDATE(), r.start_time) > 1200
+		)  
+	   )
+ AND (blocking_these is not null or r.blocking_session_id <> 0) -- only blocking	   
+--NULL or equal to 0, the request isn't blocked, or the session information of the blocking session isn't available
+---2 = The blocking resource is owned by an orphaned distributed transaction.
+---3 = The blocking resource is owned by a deferred recovery transaction.
+---4 = Session ID of the blocking latch owner couldn't be determined at this time because of internal latch state transitions.
+---5 = Session ID of the blocking latch owner couldn't be determined because it isn't tracked for this latch type (for example, for an SH latch).
+--ref https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-requests-transact-sql?view=sql-server-ver16
 ORDER BY len(bl.blocking_these) desc, r.blocking_session_id desc, r.session_id;
 
--- don't run on heavy load
---select  'Query to return active locks and the duration of the locks being held'
---SELECT  Locks.request_session_id AS SessionID ,
+-- select 'sessions blocking other, active queries & sql text'
+-- ;WITH cteBL (session_id, blocking_these) AS 
+--(SELECT s.session_id, blocking_these = x.blocking_these FROM sys.dm_exec_sessions s 
+--CROSS APPLY    (SELECT isnull(convert(varchar(6), er.session_id),'') + ', '  
+--                FROM sys.dm_exec_requests as er
+--                WHERE er.blocking_session_id = isnull(s.session_id ,0)
+--                AND er.blocking_session_id <> 0
+--                FOR XML PATH('') ) AS x (blocking_these)
+--)
+--SELECT r.wait_time / (1000.0) as WaitInSecondFromMilliSecond, bl.session_id, blocked_by = r.blocking_session_id, bl.blocking_these
+--, batch_text = st.text, r.reads, r.writes, r.logical_reads, input_buffer = ib.event_info, sdec.client_net_address, sdec.local_net_address,s.host_name--, *
+--FROM sys.dm_exec_sessions s
+--INNER JOIN sys.dm_exec_connections AS sdec  ON sdec.session_id = s.session_id
+--LEFT OUTER JOIN sys.dm_exec_requests r on r.session_id = s.session_id
+--INNER JOIN cteBL as bl on s.session_id = bl.session_id
+--OUTER APPLY sys.dm_exec_sql_text (r.sql_handle) st
+--OUTER APPLY sys.dm_exec_input_buffer(s.session_id, NULL) AS ib
+--WHERE blocking_these is not null or r.blocking_session_id <> 0
+--AND ( --bloking over 3min
+--		  (
+--			 (len(bl.blocking_these) > 0 OR r.blocking_session_id <> 0)-- blocked or blocking
+--			 and 
+--			 (r.total_elapsed_time / (1000.0)  > 180)--180=3*60
+--		  )
+--	       or 
+--      --running over 20min
+--		  r.total_elapsed_time / (1000.0)  > 1200--1200=20*60
+--	   )
+----NULL or equal to 0, the request isn't blocked, or the session information of the blocking session isn't available
+-----2 = The blocking resource is owned by an orphaned distributed transaction.
+-----3 = The blocking resource is owned by a deferred recovery transaction.
+-----4 = Session ID of the blocking latch owner couldn't be determined at this time because of internal latch state transitions.
+-----5 = Session ID of the blocking latch owner couldn't be determined because it isn't tracked for this latch type (for example, for an SH latch).
+----ref https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-requests-transact-sql?view=sql-server-ver16
+--ORDER BY len(bl.blocking_these) desc, r.blocking_session_id desc, r.session_id;
+
+ select 'who lock my object commented'
+---- don't run on heavy load unless more specific --who lock my object
+----select  'Query to return active locks and the duration of the locks being held'
+--SELECT top 10 Locks.request_session_id AS SessionID ,
 --        Obj.Name AS LockedObjectName ,
 --        COUNT(*) AS Locks, ExeSess.host_name, ExeSess.program_name,DATEDIFF(second, ActTra.Transaction_begin_time, GETDATE()) AS Duration, ActTra.Transaction_begin_time  
 --FROM    sys.dm_tran_locks Locks
@@ -110,9 +203,11 @@ ORDER BY len(bl.blocking_these) desc, r.blocking_session_id desc, r.session_id;
 --WHERE   resource_database_id = DB_ID()
 --	   --db_name(l.resource_database_id) in('MedRx', 'RMSOCR', 'MedRxAnalytics', 'Billing')
 --        AND Obj.Type = 'U'
+--	   --and Obj.Name like 'E835%'
 --GROUP BY ActTra.Transaction_begin_time ,
 --        Locks.request_session_id ,
 --        Obj.Name, ExeSess.host_name, ExeSess.program_name
+--order by Duration
 
 SELECT t1.resource_type AS [lock type], DB_NAME(resource_database_id) AS [database],
 t1.resource_associated_entity_id AS [blk object],t1.request_mode AS [lock req],  -- lock requested
@@ -141,26 +236,41 @@ ON t1.lock_owner_address = t2.resource_address OPTION (RECOMPILE);
 
 -- open tran, cpu,memory used
 */
+ select 'sp_WhoIsActive: blocker desc - CPU desc - [Used_Memory] desc - Duration desc'
 exec [RmsAdmin].dbo.sp_WhoIsActive  
 		    @show_own_spid = 0
 		  , @get_task_info =2 /* 1 ie lightweight. task-based metrics : current wait stats, physical I/O, context switches, and blocker information*/
-		  , @get_avg_time = 1
+		  , @get_avg_time = 0
 		  , @get_locks = 1
 		  --, @get_transaction_info = 1
 		  --, @delta_interval = 5 -- Interval in seconds to wait before doing the second data pull
 		  , @find_block_leaders =1
 		  , @show_sleeping_spids = 0 --1 sleeping with open transaction
 		  --, @get_plans = 1 
-		  , @sort_order = '[CPU] desc, [blocked_session_count] desc,[Used_Memory] desc, [open_tran_count] desc' 
+		  , @sort_order = '[blocked_session_count] desc, [Used_Memory] desc, [CPU] desc, [open_tran_count] desc' 
 		  --, @destination_table = ''
-		  --, @output_column_list = '[col1][col2]...'
+		  , @output_column_list = '[dd%][cpu%][reads%][writes%][wait_info][physical%][sql_text][session_id][blocked_session_count][login_name][host_name][database_name][program_name][used_memory][open_tran_count][status][tasks][sql_command][tran_log%][temp%][context%][query_plan][locks][%]'-- '[col1][col2]...'
+
+--exec [RmsAdmin].dbo.sp_WhoIsActive  
+--		    @show_own_spid = 0
+--		  , @get_task_info =2 /* 1 ie lightweight. task-based metrics : current wait stats, physical I/O, context switches, and blocker information*/
+--		  , @get_avg_time = 1
+--		  , @get_locks = 1
+--		  --, @get_transaction_info = 1
+--		  --, @delta_interval = 5 -- Interval in seconds to wait before doing the second data pull
+--		  , @find_block_leaders =1
+--		  , @show_sleeping_spids = 0 --1 sleeping with open transaction
+--		  --, @get_plans = 1 
+--		  , @sort_order = '[CPU] desc, [blocked_session_count] desc,[Used_Memory] desc, [open_tran_count] desc' 
+--		  --, @destination_table = ''
+--		  --, @output_column_list = '[col1][col2]...'
 
 
 
 if (select IS_SRVROLEMEMBER('sysadmin','mbello') IsMemberOfSysAdmin) = 1
 begin
-    select 'open transaction' 
-    dbcc opentran
+    select 'open transaction in log that may preventing log truncation' 
+    dbcc opentran WITH TABLERESULTS--, NO_INFOMSGS http://www.mssqlspark.com/2021/09/sql-server-fundamentals-dbcc-opentran.html
 end
 
 
@@ -320,6 +430,20 @@ ON es.session_id = ec.session_id
 GROUP BY ec.client_net_address, es.[program_name], es.[host_name], es.login_name  
 ORDER BY [connection count] desc--ec.client_net_address, es.[program_name] OPTION (RECOMPILE);
 
+SELECT ec.client_net_address, es.[program_name], es.[host_name], es.login_name, 
+COUNT(ec.session_id) AS [connection count] 
+FROM sys.dm_exec_sessions AS es WITH (NOLOCK) 
+INNER JOIN sys.dm_exec_connections AS ec WITH (NOLOCK) 
+ON es.session_id = ec.session_id 
+GROUP BY ec.client_net_address, es.[program_name], es.[host_name], es.login_name  
+ORDER BY es.login_name
+
+--SELECT distinct ec.client_net_address, es.[host_name], es.login_name
+--FROM sys.dm_exec_sessions AS es WITH (NOLOCK) 
+--INNER JOIN sys.dm_exec_connections AS ec WITH (NOLOCK) 
+--ON es.session_id = ec.session_id 
+--where es.host_name like 'LT-%'
+
 SELECT @@SERVERNAME serverName, 
 COUNT(ec.session_id) AS [connection count] 
 FROM sys.dm_exec_sessions AS es WITH (NOLOCK) 
@@ -371,4 +495,4 @@ SELECT ROW_NUMBER() OVER (ORDER BY ioTotalMB DESC) AS [I/O Rank],
 FROM Aggregate_IO_Statistics
 ORDER BY [I/O Rank] OPTION (RECOMPILE);
 ------
---kill 501
+--kill 501 
