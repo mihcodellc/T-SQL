@@ -57,10 +57,10 @@ EXEC sp_msforeachtable "ALTER TABLE ? WITH CHECK CHECK CONSTRAINT all"
 select  distinct 'ALTER TABLE ' + Object_name(fk.parent_object_id) + ' NOCHECK CONSTRAINT ' + fk.name 
 from sys.objects t
 join sys.foreign_keys fk on t.object_id = fk.parent_object_id
-where t.type ='U' and object_name(fk.referenced_object_id) in ('AccountingSystem') 
+where t.type ='U' and object_name(fk.referenced_object_id) in ('MyTable') 
 UNION
 select  distinct 'ALTER TABLE ' + Object_name(fk.parent_object_id) + ' NOCHECK CONSTRAINT ' + fk.name 
 from sys.objects t
 join sys.foreign_keys fk on t.object_id = fk.parent_object_id
-where t.type ='U' and object_name(fk.parent_object_id) in ('AccountingSystem') 
+where t.type ='U' and object_name(fk.parent_object_id) in ('MyTable') 
 
