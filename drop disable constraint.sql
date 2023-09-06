@@ -51,3 +51,16 @@ ALTER TABLE YourTableName CHECK CONSTRAINT YourConstraint
 EXEC sp_msforeachtable "ALTER TABLE ? NOCHECK CONSTRAINT all"
 -- Enable all constraints for database
 EXEC sp_msforeachtable "ALTER TABLE ? WITH CHECK CHECK CONSTRAINT all"
+
+
+--disable FK 
+select  distinct 'ALTER TABLE ' + Object_name(fk.parent_object_id) + ' NOCHECK CONSTRAINT ' + fk.name 
+from sys.objects t
+join sys.foreign_keys fk on t.object_id = fk.parent_object_id
+where t.type ='U' and object_name(fk.referenced_object_id) in ('AccountingSystem') 
+UNION
+select  distinct 'ALTER TABLE ' + Object_name(fk.parent_object_id) + ' NOCHECK CONSTRAINT ' + fk.name 
+from sys.objects t
+join sys.foreign_keys fk on t.object_id = fk.parent_object_id
+where t.type ='U' and object_name(fk.parent_object_id) in ('AccountingSystem') 
+
