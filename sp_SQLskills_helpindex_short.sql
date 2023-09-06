@@ -12,6 +12,7 @@ create or alter PROCEDURE [dbo].[sp_SQLskills_helpindex_short]
 	, @IncludeListOrdered BIT = 0
 )
 AS
+--9/6/2023 By Monktar Bello: included  objid in the output
 -- 2/17/2022: By Monktar Bello - added @@objname to the output table, Type
 -- 11/19/2021: By Monktar Bello - added @create_date
 --November 2021: Cleaned up and consolidated so only one helpindex for
