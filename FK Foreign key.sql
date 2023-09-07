@@ -24,3 +24,17 @@ select
 					+ '.' + object_name(parent_object_id)
 					+ ': ' + object_name(object_id)
 			from sys.foreign_keys where referenced_object_id = 1929266128  
+
+
+-- drop foreign keys
+select  distinct 'ALTER TABLE ' + 
+ rtrim(schema_name(ObjectProperty(t.object_id,'schemaid')))	+ '.' + '['+ object_name(t.object_id) + ']'+ ' DROP  CONSTRAINT if exists ' + fk.name 
+from sys.objects t
+join sys.foreign_keys fk on t.object_id  = fk.parent_object_id
+where fk.referenced_object_id in (select object_id from sys.objects where type ='U' ) 
+UNION 
+select  distinct 'ALTER TABLE ' + 
+ rtrim(schema_name(ObjectProperty(t.object_id,'schemaid')))	+ '.' + '['+ object_name(t.object_id) + ']'+ ' DROP  CONSTRAINT if exists ' + fk.name 
+from sys.objects t
+join sys.foreign_keys fk on t.object_id  = fk.parent_object_id
+where fk.parent_object_id in (select object_id from sys.objects where type ='U' ) 
