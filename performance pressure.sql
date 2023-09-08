@@ -48,6 +48,7 @@
 Read Committed Snapshot Isolation RCSI “Readers don’t block writers, writers don’t block readers, but writers still block writers.” 
 1. SNAPSHOT (easy on/off for your session)and 
 2. READ COMMITTED SNAPSHOT isolation(not use locks to protect the data)
+-- ENABLE with ALTER DATABASE TestBello  SET ALLOW_SNAPSHOT_ISOLATION ON  
 SET TRANSACTION ISOLATION LEVEL SNAPSHOT;
 SELECT * FROM dbo.Orders;
 
