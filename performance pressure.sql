@@ -46,6 +46,10 @@
 --understand row Row Versioning https://learn.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms175492(v=sql.105)?redirectedfrom=MSDN
 -- https://BrentOzar.com/go/rcsi OR -- https://www.brentozar.com/archive/2013/01/implementing-snapshot-or-read-committed-snapshot-isolation-in-sql-server-a-guide/
 Read Committed Snapshot Isolation RCSI “Readers don’t block writers, writers don’t block readers, but writers still block writers.” 
+1. SNAPSHOT (easy on/off for your session)and 
+2. READ COMMITTED SNAPSHOT isolation(not use locks to protect the data)
+SET TRANSACTION ISOLATION LEVEL SNAPSHOT;
+SELECT * FROM dbo.Orders;
 
 
 --query processing
