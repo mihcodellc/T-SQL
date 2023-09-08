@@ -2,6 +2,7 @@ create   proc [dbo].[sp_BlitzWho_RMS]
 As 
 begin
 
+
 -- 8/10/2023 By mbello: derived from sp_BlitzWho to allow easy twist
 
 SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
@@ -17,14 +18,14 @@ JOIN sys.sysprocesses AS sys2 ON sys1.spid = sys2.blocked;
 DECLARE @LiveQueryPlans TABLE (Session_Id INT NOT NULL, Query_Plan XML NOT NULL);
 
 select  
-run_date,elapsed_time,session_id,database_name,query_text,blocking_session_id,request_cpu_time,nt_domain,host_name,login_name,nt_user_name,program_name,request_physical_reads,session_cpu,session_logical_reads,query_plan,
-live_query_plan,Cached_Parameter_Info,query_cost,STATUS,wait_info,wait_resource,top_session_waits,open_transaction_count,is_implicit_transaction,fix_parameter_sniffing,client_interface_name,login_time,start_time,
-request_time,request_logical_reads,request_writes,session_physical_reads,session_writes,tempdb_allocations_mb,memory_usage,estimated_completion_time,percent_complete,DEADLOCK_PRIORITY,transaction_isolation_level,
+elapsed_time,session_id,database_name,query_text,blocking_session_id,request_cpu_time,request_logical_reads,request_physical_reads,request_writes,nt_domain,host_name,login_name,nt_user_name,program_name,wait_info,wait_resource,top_session_waits,query_plan,open_transaction_count,live_query_plan,Cached_Parameter_Info,query_cost,session_cpu,session_logical_reads,
+STATUS,is_implicit_transaction,fix_parameter_sniffing,client_interface_name,login_time,start_time,
+request_time,session_physical_reads,session_writes,tempdb_allocations_mb,memory_usage,estimated_completion_time,percent_complete,DEADLOCK_PRIORITY,transaction_isolation_level,
 degree_of_parallelism,last_dop,min_dop,max_dop,last_grant_kb,min_grant_kb,max_grant_kb,last_used_grant_kb,min_used_grant_kb,max_used_grant_kb,last_ideal_grant_kb,min_ideal_grant_kb,max_ideal_grant_kb,last_reserved_threads,
 min_reserved_threads,max_reserved_threads,last_used_threads,min_used_threads,max_used_threads,grant_time,requested_memory_kb,grant_memory_kb,is_request_granted,required_memory_kb,query_memory_grant_used_memory_kb,
 ideal_memory_kb,is_small,timeout_sec,resource_semaphore_id,wait_order,wait_time_ms,next_candidate_for_memory_grant,target_memory_kb,max_target_memory_kb,total_memory_kb,available_memory_kb,granted_memory_kb,
 query_resource_semaphore_used_memory_kb,grantee_count,waiter_count,timeout_error_count,forced_grant_count,workload_group_name,resource_pool_name,context_info,query_hash,query_plan_hash,sql_handle,plan_handle,
-statement_start_offset,statement_end_offset
+statement_start_offset,statement_end_offset, run_date
 from 
 (
 SELECT GETDATE() AS run_date, COALESCE(RIGHT('00' + CONVERT(VARCHAR(20), (ABS(r.total_elapsed_time) / 1000) / 86400), 2) + ':' + CONVERT(VARCHAR(20), (DATEADD(SECOND, (r.total_elapsed_time / 1000), 0) + DATEADD(MILLISECOND, (r.total_elapsed_time % 1000), 0)), 114), RIGHT('00' + CONVERT(VARCHAR(20), DATEDIFF(SECOND, s.last_request_start_time, GETDATE()) / 86400), 2) + ':' + CONVERT(VARCHAR(20), DATEADD(SECOND, DATEDIFF(SECOND, s.last_request_start_time, GETDATE()), 0), 114)) AS [elapsed_time], s.session_id, COALESCE(DB_NAME(r.database_id), DB_NAME(blocked.dbid), 'N/A') AS database_name, ISNULL(SUBSTRING(dest.TEXT, (query_stats.statement_start_offset / 2) + 1, (
