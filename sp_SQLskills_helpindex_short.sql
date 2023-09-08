@@ -303,7 +303,7 @@ AS
 		           ''included_columns'' = 
 			          case when type IN (5, 6) then ''n/a, columnstore index''
                            when type = 7 then ''n/a, HASH''
-			          else inc_columns end, '''+  cast(@objid as char(128)) + ''' as objid, is_unique_key
+			          else inc_columns end, '''+  cast(@objid as char(128)) + ''' as objid, is_unique_key, is_unique
 	        from #spindtab
 	        order by index_keys, included_columns, index_id '
             
@@ -319,7 +319,7 @@ AS
 		           ''included_columns'' = 
 			          case when type IN (5, 6) then ''n/a, columnstore index''
                            when type = 7 then ''n/a, HASH''
-			          else inc_columns end, '''+  cast(@objid as char(128)) + ''' as objid, is_unique_key
+			          else inc_columns end, '''+  cast(@objid as char(128)) + ''' as objid, is_unique_key, is_unique
 	        from #spindtab
 	        order by index_keys, included_columns, index_id '
 
