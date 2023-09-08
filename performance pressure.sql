@@ -13,6 +13,9 @@
 
 -- deprecated features limit.sql
 
+--tsql refreance
+--https://learn.microsoft.com/en-us/sql/t-sql/language-reference?view=sql-server-ver15
+
 -- ***sql server max capacities
 -- https://docs.microsoft.com/en-us/sql/sql-server/maximum-capacity-specifications-for-sql-server?redirectedfrom=MSDN&view=sql-server-ver16
 
