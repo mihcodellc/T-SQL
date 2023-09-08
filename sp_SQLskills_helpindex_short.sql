@@ -12,7 +12,8 @@ create or alter PROCEDURE [dbo].[sp_SQLskills_helpindex_short]
 	, @IncludeListOrdered BIT = 0
 )
 AS
---9/6/2023 By Monktar Bello: included  objid in the output
+-- 9/6/2023 By Monktar Bello: replaced (-) with DESC
+-- 9/6/2023 By Monktar Bello: included  objid in the output
 -- 2/17/2022: By Monktar Bello - added @@objname to the output table, Type
 -- 11/19/2021: By Monktar Bello - added @create_date
 --November 2021: Cleaned up and consolidated so only one helpindex for
@@ -143,18 +144,18 @@ AS
 
 		select @keys = QUOTENAME(index_col(@objname, @indid, 1), N']'), @i = 2
 		if (indexkey_property(@objid, @indid, 1, 'isdescending') = 1)
-			select @keys = @keys  + '(-)'
+			select @keys = @keys  + ' DESC'
 
 		select @thiskey = QUOTENAME(index_col(@objname, @indid, @i), N']')
 		if ((@thiskey is not null) and (indexkey_property(@objid, @indid, @i, 'isdescending') = 1))
-			select @thiskey = @thiskey + '(-)'
+			select @thiskey = @thiskey + ' DESC'
 
 		while (@thiskey is not null )
 		begin
 			select @keys = @keys + ', ' + @thiskey, @i = @i + 1
 			select @thiskey = QUOTENAME(index_col(@objname, @indid, @i), N']')
 			if ((@thiskey is not null) and (indexkey_property(@objid, @indid, @i, 'isdescending') = 1))
-				select @thiskey = @thiskey + '(-)'
+				select @thiskey = @thiskey + ' DESC'
 		end
 
 		-- Second, we'll figure out what the included columns are.
@@ -302,7 +303,7 @@ AS
 		           ''included_columns'' = 
 			          case when type IN (5, 6) then ''n/a, columnstore index''
                            when type = 7 then ''n/a, HASH''
-			          else inc_columns end, '''+  cast(@objid as char(128)) + ''' as objid
+			          else inc_columns end, '''+  cast(@objid as char(128)) + ''' as objid, is_unique_key
 	        from #spindtab
 	        order by index_keys, included_columns, index_id '
             
@@ -318,15 +319,15 @@ AS
 		           ''included_columns'' = 
 			          case when type IN (5, 6) then ''n/a, columnstore index''
                            when type = 7 then ''n/a, HASH''
-			          else inc_columns end, '''+  cast(@objid as char(128)) + ''' as objid
+			          else inc_columns end, '''+  cast(@objid as char(128)) + ''' as objid, is_unique_key
 	        from #spindtab
 	        order by index_keys, included_columns, index_id '
-
 
     --SELECT (@ExecStr)
     EXEC (@ExecStr)
 
 	return (0) -- sp_SQLskills_helpindex
+
 go
 
 EXEC sys.sp_MS_marksystemobject 'sp_SQLskills_helpindex_short';
