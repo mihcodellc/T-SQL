@@ -4,7 +4,7 @@
 ---- https://npp-user-manual.org/docs/searching/#regular-expressions
 	{N,P} ⇒ Matches N to P copies of the element 
 	. or \C ⇒ Matches any character
-	* ⇒ This matches 0 or more instances of the previous character --replace * by {N,P} to allow exact match and replace
+	* ⇒ This matches 0 or more instances of the previous character --replace * by {N,P} to allow exact match and replace OR use $ then uncheck match new lines in notepad++
 	*? ⇒ Zero or more of the previous group, but minimally: the shortest matching string, rather than the longest string
 	+ ⇒ This matches 1 or more instances of the previous character, as many as it can. 
 	+? ⇒ One or more of the previous group, but minimally.
