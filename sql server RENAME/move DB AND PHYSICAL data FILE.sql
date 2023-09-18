@@ -6,6 +6,13 @@ GO
 EXEC sp_addserver 'asp-sql', local; 
 GO
 
+
+--find the db files and locations
+ SELECT name ,  is_percent_growth, physical_name 
+FROM sys.database_files
+order by UsedPercent desc
+  
+  
 ALTER DATABASE belloTest SET ONLINE;
 --change the name
 ALTER DATABASE belloTest MODIFY NAME = Test;
