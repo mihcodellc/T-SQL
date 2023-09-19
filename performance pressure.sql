@@ -2,6 +2,10 @@
 
 -- SQL SERVER CONFIGURATION MANAGER to activate your sql agent or start db engine ...
 
+
+--events
+https://events.microsoft.com/en-us/mvtd?startTime=08:00&endTime=17:00
+	
 --*** SQL News
 -- https://cloudblogs.microsoft.com/sqlserver
 -- https://sqlblog.org/
