@@ -14,13 +14,14 @@ DECLARE @maxLog      INT,
         @startDate   DATETIME;
 
 declare @searchStrFail VARCHAR(256) = 'fail';
+-- declare @searchStrFail VARCHAR(256) = ''; !!!!!!!!!****Empty string search returns all from log
 declare @searchStrError VARCHAR(256) = 'error';
 declare @searchStrWarning VARCHAR(256) = 'warning';
 declare @searchStrPort VARCHAR(256) = 'Server is listening on';
 
 --parameters
 SELECT @startDate = dateadd(dd,-7,GETDATE());
-declare @LogType  int = 2 -- 1 ServerLog - 2 AgentLog
+declare @LogType  int = 1 -- 1 ServerLog - 2 AgentLog
 
 
 DECLARE @errorLogs   TABLE (
@@ -46,12 +47,13 @@ EXEC sys.xp_enumerrorlogs @LogType;
 --EXEC msdb.dbo.sp_get_sqlagent_properties
 
 -- errors log files
-select logId, LogDate, LogFileSizeBytes/1024 as LogFileSizeKiloBytes  from @errorLogs
+select logId, LogDate, LogFileSizeBytes/1024 as LogFileSizeKiloBytes  from @errorLogs order by LogID
 
-SELECT TOP 1 @maxLog = LogID
+SELECT @maxLog = max(LogID)
 FROM @errorLogs
-WHERE [LogDate] <= @startDate
-ORDER BY [LogDate] DESC;
+--WHERE [LogDate] <= @startDate
+--ORDER BY [LogDate] DESC;
+select @maxLog 'maxlog'
 
 WHILE @maxLog >= 0
 BEGIN
@@ -72,5 +74,5 @@ END
 
 SELECT [LogDate], [LogText]
 FROM @logData
-WHERE [LogDate] >= @startDate
+--WHERE [LogDate] >= @startDate
 ORDER BY [LogDate] DESC;
