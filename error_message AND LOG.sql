@@ -23,3 +23,28 @@ RAISERROR (15600, -1, -1, 'mysp_CreateCustomer');
 --Logs the error in the error log and the application log for the instance
 RAISERROR(N'Oops! No, don''t just hit F5. Run these demos one at a time.', 20, 1) WITH LOG;
 GO
+
+
+--EXAMPLE OF ERROR CAUGHT AND SEND TO SQL LOG AND os os log
+DECLARE @ErrorMessage NVARCHAR(4000);  
+DECLARE @ErrorSeverity INT;  
+DECLARE @ErrorState INT;
+
+BEGIN TRY  
+    -- Generate a divide-by-zero error.  
+    SELECT 1/0;  
+END TRY  
+BEGIN CATCH  
+    --SELECT  
+    --    ERROR_NUMBER() AS ErrorNumber  
+    --    ,ERROR_SEVERITY() AS ErrorSeverity  
+    --    ,ERROR_STATE() AS ErrorState  
+    --    ,ERROR_PROCEDURE() AS ErrorProcedure  
+    --    ,ERROR_LINE() AS ErrorLine  
+    --    ,ERROR_MESSAGE() AS ErrorMessage;  
+
+ SELECT @ErrorMessage = ERROR_MESSAGE(),  
+                   @ErrorSeverity = ERROR_SEVERITY(),  
+                   @ErrorState = ERROR_STATE(); 
+		RAISERROR(@ErrorMessage, @ErrorSeverity, @ErrorState) WITH LOG;
+END CATCH;  
