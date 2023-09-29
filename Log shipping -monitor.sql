@@ -18,8 +18,9 @@ exec sp_help_log_shipping_alert_job
 -- mode, user, last restore
 -- 	the delay for 4 hours as example: choose 4 hours on the restore tab then the restore job should be run frequently as possible accordingly how long the 
 --	log backup take + the time to make it available in the copy directory	
-SELECT secondary_database,restore_mode as [restore/*1 ie standby 0 no recovery*/],restore_delay as delayInMin,disconnect_users,last_restored_file
+SELECT secondary_database,restore_mode as [restore/*1 ie standby 0 no recovery*/],restore_delay,disconnect_users,last_restored_file, dateadd(minute,-restore_delay,last_restored_date) DataTill
  FROM msdb.dbo.log_shipping_secondary_databases
+
 
 
  --Last success of restore from job's message 
