@@ -2,7 +2,8 @@
 
 -- SQL SERVER CONFIGURATION MANAGER to activate your sql agent or start db engine ...
 
-
+--To review on time a year: An Accidental DBA by glenn
+https://www.sqlskills.com/help/accidental-dba/?utm_source=accidentaldba&utm_medium=blogs&utm_campaign=training
 --events
 https://events.microsoft.com/en-us/mvtd?startTime=08:00&endTime=17:00
 	
