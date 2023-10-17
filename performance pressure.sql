@@ -285,7 +285,14 @@ ORDER BY avg_total_latency DESC
 --***all metrics for monitoring SQL Server- - use with perform if available
 --https://documentation.red-gate.com/sm5/analyzing-performance/analysis-graph/list-of-metrics#Listofmetrics-Userconnections
 --https://www.datadoghq.com/blog/sql-server-monitoring-tools/#richer-real-time-sql-server-monitoring-tools
+dynamic managements views (select 'sessions blocking other, ACTIVE/executing(sys.dm_exec_requests) queries & sql text' in "Connected 3.0.sql")
+Performance Monitor, perform
+SSMS reports, Live stattistics, data-rich map, extended events, Activity Monitor
+sp_BlitzWho(better than sp_who isActive, +waits, snif, QUERY HASH, PLAN, Free cache ...), sp_BlitzCache, Power BI Dashboard
 
+	
+
+	
 --***TUNING
 set statistics io, time on
 set statistics profile on
@@ -293,6 +300,8 @@ set showplan_all on
 set showplan_text on
 set noexec on
 DBCC SHOW_STATISTICS ('atable','an_index') with STAT_HEADER -- 'DBCC for a table indexes.sql'
+DBCC DROPCLEANBUFFERS
+	
 
 --stats on a table: statistic for a table indexes.sql
 SELECT sp.stats_id,  name,  filter_definition, last_updated, 
