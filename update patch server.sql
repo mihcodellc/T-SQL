@@ -28,7 +28,7 @@ Over the coming days, keep a much closer eye than normal on monitoring tools loo
 ## https://desertdba.com/how-i-applied-13-cumulative-updates-in-12-minutes/
 ##it will restart the physical box
 
-$ServerName = "SQL-TEST001","SQL-TEST002"
+$ServerName = "SQL-TEST001","SQL-TEST002" #remote servers won't work if Service Principal Names(SPN) for SQL Server is not set in Active Directory
 
 
 $KeyPath = 'C:\DBA\'
