@@ -33,7 +33,7 @@ $ServerName = "SQL-TEST001","SQL-TEST002" #remote servers won't work if Service 
 
 $KeyPath = 'C:\DBA\'
 
-$UserName = 'rms-asp\mbello'
+$UserName = 'com.domain\mbello'
 
 $CredFile = $KeyPath+'mbello.cred'
 
