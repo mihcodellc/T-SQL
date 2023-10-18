@@ -1,5 +1,9 @@
 -- https://www.brentozar.com/archive/2021/06/how-to-patch-sql-server/
-last patches are here The Most Recent Updates for Microsoft SQL Server - SQLServerUpdates.com
+
+last patches are here 
+  https://learn.microsoft.com/en-us/troubleshoot/sql/releases/download-and-install-latest-updates
+  or
+  The Most Recent Updates for Microsoft SQL Server - SQLServerUpdates.com
 
 How to patch: 
 
