@@ -34,7 +34,7 @@ exec sp_SQLskills_ListIndexForConsolidation @ObjName = PayerProvider,  @KeysFilt
 exec sp_SQLskills_ListIndexForConsolidation @ObjName = PayerProvider, @indnameKey ='[IX_PayerProvider]' , @isShowSampleQuery = 1
 
 --hist, index isssue, read/write
-EXEC RmsAdmin.dbo.sp_BlitzIndex     @DatabaseName='MedRx', @SchemaName='dbo', @TableName='Payments'
+EXEC dba_db.dbo.sp_BlitzIndex     @DatabaseName='MedRx', @SchemaName='dbo', @TableName='Payments'
 -- check usage from sp_BlitzIndex in a table
 select index_id id, run_datetime whe, index_usage_summary, reads_per_write, index_op_stats, * from dbaDB.dbo.BlitzIndex
 where table_name = 'KFIWork' 
