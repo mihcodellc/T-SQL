@@ -25,6 +25,7 @@ https://events.microsoft.com/en-us/mvtd?startTime=08:00&endTime=17:00
 -- https://docs.microsoft.com/en-us/sql/sql-server/maximum-capacity-specifications-for-sql-server?redirectedfrom=MSDN&view=sql-server-ver16
 
 --*** Cumulative updates
+-- https://learn.microsoft.com/en-us/troubleshoot/sql/releases/download-and-install-latest-updates	
 --https://sqlserverupdates.com/
 --https://www.brentozar.com/archive/2021/06/how-to-patch-sql-server/
 
