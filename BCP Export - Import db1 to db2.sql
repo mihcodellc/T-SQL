@@ -5,6 +5,23 @@ FROM sales.Orders
 where OrderID > 50000
 
 
+--sqlcmd failed to import on last try
+-- export: please create Sample.csv and r/w for everyone *** -e error file *** in for import *** out for export
+exec xp_cmdshell 'bcp dbname.dbo.tablename out G:\test\Sample.csv -c -t, -e G:\test\error_out.log -T -S asp-sql-logship -U mbello -P xxxxxxxxx '
+-- import -- limit to 2^63 records ref https://learn.microsoft.com/en-us/sql/tools/bcp-utility?view=sql-server-ver16 .me: if no errors otherwise 8123 rows 
+exec xp_cmdshell 'bcp dbname.dbo.tablename in G:\test\Sample.csv -c -t, -e G:\test\error_out.log -T -S asp-sql-logship -U mbello -P xxxxxxxxxxx '
+
+
+--process
+-- recommend to use specialized tools like management studio (for SQL Server) or DataGrid. same tool to export & import
+-- or ETL (Extract, Transform, Load) tools like Talend, Apache Nifi, or SQL Server Data Tools (SSDT) 
+--1. run the script to insert into a table. make sure that the NULL as set something else than NULL; make sure those date or data don't exist
+--2. Export as CSV file with Datagrip to your local computer. 700 thousands rows succeeded. you can create batches if too much
+--3. Create a clone of destination table in PG
+--4. Import the CSV file to this clone table using datagrip
+--5. Insert to main table from clone in PG(dest rdms) by batches ie id between x and y then y+1 and z ...
+
+
 use management studio wizard to import the file to new table then use the imported table
 
 	or
