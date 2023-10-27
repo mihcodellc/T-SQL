@@ -1,3 +1,10 @@
+-- Coping Data From PRIMARY Starting with SQL 2016 SP2
+-- no need to create Sales.Orders_Archive
+SELECT * INTO Sales.Orders_Archive ON Test1FG1
+FROM sales.Orders
+where OrderID > 50000
+
+
 use management studio wizard to import the file to new table then use the imported table
 
 	or
