@@ -1,4 +1,39 @@
 
+create table DBA_DB.dbo.RMSTables_growth (id int identity(1,1) primary key, tableName nvarchar(128) , rows bigint, reserved bigint, 
+data bigint, index_size bigint, unused bigint, dateInsert datetime)
+ 
+create table #t (name_table nvarchar(128), rows nvarchar(128), reserved nvarchar(128), 
+data nvarchar(128), index_size nvarchar(128), unused nvarchar(128))
+
+use MedRx
+declare @clause nvarchar(2000)
+EXEC sp_MSforeachtable ' 
+begin try
+if ''?'' <> ''[dbo].[SysProcesses]''
+insert into #t EXEC sp_spaceused @objname = ''?'' 
+end try
+begin catch
+    select ''?'' as [Full Name]
+end catch
+'
+
+Insert into DBA_DB.dbo.RMSTables_growth
+select name_table,
+convert(bigint,rows)  rows,
+convert(bigint,substring(reserved,0,CHARINDEX(' ', reserved)))/1024 reserved_MB,
+convert(bigint,substring(data,0,CHARINDEX(' ', data)))/1024 data_MB,
+convert(bigint,substring(index_size,0,CHARINDEX(' ', index_size)))/1024 index_size_MB,
+convert(bigint,substring(unused,0,CHARINDEX(' ', unused)))/1024 unused_MB, GETDATE(), DB_NAME() 
+ from #t
+where rows > 0 order by data_MB desc, name_table     
+
+if object_id('tempdb..#t') is not null
+    drop table #t
+
+
+ --previous version
+
+
 use DBA_DB
 
 select 'space use per table'
@@ -18,7 +53,7 @@ data nvarchar(128), index_size nvarchar(128), unused nvarchar(128))
 --truncate table #t
 --Step 2
 --run on db concerned the ouput excluding, if exist, this line insert into #t EXEC sp_spaceused @objname = [dbo.SysProcesses]
-use MedRx
+use MyDB
 declare @clause nvarchar(2000)
 select 'insert into #t EXEC sp_spaceused @objname = [' + SCHEMA_NAME(schema_id) +'.'+ name + ']'+char(9)+char(10)  from  
 sys.tables 
@@ -28,7 +63,7 @@ order by name
 --*******************
 --*******************
 -- Step 3
-Insert into DBA_DB.dbo.RMSTables_growth
+Insert into DBA_DB.dbo.Tables_growth
 select name_table,
 cast(rows as bigint) rows,
 cast(substring(reserved,0,CHARINDEX(' ', reserved)) as bigint)/128 reserved_MB,
