@@ -11,17 +11,21 @@ SET NOCOUNT ON
 
 DECLARE @maxLog      INT,
         @searchStr   VARCHAR(256),
-        @startDate   DATETIME;
+        @startDate   DATETIME,
+	   @EndDate   DATETIME;
+
 
 declare @searchStrFail VARCHAR(256) = 'fail';
--- declare @searchStrFail VARCHAR(256) = ''; !!!!!!!!!****Empty string search returns all from log
+declare @searchStrAll VARCHAR(256) = '';-- !!!!!!!!!****Empty string search returns all from log
 declare @searchStrError VARCHAR(256) = 'error';
 declare @searchStrWarning VARCHAR(256) = 'warning';
 declare @searchStrPort VARCHAR(256) = 'Server is listening on';
 
 --parameters
-SELECT @startDate = dateadd(dd,-7,GETDATE());
-declare @LogType  int = 1 -- 1 ServerLog - 2 AgentLog
+SET @startDate = dateadd(dd,-7,GETDATE())  ; 
+SET @EndDate = dateadd(dd,1,GETDATE())  
+
+declare @LogType  int = 2 -- 1 ServerLog - 2 AgentLog
 
 
 DECLARE @errorLogs   TABLE (
@@ -55,24 +59,32 @@ FROM @errorLogs
 --ORDER BY [LogDate] DESC;
 select @maxLog 'maxlog'
 
+
+
 WHILE @maxLog >= 0
 BEGIN
     INSERT INTO @logData
-    EXEC sys.sp_readerrorlog @maxLog, @LogType, @searchStrFail --optional @startDate, @EndDate 
+    EXEC sp_User_readerrorlog @maxLog, @LogType, @searchStrAll ,null, @startDate, @EndDate 
     
-    INSERT INTO @logData
-    EXEC sys.sp_readerrorlog @maxLog, @LogType, @searchStrError --optional @startDate, @EndDate 
+   -- INSERT INTO @logData
+   -- EXEC sp_User_readerrorlog @maxLog, @LogType, @searchStrFail ,null, @startDate, @EndDate 
 
-    INSERT INTO @logData
-    EXEC sys.sp_readerrorlog @maxLog, @LogType, @searchStrWarning --optional @startDate, @EndDate 
+   -- INSERT INTO @logData
+   -- EXEC sp_User_readerrorlog @maxLog, @LogType, @searchStrError ,null, @startDate, @EndDate 
 
-     INSERT INTO @logData
-    EXEC sys.sp_readerrorlog @maxLog, @LogType, @searchStrPort --optional @startDate, @EndDate 
+   --   INSERT INTO @logData
+   -- EXEC sp_User_readerrorlog @maxLog, @LogType, @searchStrWarning ,null, @startDate, @EndDate
+
+   --INSERT INTO @logData
+   -- EXEC sp_User_readerrorlog @maxLog, @LogType, @searchStrPort ,null, @startDate, @EndDate
+
+
+    
 
     SET @maxLog = @maxLog - 1;
 END
 
-SELECT [LogDate], [LogText]
+SELECT [LogDate], [LogText], ProcInfo
 FROM @logData
---WHERE [LogDate] >= @startDate
+where LogText not like 'CHECKDB%' AND  LogText not like 'Log was backed up%'
 ORDER BY [LogDate] DESC;
