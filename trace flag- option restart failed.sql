@@ -3,11 +3,13 @@ trace flag  & query hint
 --https://docs.microsoft.com/en-US/sql/t-sql/queries/hints-transact-sql-query?view=sql-server-ver15#examples
 --https://learn.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-traceon-trace-flags-transact-sql?view=sql-server-ver15
 
--- server restart
+-- server restart failed after patch/update
   --in cmd promt
   net start MSSQL$SQLEXPRESS /T902
   or 
   -T 902 -- in configuration manager
+  --then back and forth between read the log and restart SQL server service to fix the errors from the last to the top
+  --if the root cause is Account permission use this "Update grant_permiss_user_not_found.ps1"
   
 --Enables the specified trace flags. on command line with -T 
 --OR 
