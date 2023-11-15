@@ -8,4 +8,4 @@ rollback tran
 
 --check the last id used
 SELECT IDENT_CURRENT('mytable') AS LastIdentityValue;
---DBCC CHECKIDENT ('mytable', RESEED, 38);
+--DBCC CHECKIDENT ('mytable', RESEED, 38); -- the last used
