@@ -49,7 +49,7 @@ WHERE r.command IN ( -- /* SELECT distinct r.command FROM sys.dm_exec_requests r
 		,'BACKUP LOG'
 		)
 
--- seems to track in auto running jobs. need to confirm
+-- seems to track in auto running jobs. but percent_complete is not accurate
 -- for sure for these
 --ALTER INDEX REORGANIZE
 --AUTO_SHRINK option with ALTER DATABASE
