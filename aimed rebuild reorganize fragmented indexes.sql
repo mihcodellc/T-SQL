@@ -33,7 +33,7 @@ ALTER AUTHORIZATION ON [dbo].[indexFragmentation] TO  SCHEMA OWNER
 GO
 
 
---insert into maintenance.dbo.indexFragmentation
+--insert into maintenance.dbo.indexFragmentation -- rebuid statement at the end of columns' list
 SELECT OBJECT_SCHEMA_NAME(ips.object_id) AS schema_name,
        OBJECT_NAME(ips.object_id) AS object_name,
        i.name AS index_name,
@@ -42,7 +42,8 @@ SELECT OBJECT_SCHEMA_NAME(ips.object_id) AS schema_name,
        ips.avg_page_space_used_in_percent as 'Average_page_density', --  low, more pages are required to store the same amount of data
        ips.page_count,
        ips.alloc_unit_type_desc,
-	   getdate()
+	   getdate(),
+  'alter index '+i.name + ' on ' + OBJECT_SCHEMA_NAME(ips.object_id) + '.'+ OBJECT_NAME(ips.object_id) + ' REBUILD' as 'rebuid statement',
 FROM sys.dm_db_index_physical_stats(DB_ID(), default, default, default, 'LIMITED') AS ips
 INNER JOIN sys.indexes AS i 
 ON ips.object_id = i.object_id
