@@ -43,7 +43,7 @@ SELECT OBJECT_SCHEMA_NAME(ips.object_id) AS schema_name,
        ips.page_count,
        ips.alloc_unit_type_desc,
 	   getdate(),
-  'alter index '+i.name + ' on ' + OBJECT_SCHEMA_NAME(ips.object_id) + '.'+ OBJECT_NAME(ips.object_id) + ' REBUILD' as 'rebuid statement',
+  'alter index '+i.name + ' on ' + OBJECT_SCHEMA_NAME(ips.object_id) + '.'+ OBJECT_NAME(ips.object_id) + ' REBUILD' as 'rebuild statement'
 FROM sys.dm_db_index_physical_stats(DB_ID(), default, default, default, 'LIMITED') AS ips
 INNER JOIN sys.indexes AS i 
 ON ips.object_id = i.object_id
