@@ -1,5 +1,10 @@
 --https://www.sqlskills.com/blogs/glenn/the-accidental-dba-day-17-of-30-configuring-alerts-for-high-severity-problems/
 
+
+--***severity 16 through 25 as well as specific alerts for errors 823, 824 and 825. !!! 823, 825 not implemented
+--1 severities: https://learn.microsoft.com/en-us/sql/relational-databases/errors-events/database-engine-error-severities?view=sql-server-ver16
+--2 errors: https://learn.microsoft.com/en-us/sql/relational-databases/errors-events/database-engine-events-and-errors?view=sql-server-ver16
+
 -- Add important SQL Agent Alerts to your instance
 -- Change the @OperatorName as needed
 
