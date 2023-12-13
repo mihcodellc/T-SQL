@@ -105,7 +105,7 @@ ORDER BY  1 desc,  sdes.session_id
 
 
 --Previous version commented out
-select 'sessions blocking other, active queries & sql text'
+select 'sessions blocking other, ACTIVE/executing(sys.dm_exec_requests) queries & sql text'
  ;WITH cteBL (session_id, blocking_these) AS 
 (SELECT s.session_id, blocking_these = x.blocking_these FROM sys.dm_exec_sessions s 
 CROSS APPLY    (SELECT isnull(convert(varchar(6), er.session_id),'') + ', '  
@@ -114,36 +114,38 @@ CROSS APPLY    (SELECT isnull(convert(varchar(6), er.session_id),'') + ', '
                 AND er.blocking_session_id <> 0
                 FOR XML PATH('') ) AS x (blocking_these)
 )
-SELECT r.wait_time / (1000.0) as WaitSec, r.total_elapsed_time / (1000.0) 'ElapsSec', bl.session_id, s.login_name,s.[host_name],s.[program_name], 
+SELECT r.wait_time / (1000.0) as WaitSec, r.total_elapsed_time / (1000.0) 'ElapsSec', bl.session_id,
+blocked_by = r.blocking_session_id, bl.blocking_these,
+s.login_name,s.[host_name],s.[program_name], 
 substring(case when len(ib.event_info)> 0 then ib.event_info else '' end,0,300) Query_involved,
-blocked_by = r.blocking_session_id, bl.blocking_these
-, batch_text = st.text, r.reads, r.writes, r.logical_reads, r.wait_type, r.wait_resource, sdec.client_net_address, sdec.local_net_address--, *
+batch_text = st.text, r.reads, r.writes, r.logical_reads, r.wait_type, r.wait_resource, sdec.client_net_address, sdec.local_net_address--, *
 FROM sys.dm_exec_sessions s
 INNER JOIN sys.dm_exec_connections AS sdec  ON sdec.session_id = s.session_id
 LEFT OUTER JOIN sys.dm_exec_requests r on r.session_id = s.session_id
 INNER JOIN cteBL as bl on s.session_id = bl.session_id
 OUTER APPLY sys.dm_exec_sql_text (r.sql_handle) st
 OUTER APPLY sys.dm_exec_input_buffer(s.session_id, NULL) AS ib
-WHERE --r.session_id != @@SPID
+WHERE --ib.event_info like '%LoaderState_Populate_byView_yearago%'--r.session_id != @@SPID 
  ( --blocking over 3min
 		  (
 			 (len(bl.blocking_these) > 0 OR r.blocking_session_id <> 0)-- blocked or blocking
 			 and 
 			 (
-				r.total_elapsed_time / (1000.0)  > 180 -- 180=3*60
+				r.total_elapsed_time / (1000.0)  > 30 -- 180=3*60
 				or
-				DATEDIFF(second, GETDATE(), r.start_time) > 180
+				DATEDIFF(second, GETDATE(), r.start_time) > 30
 			 )
 		  )
 	       or 
       --running over 20min
 		(
-		  r.total_elapsed_time / (1000.0)  > 1200--1200=20*60
+		  r.total_elapsed_time / (1000.0)  > 30--1200=20*60 kill 2833
 		  or
-		  DATEDIFF(second, GETDATE(), r.start_time) > 1200
+		  DATEDIFF(second, GETDATE(), r.start_time) > 30
 		)  
 	   )
- AND (blocking_these is not null or r.blocking_session_id <> 0) -- only blocking	   
+ --AND (blocking_these is not null or r.blocking_session_id <> 0) -- only blocking	
+--blocking_session_id: means
 --NULL or equal to 0, the request isn't blocked, or the session information of the blocking session isn't available
 ---2 = The blocking resource is owned by an orphaned distributed transaction.
 ---3 = The blocking resource is owned by a deferred recovery transaction.
