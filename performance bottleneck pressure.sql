@@ -75,7 +75,19 @@ SELECT * FROM dbo.Orders;
 --system dynamic view ORGANIZED even for disater recovery
 -- https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/system-dynamic-management-views?view=sql-server-ver15
 
+
+--usefull links
+https://chat.openai.com/c/2a1ba075-f115-4e9f-8d3e-14a0c50f6ee1
+https://www.red-gate.com/hub/events/series/postgresql-101?utm_source=mssql&utm_medium=email&utm_campaign=postgres&utm_content=101series&utm_term=350x175?utm_content=head
+https://passdatacommunitysummit.com/video-library/
+https://info.crunchydata.com/register-for-postgis-day-understanding-postgres-iops-and-json-updates-in-postgres-16?ecid=ACsprvvUXBM7gdkace26Ji-SUn76BntNvuoabv3NZVpS23QfzgHOuM7D-zW_Q_W5LpL2mmV8kPKW&utm_campaign=Crunchy%20Data%20Newsletter&utm_medium=email&_hsmi=282668410&_hsenc=p2ANqtz-_M-hMGBdhHE6x3o_dBkndHtd1cWayYn1TFui6iQA0lq0WqLgs9VcUfu3q12s7VzcGkgkjOZ76wU1xpDSB8OzKQrkEkVg&utm_content=282668410&utm_source=hs_email
+https://doc.ubuntu-fr.org/tutoriel/learn_unix_in_10_minutes#substitution_de_commande
+https://app.slack.com/client/T1LTZ0BQV/C1MS1RA4B
+
+
+	
 --CPU pressure & memory pressure
+--compare over time "Check DBA issues from Windows OS.ps1"	
 --***ref to sp_PressureDetector.sql likely over time to decide
 -- compare to connected.sql (include  sp_WhoIsActive.sql) to fix issues right now and BlitzFirst to not get fired, see urgent things
 -- it using some of the queries here and written by elder in the field.
@@ -83,6 +95,9 @@ SELECT * FROM dbo.Orders;
 -- https://docs.microsoft.com/en-us/troubleshoot/sql/performance/troubleshoot-high-cpu-usage-issues
 
 
+
+
+	
 -- ********************************MEMORY PRESSURE 
 select * from sys.dm_os_waiting_tasks 
 where wait_type in (N'PAGELATCH_XX')
@@ -149,6 +164,7 @@ select * from sys.dm_exec_requests
 
 
 ---********************************** CPU pressure
+	--by OS "counter at Check DBA issues from Windows OS.ps1" 
 select * from sys.dm_os_waiting_tasks  ---https://support.solarwinds.com/SuccessCenter/s/article/SQL-Server-Wait-Types?language=en_US
 where wait_type in (N'CXPACKET', N'SOS_SCHEDULER_YIELD', N'THREADPOOL', N'CMEMTHREAD')
 
