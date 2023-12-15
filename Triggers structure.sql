@@ -1,6 +1,6 @@
 -- https://www.mssqltips.com/sqlservertip/6057/sql-server-trigger-best-practices/#:~:text=SQL%20Server%20Trigger%20Best%20Practices%201%201%20-,Perform%20Validations%20First%20for%20SQL%20Server%20Triggers%20
 create TRIGGER [dbo].[Tr_History]
-ON [dbo].[LockboxDocumentTracking]
+ON [dbo].[MyTable]
 AFTER INSERT, UPDATE, DELETE
 AS
 BEGIN
