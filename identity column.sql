@@ -2,6 +2,9 @@ use MyDB
 
 --check the last id used
 SELECT IDENT_CURRENT('schema.mytable') AS LastIdentityValue;
+--SELECT SCOPE_IDENTITY()
+--select IDENT_CURRENT()
+--select @@IDENTITY
 
 begin tran
 --SET IDENTITY_INSERT schema.mytable ON
