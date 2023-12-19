@@ -1,3 +1,6 @@
+-- https://www.mssqltips.com/sqlservertip/5832/move-sql-server-tables-to-different-filegroups/
+
+
 -- where are my tables
 SELECT OBJECT_NAME([si].[object_id]) AS [tablename]
     ,[ds].[name] AS [filegroupname]
@@ -12,3 +15,11 @@ INNER JOIN [sys].[objects] [so] ON [si].[object_id] = [so].[object_id]
 WHERE [so].[type] = 'U' and OBJECT_NAME([si].[object_id]) like '%Orders%'
     AND [so].[is_ms_shipped] = 0
 ORDER BY [tablename] ASC;
+
+--OR
+
+SELECT o.[name] AS TableName, i.[name] AS IndexName, fg.[name] AS FileGroupName
+FROM sys.indexes i 
+INNER JOIN sys.filegroups fg ON i.data_space_id = fg.data_space_id
+INNER JOIN sys.all_objects o ON i.[object_id] = o.[object_id]
+WHERE i.data_space_id = fg.data_space_id AND o.type = 'U' and  OBJECT_NAME([i].[object_id]) like '%A_table_name%'
