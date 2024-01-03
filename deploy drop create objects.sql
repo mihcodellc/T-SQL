@@ -24,8 +24,15 @@ IF OBJECT_ID('dbo].[AtABLE]', 'U') IS NOT NULL
     DROP TABLE dbo.[AtABLE]
 GO
 
+-- column
+if exists (select 1 from information_schema.columns where table_name = 'AtABLE' and column_name = 'aColumn')
+begin
+    ............
+END
+GO    
+    
 --proc
-IF OBJECT_ID('dbo].[usp_aStore_Proc]', 'F') IS NOT NULL
+IF OBJECT_ID('dbo].[usp_aStore_Proc]', 'P') IS NOT NULL
 --IF  EXISTS (SELECT 1 FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[usp_aStore_Proc]') AND type in (N'P'))
     DROP PROCEDURE dbo.[usp_aStore_Proc]
 GO
