@@ -111,7 +111,7 @@ JOIN sys.types t on a.user_type_id = t.user_type_id
 WHERE a.name like '%lo%' and b.type ='U' and t.name in ('int','smallint', 'numeric', 'bigint')
 
 --order table columns and get column data type
-SELECT OBJECT_SCHEMA_NAME(a.object_id) schema_, OBJECT_NAME(a.object_id) table_, a.name ColName,b.type_desc,  b.type, t. name ColtypeName, a.is_nullable, is_identity, is_computed
+SELECT OBJECT_SCHEMA_NAME(a.object_id) schema_, OBJECT_NAME(a.object_id) table_, a.name ColName,b.type_desc, a.max_length, b.type, t. name ColtypeName, a.is_nullable, is_identity, is_computed
 FROM sys.all_columns a 
 JOIN sys.all_objects b on a.object_id = b.object_id
 JOIN sys.types t on a.user_type_id = t.user_type_id
