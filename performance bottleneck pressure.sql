@@ -10,7 +10,8 @@ https://events.microsoft.com/en-us/mvtd?startTime=08:00&endTime=17:00
 --*** SQL News
 -- https://cloudblogs.microsoft.com/sqlserver
 -- https://sqlblog.org/
-
+--https://www.red-gate.com/simple-talk/databases/sql-server/
+	
 -- ***sql server editions compared
 -- https://www.microsoft.com/en-us/sql-server/sql-server-2022-comparison
 -- https://www.microsoft.com/en-us/sql-server/sql-server-2019-comparison
