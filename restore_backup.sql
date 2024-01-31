@@ -5,6 +5,8 @@
 -- https://www.brentozar.com/archive/2017/03/databaserestore-open-source-database-restore-stored-procedure/
 -- "DatabaseRestore OK.sql" in orion repository a change to the above
 
+-- after a full and diff restored, the log to restore is the one done just after the diff is done 
+
 USE [master]
 
 RESTORE DATABASE AdventureWorks2014
