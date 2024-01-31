@@ -7,6 +7,9 @@
 RESTORE HEADERONLY FROM DISK = N'C:\MSSQL\Backup\MyDatabase_20230605124500.trn' -- of each set of backups in text output and searcch the LSN
 or run
 db backups overview below
+	and supposed you have full, diff, logs available
+or
+when searching for log you can restore, go to section "find the log you can restore"
 
 --The transaction log LSN chain is NOT AFFECTED by a full or differential database backup
 -- When planning which transaction log backup to use to roll forward, the LastLSN + 1 of the Full/Diff database backup 
@@ -249,3 +252,22 @@ ORDER BY backup_start_date DESC
 --WHERE s.database_name = @db_name and s.[type] = 'L' and backup_start_date > '2022-07-25 20:59:55.000'
 --ORDER BY backup_start_date 
 --,backup_finish_date
+
+--**** find the log you can restore when db reject a log and send LSN you can restore
+DECLARE @TargetLSN NVARCHAR(50) = '9600401000047277700001'; -- Replace 'YourTargetLSN' with the LSN you're searching for
+SELECT TOP 1
+    bs.backup_start_date,
+    bs.backup_finish_date,
+    bs.database_name,
+    bs.type,
+    bs.first_lsn,
+    bs.last_lsn,
+    bs.checkpoint_lsn,
+    bs.database_backup_lsn
+FROM
+    msdb.dbo.backupset bs
+WHERE
+    bs.type = 'L' -- Log backup
+    AND bs.last_lsn = @TargetLSN -- Check if the last LSN is greater than or equal to the target LSN
+ORDER BY
+    bs.backup_finish_date DESC; -- Get the most recent log backup first	
