@@ -15,6 +15,7 @@ when searching for log you can restore, go to section "find the log you can rest
 -- When planning which transaction log backup to use to roll forward, the LastLSN + 1 of the Full/Diff database backup 
 --		  will fall in between the FirstLSN and LastLSN of its subsequent transaction log backup
 -- last LSN of log_backup_1 = First LSN of the next log_backup_2
+-- after a full and diff restored, the log to restore is the one done just after the diff is done 	
 
 -- need a version to read heads of backup files 
 
