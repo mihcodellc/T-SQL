@@ -6,6 +6,15 @@ FROM sys.dm_sql_referencing_entities ('dbo.AnObject', 'OBJECT'); -- schema inclu
 SELECT DISTINCT referenced_schema_name, referenced_entity_name,is_updated, is_selected 
 FROM sys.dm_sql_referenced_entities  ('dbo.AnObject', 'OBJECT')  -- schema included in the name
 
+	-- more here https://www.mssqltips.com/sqlservertip/2999/different-ways-to-find-sql-server-object-dependencies/
+SELECT OBJECT_NAME (referencing_id),
+              referenced_database_name, 
+       referenced_schema_name, referenced_entity_name
+FROM sys.sql_expression_dependencies d
+WHERE OBJECT_NAME(d.referenced_id) = 'TableName'
+      AND OBJECT_DEFINITION (referencing_id)  LIKE '%ColumnName%'
+ORDER BY OBJECT_NAME(referencing_id);	
+
 SELECT OBJECTPROPERTY(object_id, 'IsTable') AS [IsTable],
 OBJECTPROPERTY(object_id, 'IsPrimaryKey') AS [IsPrimaryKey],
 OBJECTPROPERTY(object_id, 'IsForeignKey') AS [IsForeignKey],
