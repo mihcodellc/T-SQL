@@ -1,4 +1,5 @@
 -- extract db schema
+--https://learn.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-clonedatabase-transact-sql?view=sql-server-ver16
 DBCC CLONEDATABASE (AdventureWorks2022, AdventureWorks_Clone);
 GO
 -- use to extract the schema of temp table or simply into MyTable then extract with management studio
