@@ -2,7 +2,11 @@ USE [master]
 GO
 /*
 --Last Changed -- Date: 2/2/2021 -- By: Monktar Bello - Initial version
-
+-- note: Enable Promotion of distributed Transaction in properties: True/false 
+--      ie local transaction that can be automatically promoted to a fully distributable transaction as needed
+--      if local or the existing connection, set it to false
+--      this is just to avoid overhead of distributed transactions
+ 
 ***************INSTRUCTIONS - start
 --it will link to a remote server specified in @datasrc
 
