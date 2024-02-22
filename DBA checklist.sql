@@ -63,3 +63,4 @@ DBCC SQLPERF(LOGSPACE)
 ****Never restore and check DBs
 ****Security Logs
 ****Weekly Penetration Tests
+****Drop object after a whole year to make sure no one is using it
