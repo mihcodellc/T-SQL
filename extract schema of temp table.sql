@@ -1,4 +1,7 @@
--- use to extract the schema of temp table
+-- extract db schema
+DBCC CLONEDATABASE (AdventureWorks2022, AdventureWorks_Clone);
+GO
+-- use to extract the schema of temp table or simply into MyTable then extract with management studio
 
 SELECT * INTO #table1 FROM TableQuery
 
