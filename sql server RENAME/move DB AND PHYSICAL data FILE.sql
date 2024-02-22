@@ -28,7 +28,7 @@ ALTER DATABASE Test SET OFFLINE;
 --ALTER DATABASE Test
 --SET SINGLE_USER WITH ROLLBACK IMMEDIATE
 --GO
---ALTER DATABASE Test SET OFFLINE
+--ALTER DATABASE Test SET OFFLINE -- easy way to set db offline : restart sql instance and set it right away offline
 --GO
 
 --Change the file location inside SQL Server with new name
