@@ -1,3 +1,4 @@
+--easy way to set db offline : restart sql instance and set it right away offline
 ---- MUST Capture datatbase details before move forward. You may need 
 --USE DBNAME
 --GO
