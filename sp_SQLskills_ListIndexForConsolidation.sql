@@ -242,7 +242,7 @@ BEGIN
 		  'CREATE ' + TypeDescription +' INDEX '  + index_description + ' ON ' +  @SchemaName + '.' + ObjName + ' ( ' + index_keys +  CASE WHEN inc_columns IS NOT NULL THEN ' ) INCLUDE (' + inc_columns + ' )   ' ELSE ' )' END + ' WITH (FILLFACTOR=?, ONLINE=?, SORT_IN_TEMPDB=?, DATA_COMPRESSION=?); '
 		  END as Tsql_Definition
     FROM #ListIndexInfo
-    ORDER BY ObjName, index_id, inc_columns ;
+    ORDER BY ObjName, index_keys, inc_columns ;
  
     if @excludeRatioReadWrite > 0 and @indnameKey is null
     begin
