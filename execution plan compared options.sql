@@ -240,6 +240,19 @@ order by qs.sql_handle, st.text
     
 
 --Free PRoc cache
+CHECKPOINT 
+DBCC DROPCLEANBUFFERS
+DBCC FREEPROCCACHE
+	    
+DBCC FREPROCACHE; instead use
+DECLARE @PlanHandle VARBINARY(64);
+SELECT @PlanHandle = deps.plan_handle
+FROM sys.dm_exec_procedure_stats AS deps WHERE deps.object_id = OBJECT_ID('dbo.AddressByCity');
+IF @PlanHandle IS NOT NULL
+BEGIN
+    DBCC FREEPROCCACHE(@PlanHandle);
+END
+
 -- https://docs.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-freeproccache-transact-sql?view=sql-server-ver15
 SELECT UseCounts,RefCounts, plan_handle, Cacheobjtype, Objtype, 
 DB_NAME(DB_ID()) AS DatabaseName, TEXT AS SQL 
