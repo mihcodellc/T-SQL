@@ -1,3 +1,6 @@
+-- if need to get around apps for your queries: "Connected -Get around Apps.sql"
+
+
 -- https://docs.microsoft.com/en-us/sql/database-engine/configure-windows/diagnostic-connection-for-database-administrators?view=sql-server-ver15
 --To establish a DAC from SQL Server Management Studio
 
