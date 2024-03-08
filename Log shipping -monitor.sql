@@ -22,17 +22,36 @@ SELECT secondary_database,restore_mode as [restore/*1 ie standby 0 no recovery*/
  FROM msdb.dbo.log_shipping_secondary_databases
 
 
- --Last success of restore from job's message 
+	 --INFO ABOUT LOGSHIP INCLUDE JOBID
+ EXEC sp_help_log_shipping_secondary_primary  
+ @primary_server = 'ASP-SQL' , @primary_database = 'MedRx'
+
+ use master
+ --Refresh
+ -- @agent_id = secondary_id from previous "sp_help_log_shipping_secondary_primary" execution
+exec sp_refresh_log_shipping_monitor @agent_id='AA141B0D-8B67-4328-9A77-99F29AC62848', @agent_type =1, @database ='msdbCentral', @mode =1 --mode refresh
+exec sp_refresh_log_shipping_monitor @agent_id='AD0A7DAC-F85F-4D0A-9CF0-D59553DF6FCA', @agent_type =1, @database ='MedRx', @mode =1 --mode refresh
+
+
+
+--Last success of restore from job's message 
  ;with cte as  (
 SELECT sj.name as job_name, 
 	 substring(sh.message,1,23) + ' -- FileName: ' +substring(sh.message,PATINDEX('%LOGSHIPPING_COPY%', sh.message)+17, PATINDEX('%.trn%', sh.message)+4) as last_Restore,
-	 	 row_number() over(partition by sj.name order by run_date desc, cast(substring(sh.message,1,19) as datetime) /*run_time leftover secs*/ desc) rnk
+	 	 row_number() over(partition by sj.name order by run_date desc, cast(substring(sh.message,1,19) as datetime) /*run_time leftover secs*/ desc) rnk, sj.job_id
 FROM msdb.dbo.sysjobs sj
 JOIN msdb.dbo.sysjobhistory sh ON sj.job_id = sh.job_id
 where  sj.name like 'LSRestore%' and sh.message like '%restored log%'
 )
-select top 14/* 14 ie # dbs in logshpping*/ job_name, last_Restore from cte where rnk = 1
+select top 14/* 14 ie # dbs in logshpping*/ job_name, last_Restore, job_id from cte where rnk = 1
 order by job_name
+
+ SELECT b.type, b.last_lsn, a.*
+FROM msdb..restorehistory a
+INNER JOIN msdb..backupset b ON a.backup_set_id = b.backup_set_id
+WHERE a.destination_database_name = 'MedRx'
+ORDER BY restore_date DESC
+
 
 
 
@@ -54,7 +73,7 @@ exec sp_help_log_shipping_primary_secondary
 use master -- *** ON PRIMARY ***
 exec sp_delete_log_shipping_primary_secondary  
     @primary_database = 'TestBello',   
-    @secondary_server = 'asp-sql-new3',   
+    @secondary_server = 'sql-new3',   
     @secondary_database = 'TestBello' 
 --2
 use master -- *** ON SECONDARY ***
