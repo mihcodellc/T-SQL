@@ -47,4 +47,31 @@ RESTORE DATABASE [TestBello] FROM  DISK = N'C:\Backups\TestBello.bak' WITH MOVE 
 --WITH MOVE 'AdventureWorks2014_data' TO 'C:\DATA\AdventureWorks2014.mdf'
 
 
+use master
+-- https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/restore-a-differential-database-backup-sql-server?view=sql-server-ver16	
+-- https://learn.microsoft.com/en-us/sql/t-sql/statements/restore-statements-transact-sql?view=sql-server-ver16
+--files in my backups
+RESTORE FILELISTONLY FROM DISK = N'C:\AdventureWorks-FullBackup.bak'   
+   WITH FILE=2;  
+GO
+
+-- info about the backup where Position = Position of the backup set in the volume (for use with the FILE = option).
+RESTORE HEADERONLY FROM DISK = N'C:\AdventureWorks-FullBackup.bak'--N'C:\AdventureWorks-FullBackup.bak'; 
+GO
+
+-- Assume the database is lost, and restore full database,   
+-- specifying the original FULL DATABASE BACKUP and NORECOVERY,   
+-- which allows subsequent restore operations to proceed.  
+RESTORE DATABASE MyAdvWorks  
+   FROM MyAdvWorks_1  -- OR FROM DISK = N'C:\AdventureWorks-FullBackup.bak'
+   WITH NORECOVERY,  STATS = 5;  
+GO  
+-- Now restore the DIFFERENTIAL DATABASE BACKUP, the second backup on   
+-- the MyAdvWorks_1 backup device.  
+----diff does restore all datafiles
+RESTORE DATABASE MyAdvWorks  
+   FROM MyAdvWorks_1  -- OR FROM DISK = N'C:\AdventureWorks-FullBackup.bak'
+   WITH FILE = 2,  -- from Position returned by RESTORE HEADERONLY statement
+   NORECOVERY,  NOUNLOAD,  STATS = 5 
+GO
 
