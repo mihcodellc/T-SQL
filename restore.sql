@@ -50,6 +50,7 @@ RESTORE DATABASE [TestBello] FROM  DISK = N'C:\Backups\TestBello.bak' WITH MOVE 
 use master
 -- https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/restore-a-differential-database-backup-sql-server?view=sql-server-ver16	
 -- https://learn.microsoft.com/en-us/sql/t-sql/statements/restore-statements-transact-sql?view=sql-server-ver16
+-- https://learn.microsoft.com/en-us/sql/t-sql/statements/restore-statements-transact-sql?view=sql-server-ver16#restoring_full_n_differential_db_backups	
 --files in my backups
 RESTORE FILELISTONLY FROM DISK = N'C:\AdventureWorks-FullBackup.bak'   
    WITH FILE=2;  
@@ -75,3 +76,7 @@ RESTORE DATABASE MyAdvWorks
    NORECOVERY,  NOUNLOAD,  STATS = 5 
 GO
 
+RESTORE LOG MyAdvWorks  
+   FROM MyAdvWorks_log2  
+   WITH NORECOVERY,  NOUNLOAD,  STATS = 5;  
+GO  
