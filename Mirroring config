@@ -1,0 +1,33 @@
+
+SELECT 'Metadata Check';  
+SELECT EP.name, SP.STATE,   
+   CONVERT(nvarchar(38), suser_name(SP.grantor_principal_id))   
+      AS GRANTOR,   
+   SP.TYPE AS PERMISSION,  
+   CONVERT(nvarchar(46),suser_name(SP.grantee_principal_id))   
+      AS GRANTEE   
+   FROM sys.server_permissions SP , sys.endpoints EP  
+   WHERE SP.major_id = EP.endpoint_id  
+   ORDER BY Permission,grantor, grantee;   
+GO
+-- *****************
+--Identify Service Broker/Mirroring Endpoints:
+SELECT *
+FROM sys.tcp_endpoints
+--WHERE type_desc = 'SERVICE_BROKER'
+
+-- Identify Database Mirroring Endpoints:
+SELECT name, state_desc, role_desc, type_desc, *
+FROM sys.database_mirroring_endpoints
+
+----drop endpoint
+--DROP ENDPOINT Hadr_endpoint;
+
+-- Identify Mirrored Databases from DMVs:
+SELECT d.name AS DatabaseName, mirroring_partner_name AS PartnerServer, mirroring_state_desc AS MirroringState
+FROM sys.database_mirroring AS m
+INNER JOIN sys.databases AS d ON m.database_id = d.database_id
+WHERE mirroring_state_desc IS NOT NULL
+
+
+
