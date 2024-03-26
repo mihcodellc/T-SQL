@@ -78,5 +78,9 @@ GO
 
 RESTORE LOG MyAdvWorks  
    FROM MyAdvWorks_log2  
-   WITH NORECOVERY,  NOUNLOAD,  STATS = 5;  
+   WITH NORECOVERY,  NOUNLOAD,  STATS = 5;  -- NOUNLOAD only on tape device otherwise it is ignored
 GO  
+--restore log in standy to read ONLY - 
+RESTORE LOG MyAdvWorks FROM  MyAdvWorks_log2 
+WITH  STANDBY = 'G:\undoStandy.bak' -- ANY NAME FILE NAME: To keep a "copy-on-write" pre-image for pages modified during the undo pass of a RESTORE WITH STANDBY
+
