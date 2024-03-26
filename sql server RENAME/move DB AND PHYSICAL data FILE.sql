@@ -11,6 +11,15 @@ GO
  SELECT name ,  is_percent_growth, physical_name 
 FROM sys.database_files
 
+
+--find the db files and locations --CERTAIN THAN PREVIOUS sys.database_files
+ SELECT DB_name(database_id) dbName, name ,  is_percent_growth, physical_name 
+FROM sys.master_files-- database_files
+where database_id = DB_ID(Db_name())
+order by 1
+
+ --!!!!!IF DATABASE IN LOGSHIPPING, DISABLE RETORE JOB, MAKE SURE NO PENDING RESTORE IS ACTIVE
+ --!!!!! remember to enable it back once done
   
 ALTER DATABASE belloTest SET ONLINE;
 --change the name
