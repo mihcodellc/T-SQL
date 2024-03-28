@@ -1,11 +1,16 @@
 
---rename the instance
+--rename default  instance
 --https://docs.microsoft.com/en-us/sql/database-engine/install-windows/rename-a-computer-that-hosts-a-stand-alone-instance-of-sql-server?view=sql-server-ver16
 EXEC sp_dropserver 'asp-sql-new3'; 
 GO 
 EXEC sp_addserver 'asp-sql', local; 
 GO
 
+ --rename named instances
+EXEC sp_dropserver '<old_name\instancename>';
+GO
+EXEC sp_addserver '<new_name\instancename>', local;
+GO
 
 --find the db files and locations
  SELECT name ,  is_percent_growth, physical_name 
