@@ -1,12 +1,12 @@
 
---rename default  instance
+--rename computer name part of default instance name -- at this time, you can't change instance name without reinstalling sql server
 --https://docs.microsoft.com/en-us/sql/database-engine/install-windows/rename-a-computer-that-hosts-a-stand-alone-instance-of-sql-server?view=sql-server-ver16
 EXEC sp_dropserver 'asp-sql-new3'; 
 GO 
 EXEC sp_addserver 'asp-sql', local; 
 GO
 
- --rename named instances
+ --rename computer name part of named instance name -- at this time, you can't change instance name without reinstalling sql server
 EXEC sp_dropserver '<old_name\instancename>';
 GO
 EXEC sp_addserver '<new_name\instancename>', local;
