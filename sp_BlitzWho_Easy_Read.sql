@@ -1,3 +1,13 @@
+--live activity checker - what’s really happening - Forget sp_Who and sp_Who2---replace Activitor monitor
+exec [RmsAdmin].[dbo].[sp_BlitzWho_test] @ExpertMode = 1 --cached_parameter_info(sniffing),top_session_waits, tempdb_allocations, workload_group, resource_pool kill 2902
+  --,@OutputDatabaseName = 'RmsAdmin' 
+  --,@OutputSchemaName = 'dbo'  
+  --,@OutputTableName = 'BlitzWho'
+  , @sortOrder= 'host_name' --database_name/*Monktar added elapsed_time desc*/
+						  --, request_cpu_time, elapsed_time, request_logical_reads,request_physical_reads, request_writes, grant_memory_kb kill 2620
+						  --, login_name, --- [blocking_session_id], host_name
+go
+
 create PROCEDURE [dbo].[sp_BlitzWho_Easy_Read] @Help TINYINT = 0
 	,@ShowSleepingSPIDs TINYINT = 0
 	,@ExpertMode BIT = 0
