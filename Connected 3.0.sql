@@ -104,7 +104,6 @@ ORDER BY  1 desc,  sdes.session_id
 --SELECT @@MAX_CONNECTIONS AS 'Max Connections';  
 
 
---Previous version commented out
 select 'sessions blocking other, ACTIVE/executing(sys.dm_exec_requests) queries & sql text'
  ;WITH cteBL (session_id, blocking_these) AS 
 (SELECT s.session_id, blocking_these = x.blocking_these FROM sys.dm_exec_sessions s 
@@ -117,31 +116,33 @@ CROSS APPLY    (SELECT isnull(convert(varchar(6), er.session_id),'') + ', '
 SELECT r.wait_time / (1000.0) as WaitSec, r.total_elapsed_time / (1000.0) 'ElapsSec', bl.session_id,
 blocked_by = r.blocking_session_id, bl.blocking_these,
 s.login_name,s.[host_name],s.[program_name], 
-substring(case when len(ib.event_info)> 0 then ib.event_info else '' end,0,300) Query_involved,
-batch_text = st.text, r.reads, r.writes, r.logical_reads, r.wait_type, r.wait_resource, sdec.client_net_address, sdec.local_net_address--, *
+substring(case when len(ib.event_info)> 0 then ib.event_info else '' end,0,2000) Query_involved,
+batch_text = st.text, r.reads, r.writes, r.logical_reads, r.wait_type, r.wait_resource, sdec.client_net_address, sdec.local_net_address, derp.query_plan--, *
 FROM sys.dm_exec_sessions s
 INNER JOIN sys.dm_exec_connections AS sdec  ON sdec.session_id = s.session_id
 LEFT OUTER JOIN sys.dm_exec_requests r on r.session_id = s.session_id
-INNER JOIN cteBL as bl on s.session_id = bl.session_id
+LEFT JOIN cteBL as bl on s.session_id = bl.session_id
+--INNER JOIN cteBL as bl on s.session_id = bl.session_id
 OUTER APPLY sys.dm_exec_sql_text (r.sql_handle) st
 OUTER APPLY sys.dm_exec_input_buffer(s.session_id, NULL) AS ib
-WHERE --ib.event_info like '%LoaderState_Populate_byView_yearago%'--r.session_id != @@SPID 
+OUTER APPLY sys.dm_exec_query_plan(r.plan_handle) AS derp
+WHERE --s.session_id in (1865, 2890, 2030) --ib.event_info like '%LoaderState_Populate_byView_yearago%'--s.session_id != @@SPID  -- kill 3062, kill 2269 kill 2012
  ( --blocking over 3min
 		  (
 			 (len(bl.blocking_these) > 0 OR r.blocking_session_id <> 0)-- blocked or blocking
 			 and 
 			 (
-				r.total_elapsed_time / (1000.0)  > 30 -- 180=3*60
+				r.total_elapsed_time / (1000.0)  > 180 -- 180=3*60
 				or
-				DATEDIFF(second, GETDATE(), r.start_time) > 30
+				DATEDIFF(second, GETDATE(), r.start_time) > 180
 			 )
 		  )
 	       or 
       --running over 20min
 		(
-		  r.total_elapsed_time / (1000.0)  > 30--1200=20*60 kill 2833
+		  r.total_elapsed_time / (1000.0)  > 1200--1200=20*60 kill 687
 		  or
-		  DATEDIFF(second, GETDATE(), r.start_time) > 30
+		  DATEDIFF(second, GETDATE(), r.start_time) > 1200
 		)  
 	   )
  --AND (blocking_these is not null or r.blocking_session_id <> 0) -- only blocking	
@@ -182,6 +183,7 @@ ORDER BY len(bl.blocking_these) desc, r.blocking_session_id desc, r.session_id;
 --      --running over 20min
 --		  r.total_elapsed_time / (1000.0)  > 1200--1200=20*60
 --	   )
+--blocking_session_id: means
 ----NULL or equal to 0, the request isn't blocked, or the session information of the blocking session isn't available
 -----2 = The blocking resource is owned by an orphaned distributed transaction.
 -----3 = The blocking resource is owned by a deferred recovery transaction.
@@ -244,6 +246,7 @@ exec [RmsAdmin].dbo.sp_WhoIsActive
 		  , @get_task_info =2 /* 1 ie lightweight. task-based metrics : current wait stats, physical I/O, context switches, and blocker information*/
 		  , @get_avg_time = 0
 		  , @get_locks = 1
+		  --, @get_plans = 1
 		  --, @get_transaction_info = 1
 		  --, @delta_interval = 5 -- Interval in seconds to wait before doing the second data pull
 		  , @find_block_leaders =1
