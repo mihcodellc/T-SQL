@@ -1,5 +1,5 @@
 --***1.perform benchmark tests and determine the I/O capacity
--- disk performance:diskspd, Crystal Mark, IOmeter
+-- disk performance:diskspd, Crystal Disk Mark, IOmeter
 -- https://blog.purestorage.com/purely-technical/what-is-sql-servers-io-block-size/
 --*****Operation -> IO Block size
 -- ----log  -> 512bytes - 60 KB
