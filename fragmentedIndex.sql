@@ -67,6 +67,7 @@ ORDER BY page_count DESC;
 
 --- syntax from the indexFragmentation
 --create table  maintenance.dbo.my_index (id_name varchar(200), erro int, whebn datetime2 not null default getdate())
+set statistics profile on
 select 'insert into maintenance.dbo.my_index(id_name, erro) ' + 'Select ''' + index_name + ''', @@error'
 + char(10)+' alter index '+index_name + ' on ' + schemaName + '.'+ objectname + ' REBUILD with (ONLINE=ON) ' as 'rebuid statement',* 
 from maintenance.dbo.indexFragmentation where timechecked > '20240414' and index_type<>'Heap'
