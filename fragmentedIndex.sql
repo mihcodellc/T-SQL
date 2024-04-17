@@ -29,9 +29,9 @@ EXECUTE maintenance.dbo.IndexOptimize
 
 --if above didn't work, use of the options below according to % of fragmentation and table or index
 -- different ways to maintain index
-ALTER INDEX ALL ON Production.Product REBUILD WITH (FILLFACTOR = 80, SORT_IN_TEMPDB = ON, STATISTICS_NORECOMPUTE = ON)
+ALTER INDEX ALL ON Production.Product REBUILD WITH (ONLINE=ON, FILLFACTOR = 80, SORT_IN_TEMPDB = ON, STATISTICS_NORECOMPUTE = ON)
 
-ALTER INDEX index_name ON schema.table_name REBUILD WITH (FILLFACTOR = 80, SORT_IN_TEMPDB = ON, STATISTICS_NORECOMPUTE = ON)
+ALTER INDEX index_name ON schema.table_name REBUILD WITH (ONLINE=ON, FILLFACTOR = 80, SORT_IN_TEMPDB = ON, STATISTICS_NORECOMPUTE = ON)
 
 ALTER INDEX PK_Employee_BusinessEntityID ON HumanResources.Employee REBUILD;
 
@@ -64,6 +64,12 @@ ORDER BY page_count DESC;
 --from maintenance.dbo.indexFragmentation
 --where index_name in('ix_name') --and alloc_unit_type_desc = 'IN_ROW_DATA'
 --order by index_name, TimeChecked desc
+
+--- syntax from the indexFragmentation
+select 'alter index '+index_name + ' on ' + schemaName + '.'+ objectname + ' REBUILD with (ONLINE=ON) ' as 'rebuid statement',* 
+from maintenance.dbo.indexFragmentation where timechecked > '20240414' and index_type<>'Heap'
+ and avg_fragmentation_in_percent> 79
+order by page_count desc,avg_fragmentation_in_percent desc
 
 set transaction isolation level read uncommitted
 set nocount on
@@ -165,7 +171,7 @@ order by avg_fragmentation_in_percent desc
 
 
 -- different ways to maintain index
-ALTER INDEX ALL ON Production.Product REBUILD WITH (FILLFACTOR = 80, SORT_IN_TEMPDB = ON, STATISTICS_NORECOMPUTE = ON)
+ALTER INDEX ALL ON Production.Product REBUILD WITH (ONLINE=ON, FILLFACTOR = 80, SORT_IN_TEMPDB = ON, STATISTICS_NORECOMPUTE = ON)
 
 ALTER INDEX PK_Employee_BusinessEntityID ON HumanResources.Employee REBUILD;
 
