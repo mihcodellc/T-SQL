@@ -1,3 +1,4 @@
+-- a os service configurable for log shipping: https://github.com/trimble-oss/sql-log-shipping-service
 -- created 7/21/2022 by Monktar Bello
 
 -- https://docs.microsoft.com/en-us/sql/database-engine/log-shipping/monitor-log-shipping-transact-sql?view=sql-server-ver16
