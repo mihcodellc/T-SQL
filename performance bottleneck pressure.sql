@@ -87,10 +87,11 @@ https://app.slack.com/client/T1LTZ0BQV/C1MS1RA4B
 
 
 	
---CPU pressure & memory pressure
+--CPU pressure & memory pressure: resmon, perfmon
+-- sp_BlitzWho_Easy_Read.sql FIRST	
+-- compare to connected.sql	
 --compare over time "Check DBA issues from Windows OS.ps1"	
 --***ref to sp_PressureDetector.sql likely over time to decide
--- compare to connected.sql (include  sp_WhoIsActive.sql) to fix issues right now and BlitzFirst to not get fired, see urgent things
 -- it using some of the queries here and written by elder in the field.
 --you should vet always
 -- https://docs.microsoft.com/en-us/troubleshoot/sql/performance/troubleshoot-high-cpu-usage-issues
