@@ -88,7 +88,8 @@ https://app.slack.com/client/T1LTZ0BQV/C1MS1RA4B
 
 	
 --CPU pressure & memory pressure: resmon, perfmon
--- sp_BlitzWho_Easy_Read.sql FIRST	
+-- https://learn.microsoft.com/en-us/troubleshoot/sql/database-engine/performance/troubleshoot-high-cpu-usage-issues	
+-- sp_BlitzWho_Easy_Read.sql FIRST		
 -- compare to connected.sql	
 --compare over time "Check DBA issues from Windows OS.ps1"	
 --***ref to sp_PressureDetector.sql likely over time to decide
