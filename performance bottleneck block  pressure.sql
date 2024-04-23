@@ -58,7 +58,8 @@ https://events.microsoft.com/en-us/mvtd?startTime=08:00&endTime=17:00
 Read Committed Snapshot Isolation RCSI “Readers don’t block writers, writers don’t block readers, but writers still block writers.” 
 	if I may, RCSI doesn't apply to writers VS writers; you still have the READ COMMIT in it. RCSI is using SNAPSHOT ie before your query start. 
 	OK when reading small chunck of data. the NOLOCK has no effect on writers but on readers and you end up with no commited data in your read data. 
-	it won't wait on anyone still the amount of data you request matters either way. not mention not well-writing query
+	it won't wait on anyone still the amount of data you request matters either way. not mention not well-writing query.
+	session transaction level prevail and begin transaction will hold the lock anyway
 1. SNAPSHOT (easy on/off for your session)and 
 2. READ COMMITTED SNAPSHOT isolation(not use locks to protect the data)
 -- ENABLE with ALTER DATABASE TestBello  SET ALLOW_SNAPSHOT_ISOLATION ON  
