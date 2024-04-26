@@ -91,7 +91,7 @@ https://app.slack.com/client/T1LTZ0BQV/C1MS1RA4B
 
 
 	
---CPU pressure & memory pressure: resmon, perfmon
+--CPU pressure & memory pressure: resmon, perfmon whether SQL or VM
 -- https://learn.microsoft.com/en-us/troubleshoot/sql/database-engine/performance/troubleshoot-high-cpu-usage-issues
 	--also account for the frequently run queries with high CPU, their executions count can add up and be source of your problem
 	--history of blitzCache with its executions couts and CPU usage can help OR Blitz PowerBI file for history
