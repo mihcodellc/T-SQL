@@ -92,7 +92,11 @@ https://app.slack.com/client/T1LTZ0BQV/C1MS1RA4B
 
 	
 --CPU pressure & memory pressure: resmon, perfmon
--- https://learn.microsoft.com/en-us/troubleshoot/sql/database-engine/performance/troubleshoot-high-cpu-usage-issues	
+-- https://learn.microsoft.com/en-us/troubleshoot/sql/database-engine/performance/troubleshoot-high-cpu-usage-issues
+	--also account for the frequently run queries with high CPU, their executions count can add up and be source of your problem
+	--history of blitzCache with its executions couts and CPU usage can help
+	--make sure the VM tools managers show CPU host Vs VMs at least a way to tell i don't see pressure on your VM and i'm not busy
+	-- read the vm cpu usage below: Get CPU Utilization History for last 256 minutes
 -- sp_BlitzWho_Easy_Read.sql FIRST		
 -- compare to connected.sql	
 --compare over time "Check DBA issues from Windows OS.ps1"	
@@ -101,6 +105,27 @@ https://app.slack.com/client/T1LTZ0BQV/C1MS1RA4B
 --you should vet always
 -- https://docs.microsoft.com/en-us/troubleshoot/sql/performance/troubleshoot-high-cpu-usage-issues
 
+
+-- Get CPU Utilization History for last 256 minutes (in one minute intervals)  (Query 42) (CPU Utilization History)
+-- processor time _total in perfmon
+-- populate by extend event
+DECLARE @ts_now bigint = (SELECT ms_ticks FROM sys.dm_os_sys_info WITH (NOLOCK)); 
+
+SELECT TOP(256) SQLProcessUtilization AS [SQL Server Process CPU Utilization], 
+               --SystemIdle AS [System Idle Process], 
+               --100 - SystemIdle - SQLProcessUtilization AS [Other Process CPU Utilization], 
+               DATEADD(ms, -1 * (@ts_now - [timestamp]), GETDATE()) AS [Event Time] ,
+			[record]
+FROM (SELECT record.value('(./Record/@id)[1]', 'int') AS record_id, 
+              record.value('(./Record/SchedulerMonitorEvent/SystemHealth/SystemIdle)[1]', 'int') 
+                      AS [SystemIdle], 
+              record.value('(./Record/SchedulerMonitorEvent/SystemHealth/ProcessUtilization)[1]', 'int') 
+                      AS [SQLProcessUtilization], [timestamp], [record] 
+         FROM (SELECT [timestamp], CONVERT(xml, record) AS [record] 
+                      FROM sys.dm_os_ring_buffers WITH (NOLOCK)
+                      WHERE ring_buffer_type = N'RING_BUFFER_SCHEDULER_MONITOR' 
+                      AND record LIKE N'%<SystemHealth>%') AS x) AS y 
+ORDER BY record_id DESC OPTION (RECOMPILE);
 
 
 
