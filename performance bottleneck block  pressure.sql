@@ -105,6 +105,12 @@ https://app.slack.com/client/T1LTZ0BQV/C1MS1RA4B
 --you should vet always
 -- https://docs.microsoft.com/en-us/troubleshoot/sql/performance/troubleshoot-high-cpu-usage-issues
 
+optimization: 
+	- query plan examined 
+	- query structure(ref cahier des charges), not created(by you to support) or suggested index(optimizer) or not covering index
+	- tables carrying lot of data: reduce the volume 
+	- ...
+
 
 -- Get CPU Utilization History for last 256 minutes (in one minute intervals)  (Query 42) (CPU Utilization History)
 -- processor time _total in perfmon
