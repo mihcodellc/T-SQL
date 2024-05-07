@@ -236,13 +236,13 @@ BEGIN
     SELECT distinct 'no filter' as group_ini, @SchemaName, objname, index_id, index_keys, inc_columns, PARSENAME(index_name, 1) Indname,
 		  'ALTER INDEX ' + PARSENAME(index_name, 1) + ' ON '  + ObjName + ' DISABLE; ' as Tsql_Disable,
 		  'DROP INDEX '  + PARSENAME(index_name, 1) + ' ON '  + ObjName as Tsql_DROP,
-		  'ALTER INDEX '  + PARSENAME(index_name, 1) + ' ON '  + ObjName + ' REBUILD WITH (FILLFACTOR=?, ONLINE=?, SORT_IN_TEMPDB=?, DATA_COMPRESSION=?) ' as Tsql_Enable,
+		  'ALTER INDEX '  + PARSENAME(index_name, 1) + ' ON '  + ObjName + ' REBUILD WITH (FILLFACTOR=?, ONLINE=?, SORT_IN_TEMPDB=?, DATA_COMPRESSION=?) '  as Tsql_Enable ,
 		  CASE WHEN [TYPE] = 2 THEN 'CREATE NONCLUSTERED INDEX '  + index_description + ' ON ' + ObjName + ' ( ' + index_keys +  CASE WHEN inc_columns IS NOT NULL THEN ' ) INCLUDE (' + inc_columns + ' )   ' ELSE ' )' END + ' WITH (FILLFACTOR=?, ONLINE=?, SORT_IN_TEMPDB=?, DATA_COMPRESSION=?); ' 
 		  ELSE 
 		  'CREATE ' + TypeDescription +' INDEX '  + index_description + ' ON ' +  @SchemaName + '.' + ObjName + ' ( ' + index_keys +  CASE WHEN inc_columns IS NOT NULL THEN ' ) INCLUDE (' + inc_columns + ' )   ' ELSE ' )' END + ' WITH (FILLFACTOR=?, ONLINE=?, SORT_IN_TEMPDB=?, DATA_COMPRESSION=?); '
-		  END as Tsql_Definition
-    FROM #ListIndexInfo
-    ORDER BY ObjName, index_keys, inc_columns ;
+		  END COLLATE DATABASE_DEFAULT as Tsql_Definition
+    FROM #ListIndexInfo 
+    ORDER BY ObjName, index_keys, inc_columns --COLLATE DATABASE_DEFAULT
  
     if @excludeRatioReadWrite > 0 and @indnameKey is null
     begin
