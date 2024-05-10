@@ -36,6 +36,7 @@ https://events.microsoft.com/en-us/mvtd?startTime=08:00&endTime=17:00
 
 --*****Server Performance and Activity Monitoring
 --https://docs.microsoft.com/en-us/sql/relational-databases/performance/server-performance-and-activity-monitoring?view=sql-server-ver15
+-- AZURE: https://learn.microsoft.com/en-us/azure/search/search-performance-tips	
 
 --******Business continuity and database recovery - SQL Server
 --https://docs.microsoft.com/en-us/sql/database-engine/sql-server-business-continuity-dr?view=sql-server-ver15
