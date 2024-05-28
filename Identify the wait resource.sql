@@ -1,5 +1,9 @@
 Identify the wait resource
 
+  --https://www.sqlservercentral.com/blogs/sql-server-deciphering-wait-resource
+
+--->>>>>>>>>>>>>>find Page Wait Resource
+  
 --sys.dm_exec_requests.wait_resource: 10:1:1838184834
 -- ie Db_ID:FileID:PageID
 -- Step 1: Identify the Database
@@ -27,3 +31,14 @@ DBCC TRACEOFF(3604);
 SELECT OBJECT_NAME(849490155) AS ObjectName, * 
 FROM sys.objects 
 WHERE object_id = 849490155;
+
+
+
+--->>>>>>>>>>>>>>find Key Wait Resource 
+SELECT 
+ o.name AS TableName, 
+i.name AS IndexName,
+SCHEMA_NAME(o.schema_id) AS SchemaName
+FROM sys.partitions p JOIN sys.objects o ON p.OBJECT_ID = o.OBJECT_ID 
+JOIN sys.indexes i ON p.OBJECT_ID = i.OBJECT_ID  AND p.index_id = i.index_id 
+WHERE p.hobt_id = 72057594040811520
