@@ -178,7 +178,8 @@ GO
 
 
 --**** determining the ratio between the multi-use and single-use query execution plans cached
-SELECT Db_Name(QueryText.dbid) AS database_name,
+SELECT --Db_Name(QueryText.dbid) AS database_name,
+ExecPlans.objtype, ExecPlans.cacheobjtype,
   Sum(CASE WHEN ExecPlans.usecounts = 1 THEN 1 ELSE 0 END) AS Single,
   Sum(CASE WHEN ExecPlans.usecounts > 1 THEN 1 ELSE 0 END) AS Reused,
   --Sum(ExecPlans.size_in_bytes) / (1024) AS KB -- Arithmetic overflow error converting expression to data type int.
@@ -186,8 +187,13 @@ SELECT Db_Name(QueryText.dbid) AS database_name,
   Sum(CAST(ExecPlans.size_in_bytes AS BIGINT)) / (1024) AS KB
    FROM sys.dm_exec_cached_plans AS ExecPlans
     CROSS APPLY sys.dm_exec_sql_text(ExecPlans.plan_handle) AS QueryText
-   WHERE ExecPlans.cacheobjtype = 'Compiled Plan' AND QueryText.dbid IS NOT NULL 
-     GROUP BY QueryText.dbid;
+   WHERE 
+   --ExecPlans.cacheobjtype = 'Compiled Plan' AND 
+   QueryText.dbid IS NOT NULL 
+     GROUP BY --QueryText.dbid,
+	objtype,
+    cacheobjtype
+    order by 1
     
 --- rate ad hoc queries in your db
     SELECT Convert(INT,Sum
