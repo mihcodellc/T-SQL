@@ -1,4 +1,4 @@
-trace flag  & query hint
+trace flag list  & query hint
 --https://docs.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-traceon-transact-sql?view=sql-server-ver15
 --https://docs.microsoft.com/en-US/sql/t-sql/queries/hints-transact-sql-query?view=sql-server-ver15#examples
 --https://learn.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-traceon-trace-flags-transact-sql?view=sql-server-ver15
