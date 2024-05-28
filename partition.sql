@@ -61,6 +61,17 @@ ORDER BY [tablename] ASC;
 --TO FILEGROUP Test1FG1;
 --GO
 
+--************************start
+-- add new date column 
+--Create a partition function. ? column unsure at this time? can we alter the function in future to accomodate the change in this table
+--Create a partition scheme.
+--Create a new partitioned table.
+--Move data to the new partitioned table. ? just is needed at this time 6months
+--Drop any foreign key constraints on the existing table.
+--Switch the existing table to the new partitioned table.? what switch is doing ?
+--Rename the tables.
+--Recreate foreign key constraints.
+--Drop the old table.
 
 --drop PARTITION FUNCTION pf_salesYearPartitions 
 create PARTITION FUNCTION pf_salesYearPartitions (int)
@@ -74,9 +85,27 @@ AS PARTITION pf_salesYearPartitions
 ALL TO (Test1FG1)
 --ALL TO (USERDATA)
 
---select min(orderId), max(orderid) from sales.Orders
+--create the partitioning version with the partition scheme
+CREATE TABLE [dbo].[MyTable_partioning](
+	id, col1, col2
+ CONSTRAINT [PK_MyTable_partioning] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)
+) ON MyTable_PartitionScheme ([id]);
 
---drop TABLE [Sales].[Orders_P]
+CREATE NONCLUSTERED INDEX IX_MyTable_recordtype ON [dbo].MyTable ( col2 ) 
+WITH (FILLFACTOR=95, ONLINE=ON, DROP_EXISTING = ON) ON LoaderRecordType_PartitionScheme(RecordType); 
+
+
+CREATE UNIQUE CLUSTERED INDEX PK_MyTable ON [dbo].MyTable 
+( [id] ) WITH (FILLFACTOR=90, ONLINE=ON, DROP_EXISTING = ON) ON MyTable_Id_PartitionScheme(id); --55min
+
+--check the partition
+SELECT ps.name,pf.name,boundary_id,value
+FROM sys.partition_schemes ps
+INNER JOIN sys.partition_functions pf ON pf.function_id=ps.function_id
+INNER JOIN sys.partition_range_values prf ON pf.function_id=prf.function_id
 
 -- data on partition
 SELECT partition_id, index_id, partition_number, Rows, OBJECT_NAME(OBJECT_ID) 
@@ -90,14 +119,32 @@ WHERE OBJECT_NAME(OBJECT_ID)='Orders'
 GO
 
 
--- make the switch
-ALTER TABLE Sales.Orders SWITCH TO Sales.Orders_P PARTITION 1
+--move data to new table
+SET IDENTITY_INSERT dbo.MyTable ON
+INSERT INTO [MyTable_partioning] (col1, col2, ...)
+SELECT col1, col2, ...
+FROM MyTable b
+where ID > 357079933
 
---SELECT * INTO UserLogHistory1 ON HISTORY 
---FROM UserLog
-
+SET IDENTITY_INSERT dbo.MyTable OFF
 
 SELECT * INTO UserLogHistory FROM UserLog
+
+--Drop Foreign Key Constraints (If Any)
+
+--Switch the Existing Table to the New Partitioned Table
+ALTER TABLE Sales SWITCH TO NewSales;
+ALTER TABLE Sales.Orders SWITCH TO Sales.Orders_P PARTITION 1
+
+--Rename the Tables
+EXEC sp_rename 'Sales', 'OldSales';
+EXEC sp_rename 'NewSales', 'Sales';
+
+--Recreate foreign key constraints.
+
+--Drop the old table.
+
+
 
 	-- where are my tables,  filegroup information
 SELECT OBJECT_NAME([si].[object_id]) AS [tablename]
@@ -116,7 +163,4 @@ ORDER BY [tablename] ASC;
 
 
 
-SELECT partition_id, index_id, partition_number, Rows, OBJECT_NAME(OBJECT_ID) tableName, filestream_filegroup_id
-FROM sys.partitions
-WHERE OBJECT_NAME(OBJECT_ID)='Orders'
-GO
+
