@@ -25,13 +25,13 @@ SELECT secondary_database,restore_mode as [restore/*1 ie standby 0 no recovery*/
 
 	 --INFO ABOUT LOGSHIP INCLUDE JOBID
  EXEC sp_help_log_shipping_secondary_primary  
- @primary_server = 'ASP-SQL' , @primary_database = 'MedRx'
+ @primary_server = 'InstanceName' , @primary_database = 'MyDB'
 
  use master
  --Refresh
  -- @agent_id = secondary_id from previous "sp_help_log_shipping_secondary_primary" execution
-exec sp_refresh_log_shipping_monitor @agent_id='AA141B0D-8B67-4328-9A77-99F29AC62848', @agent_type =1, @database ='msdbCentral', @mode =1 --mode refresh
-exec sp_refresh_log_shipping_monitor @agent_id='AD0A7DAC-F85F-4D0A-9CF0-D59553DF6FCA', @agent_type =1, @database ='MedRx', @mode =1 --mode refresh
+exec sp_refresh_log_shipping_monitor @agent_id='AA141B0D-8B67-4328-9A77-99F29AC62848', @agent_type =1, @database ='db1', @mode =1 --mode refresh
+exec sp_refresh_log_shipping_monitor @agent_id='AD0A7DAC-F85F-4D0A-9CF0-D59553DF6FCA', @agent_type =1, @database ='db2', @mode =1 --mode refresh
 
 
 
@@ -47,10 +47,14 @@ where  sj.name like 'LSRestore%' and sh.message like '%restored log%'
 select top 14/* 14 ie # dbs in logshpping*/ job_name, last_Restore, job_id from cte where rnk = 1
 order by job_name
 
+--run task
+exec msdb.dbo.sp_help_job @execution_status=1 --- running
+
+	
  SELECT b.type, b.last_lsn, a.*
 FROM msdb..restorehistory a
 INNER JOIN msdb..backupset b ON a.backup_set_id = b.backup_set_id
-WHERE a.destination_database_name = 'MedRx'
+WHERE a.destination_database_name = 'MyDB'
 ORDER BY restore_date DESC
 
 
