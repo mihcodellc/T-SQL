@@ -23,3 +23,27 @@ FROM sys.indexes i
 INNER JOIN sys.filegroups fg ON i.data_space_id = fg.data_space_id
 INNER JOIN sys.all_objects o ON i.[object_id] = o.[object_id]
 WHERE i.data_space_id = fg.data_space_id AND o.type = 'U' and  OBJECT_NAME([i].[object_id]) like '%A_table_name%'
+
+
+--objects left on datafile
+SELECT 
+    OBJECT_NAME(p.object_id) AS ObjectName,
+    i.name AS IndexName,
+    au.type_desc AS AllocationType,
+    au.total_pages * 8 / 1024 AS TotalSizeMB,
+	[df].[physical_name] AS [datafilename],
+	df.name as FileLogicalName
+FROM 
+    sys.partitions p
+JOIN 
+    sys.allocation_units au ON p.partition_id = au.container_id
+JOIN 
+    sys.indexes i ON p.object_id = i.object_id AND p.index_id = i.index_id
+JOIN [sys].[data_spaces] ds ON [i].[data_space_id] = [ds].[data_space_id]
+JOIN [sys].[database_files] [df] ON [ds].[data_space_id] = [df].[data_space_id]
+WHERE df.name = 'Billing'
+--    au.data_space_id = (SELECT data_space_id FROM sys.filegroups WHERE name = 'Billing')
+ORDER BY 
+    TotalSizeMB DESC;
+GO
+
