@@ -26,13 +26,14 @@ WHERE i.data_space_id = fg.data_space_id AND o.type = 'U' and  OBJECT_NAME([i].[
 
 
 --objects left on datafile
-SELECT 
+SELECT [so].[type],so.type_desc,
     OBJECT_NAME(p.object_id) AS ObjectName,
     i.name AS IndexName,
     au.type_desc AS AllocationType,
     au.total_pages * 8 / 1024 AS TotalSizeMB,
 	[df].[physical_name] AS [datafilename],
-	df.name as FileLogicalName
+	df.name as FileLogicalName,
+	[ds].[name] AS [filegroupname]
 FROM 
     sys.partitions p
 JOIN 
@@ -41,9 +42,10 @@ JOIN
     sys.indexes i ON p.object_id = i.object_id AND p.index_id = i.index_id
 JOIN [sys].[data_spaces] ds ON [i].[data_space_id] = [ds].[data_space_id]
 JOIN [sys].[database_files] [df] ON [ds].[data_space_id] = [df].[data_space_id]
-WHERE df.name = 'Billing'
---    au.data_space_id = (SELECT data_space_id FROM sys.filegroups WHERE name = 'Billing')
+INNER JOIN [sys].[objects] [so] ON [i].[object_id] = [so].[object_id]
+WHERE --df.name = 'logicFileName' --and 
+		[so].[type] <> 'U'
+--    au.data_space_id = (SELECT data_space_id FROM sys.filegroups WHERE name = '?')
 ORDER BY 
-    TotalSizeMB DESC;
-GO
+    [filegroupname] DESC;
 
