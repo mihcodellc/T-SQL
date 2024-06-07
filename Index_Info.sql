@@ -11,6 +11,24 @@ SELECT @@VERSION
 --select * from sys.dm_db_missing_index_groups
 --select * from sys.databases order by database_id
 --select DB_ID()
+	
+-- Monitor indexes size = their maintenance eat spaces make sure to get it back: log backup, skrink log file
+SELECT 
+    OBJECT_NAME(i.object_id) AS TableName,
+    i.name AS IndexName,
+    i.index_id,
+    (8.000/1024) * SUM(a.used_pages) AS IndexSizeMB
+FROM 
+    sys.indexes AS i
+    JOIN sys.partitions AS p ON p.object_id = i.object_id AND p.index_id = i.index_id
+    JOIN sys.allocation_units AS a ON a.container_id = p.partition_id
+GROUP BY 
+    i.object_id, i.index_id, i.name
+ORDER BY 
+    IndexSizeMB DESC;
+
+DBCC SQLPERF(LOGSPACE); -- Monitor transaction log size
+	
 --/****************************************************************************************************************************/
 /**************************************** 1. Create Missing Index ***********************************************************/
 /****************************************************************************************************************************/
