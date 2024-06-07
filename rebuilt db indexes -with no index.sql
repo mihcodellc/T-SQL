@@ -30,13 +30,14 @@ exec sp_msforeachtable 'insert into #temp exec [sp_SQLskills_helpindex_short] [?
 --fix (-) = DESC in the index definition
 
 select 'insert into rmsadmin.dbo.trackIndex_rebuild (objname,index_name) select ''' + objname + ''','''+index_name+'''; ' +
-case when is_primary = 1 then 'CREATE UNIQUE CLUSTERED INDEX ' + index_name + ' ON ' + objname + ' ('+ index_keys + ') WITH (ONLINE=OFF, DROP_EXISTING = ON, FILLFACTOR = 90) '  +  ' ON [FG_MedRx_Data] ' + char(10)+ 'GO'  
+case when is_primary = 1 then 'CREATE UNIQUE CLUSTERED INDEX ' + index_name + ' ON ' + objname + ' ('+ index_keys + ') WITH (SORT_IN_TEMPDB = ON,ONLINE=OFF, DROP_EXISTING = ON, FILLFACTOR = 90) '  +  ' ON [FG_MedRx_Data] ' + char(10)+ 'GO'  
      WHEN is_primary = 0 and is_unique_key = 1  THEN 
 	 --'CREATE UNIQUE NONCLUSTERED INDEX '  +  index_name + ' ON ' + objname + ' ('+ index_keys + ')' 
 	 'CREATE UNIQUE ' + iif(type=2,' NONCLUSTERED ',' CLUSTERED ') + ' INDEX '  +  index_name + ' ON ' + objname + ' ('+ index_keys + ')' 
-			+ IIF(LEN(inc_columns) > 0, ' INCLUDE (' + inc_columns + ')', '')  + ' WITH (ONLINE=OFF, DROP_EXISTING = ON, FILLFACTOR = 90) ' +  ' ON [FG_MedRx_Data] ' + char(10) + 'GO'  
+			+ IIF(LEN(inc_columns) > 0, ' INCLUDE (' + inc_columns + ')', '')  + ' WITH (SORT_IN_TEMPDB = ON, ONLINE=OFF, DROP_EXISTING = ON, FILLFACTOR = 90) ' +  ' ON [FG_MedRx_Data] ' + char(10) + 'GO'  
 	 WHEN is_primary = 0 and is_unique_key = 0 THEN
 	 'CREATE ' + iif(type=2,' NONCLUSTERED ',' CLUSTERED ') + ' INDEX '  +  index_name + ' ON ' + objname + ' ('+ index_keys + ')' 
-	 + 	IIF(LEN(inc_columns) > 0, ' INCLUDE (' + inc_columns + ')', '')  + ' WITH (ONLINE=OFF, DROP_EXISTING = ON, FILLFACTOR = 90) ' +  ' ON [FG_MedRx_Data] ' + char(10) + 'GO'  
+	 + 	IIF(LEN(inc_columns) > 0, ' INCLUDE (' + inc_columns + ')', '')  + ' WITH (SORT_IN_TEMPDB = ON,ONLINE=OFF, DROP_EXISTING = ON, FILLFACTOR = 90) ' +  ' ON [FG_MedRx_Data] ' + char(10) + 'GO'  
 else '' end saveAndRebuilt -- Filegroup's name = FG_MedRx_Data
 from #temp where is_primary = 1
+
