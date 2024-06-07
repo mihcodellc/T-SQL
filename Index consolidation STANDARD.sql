@@ -3,13 +3,32 @@
 -- https://www.sqlskills.com/blogs/jonathan/finding-what-queries-in-the-plan-cache-use-a-specific-index/
 
 --One way to test the consolidated index is to use hint to force its use and compare to the existing
+--compare to missing indexes
 -- you still need to find relevant queries to test with
 -- disable current - test new -  drop current OR new depending of benefits (duration, reads/write, user's queries, CPU, memories ...)
+
+-- ****Monitor index size
+SELECT 
+    OBJECT_NAME(i.object_id) AS TableName,
+    i.name AS IndexName,
+    i.index_id,
+    (8.000/1024) * SUM(a.used_pages) AS IndexSizeMB
+FROM 
+    sys.indexes AS i
+    JOIN sys.partitions AS p ON p.object_id = i.object_id AND p.index_id = i.index_id
+    JOIN sys.allocation_units AS a ON a.container_id = p.partition_id
+GROUP BY 
+    i.object_id, i.index_id, i.name
+ORDER BY 
+    IndexSizeMB DESC;
+
+DBCC SQLPERF(LOGSPACE); -- Monitor transaction log size
+
 
 set transaction isolation level read uncommitted
 set nocount on
 
--- no foreign key
+-- ****no foreign key
 	           select  name FK_name, schema_name(fk.schema_id) + '.' + object_name(fk.parent_object_id) + '.' +col_name(fk.parent_object_id,fkc.parent_column_id) InColName,  object_name(fk.referenced_object_id) refTable ,
 			 fk.is_disabled, fk.is_not_trusted, 
 			 fk.delete_referential_action_desc d_action, fk.update_referential_action_desc u_action 
