@@ -33,7 +33,7 @@ ALTER INDEX ALL ON Production.Product REBUILD WITH (ONLINE=ON, FILLFACTOR = 80, 
 
 ALTER INDEX index_name ON schema.table_name REBUILD WITH (ONLINE=ON, FILLFACTOR = 80, SORT_IN_TEMPDB = ON, STATISTICS_NORECOMPUTE = ON)
 
-ALTER INDEX PK_Employee_BusinessEntityID ON HumanResources.Employee REBUILD;
+ALTER INDEX PK_Employee_BusinessEntityID ON HumanResources.Employee REBUILD WITH (SORT_IN_TEMPDB = ON);
 
 ALTER INDEX ALL ON HumanResources.Employee REORGANIZE;
 
@@ -177,6 +177,12 @@ order by avg_fragmentation_in_percent desc
 -- different ways to maintain index
 ALTER INDEX ALL ON Production.Product REBUILD WITH (ONLINE=ON, FILLFACTOR = 80, SORT_IN_TEMPDB = ON, STATISTICS_NORECOMPUTE = ON)
 
-ALTER INDEX PK_Employee_BusinessEntityID ON HumanResources.Employee REBUILD;
+ALTER INDEX PK_Employee_BusinessEntityID ON HumanResources.Employee REBUILD WITH (SORT_IN_TEMPDB = ON);;
 
 ALTER INDEX ALL ON HumanResources.Employee REORGANIZE;
+
+
+--Remember if you didn't use SORT_IN_TEMPDB, please check the log use space : 
+DBCC SQLPERF(LOGSPACE); -- Monitor transaction log size then shrink to desired size
+DBCC SHRINKFILE (YourLogFileLogicalName, DesiredSizeInMB);
+
