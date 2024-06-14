@@ -23,7 +23,7 @@ IF EXISTS (SELECT spid FROM sys.sysprocesses WHERE dbid = @dbid)
     --Kill any connections while you are on master
 	USE master
     DECLARE SysProc CURSOR LOCAL FORWARD_ONLY DYNAMIC READ_ONLY FOR
-    SELECT spid FROM master.dbo.sysprocesses WHERE dbid = @dbid
+    SELECT spid FROM master.dbo.sysprocesses WHERE dbid = @dbid and spid <> @@SPID
     OPEN SysProc
     FETCH NEXT FROM SysProc INTO @SysProcId
     WHILE @@FETCH_STATUS = 0
