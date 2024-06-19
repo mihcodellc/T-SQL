@@ -48,6 +48,10 @@ ALTER EVENT SESSION [WorkloadCapture] ON SERVER STATE = STOP;
 
 --You can export and analyze this data using various tools, such as SSMS, PowerShell, or custom scripts.
 
+--***Configure Distributed Replay for Database Experimentation Assistant 
+-- https://learn.microsoft.com/en-us/sql/dea/database-experimentation-assistant-configure-replay?view=sql-server-ver16
+
+
 --For replay
 --S:\MSSQL\SQLOS-x86\140\Tools\DReplayController
 --S:\MSSQL\SQLOS-x86\140\Tools\DReplayClient\Log
@@ -68,7 +72,7 @@ https://learn.microsoft.com/en-us/sql/tools/distributed-replay/configure-distrib
 --restart SQL Replay Controler, SQL Replay CLient then read the log of client 
 --    or dreplay.exe status -f 1 --status
 --replay admin tools is included the last time in SSMS installation not SQL Server installation
---
+-- locate here : S:\MSSQL\SQLOS-x86\140\Tools\Binn\DReplay.exe once SSMS is installed
 dreplay.exe status -f 1 --status
   
 Info DReplay    Usage:
