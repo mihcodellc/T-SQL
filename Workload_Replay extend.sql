@@ -61,6 +61,7 @@ The Distributed Replay Controller has been removed from SQL Server 2022 (16.x) S
     New way for replay: use Replay Markup Language (RML) Utilities, which includes ostress, to replay a workload.
     >>https://learn.microsoft.com/en-us/troubleshoot/sql/tools/replay-markup-language-utility
     to download and details
+    once install go to C:\Program Files\Microsoft Corporation\RMLUtils
 --S:\MSSQL\SQLOS-x86\140\Tools\DReplayController
 --S:\MSSQL\SQLOS-x86\140\Tools\DReplayClient\Log
 --install from sql installer Replay Controller then REplay client on each machien supposed to run the worload
