@@ -65,6 +65,8 @@ ALTER EVENT SESSION [WorkloadCapture] ON SERVER STATE = STOP;
 --    computer name if not local
 https://learn.microsoft.com/en-us/sql/tools/distributed-replay/configure-distributed-replay?view=sql-server-ver16#DReplayController
 
+--restart SQL Replay Controler, SQL Replay CLient then read the log of client 
+--    or dreplay.exe status -f 1 --status
 --replay admin tools is included the last time in SSMS installation not SQL Server installation
 --
 dreplay.exe status -f 1 --status
