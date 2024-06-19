@@ -53,6 +53,14 @@ ALTER EVENT SESSION [WorkloadCapture] ON SERVER STATE = STOP;
 
 
 --For replay
+--https://learn.microsoft.com/en-us/sql/tools/distributed-replay/sql-server-distributed-replay?view=sql-server-ver16
+The Distributed Replay Controller has been removed from SQL Server 2022 (16.x) Setup, and 
+    the Distributed Replay Client is no longer available in SQL Server Management Studio (SSMS) starting with version 18. 
+    To obtain the Distributed Replay Controller, you must install SQL Server 2019 (15.x) or an earlier version. 
+    To obtain the Distributed Replay Client, you must install SSMS 17.9.1.
+    New way for replay: use Replay Markup Language (RML) Utilities, which includes ostress, to replay a workload.
+    >>https://learn.microsoft.com/en-us/troubleshoot/sql/tools/replay-markup-language-utility
+    to download
 --S:\MSSQL\SQLOS-x86\140\Tools\DReplayController
 --S:\MSSQL\SQLOS-x86\140\Tools\DReplayClient\Log
 --install from sql installer Replay Controller then REplay client on each machien supposed to run the worload
@@ -71,7 +79,6 @@ https://learn.microsoft.com/en-us/sql/tools/distributed-replay/configure-distrib
 
 --restart SQL Replay Controler, SQL Replay CLient then read the log of client 
 --    or dreplay.exe status -f 1 --status
---replay admin tools is included the last time in SSMS installation not SQL Server installation
 -- locate here : S:\MSSQL\SQLOS-x86\140\Tools\Binn\DReplay.exe once SSMS is installed
 dreplay.exe status -f 1 --status
   
@@ -85,9 +92,11 @@ Verbs:
  cancel     Cancel the current operation on the controller.
  -?         Display the command syntax summary.
 
-Options:
+Options examples:
  dreplay preprocess [-m controller] -i input_trace_file -d controller_working_dir [-c config_file] [-f status_interval]
  dreplay replay [-m controller] -d controller_working_dir [-o] [-s target_server] -w clients [-c config_file] [-f status_interval]
  dreplay status [-m controller] [-f status_interval]
  dreplay cancel [-m controller] [-q]
  Run dreplay <verb> -? for detailed help on each verb.
+
+  
