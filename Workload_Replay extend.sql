@@ -58,6 +58,13 @@ ALTER EVENT SESSION [WorkloadCapture] ON SERVER STATE = STOP;
 --netsh advfirewall firewall add rule name="allow dreplay controller" dir=in program="S:\MSSQL\SQLOS-x86\140\Tools\DReplayController\DReplayController.exe" action=allow
 --netsh advfirewall firewall add rule name="allow dreplay client" dir=in program="S:\MSSQL\SQLOS-x86\140\Tools\DReplayClient\DReplayClient.exe" action=allow
 
+--make sure the config file are properly set for client and controller
+--in client config file, <Controller> is 
+--     "localhost" or "." to refer to the local computer
+-- OR
+--    computer name if not local
+https://learn.microsoft.com/en-us/sql/tools/distributed-replay/configure-distributed-replay?view=sql-server-ver16#DReplayController
+
 --replay admin tools is included the last time in SSMS installation not SQL Server installation
 --
 dreplay.exe status -f 1 --status
