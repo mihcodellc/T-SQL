@@ -1,41 +1,14 @@
---https://sqlperformance.com/2020/04/sql-indexes/an-approach-to-index-tuning-part-2
--- https://sqlperformance.com/2020/03/sql-indexes/an-approach-to-index-tuning-part-1
--- https://www.sqlskills.com/blogs/jonathan/finding-what-queries-in-the-plan-cache-use-a-specific-index/
-
---One way to test the consolidated index is to use hint to force its use and compare to the existing
---compare to missing indexes
--- you still need to find relevant queries to test with
--- disable current - test new -  drop current OR new depending of benefits (duration, reads/write, user's queries, CPU, memories ...)
-
--- ****Monitor index size
-SELECT 
-    OBJECT_NAME(i.object_id) AS TableName,
-    i.name AS IndexName,
-    i.index_id,
-    (8.000/1024) * SUM(a.used_pages) AS IndexSizeMB
-FROM 
-    sys.indexes AS i
-    JOIN sys.partitions AS p ON p.object_id = i.object_id AND p.index_id = i.index_id
-    JOIN sys.allocation_units AS a ON a.container_id = p.partition_id
-GROUP BY 
-    i.object_id, i.index_id, i.name
-ORDER BY 
-    IndexSizeMB DESC;
-
-DBCC SQLPERF(LOGSPACE); -- Monitor transaction log size
-
-
 set transaction isolation level read uncommitted
 set nocount on
 
--- ****no foreign key
+-- no foreign key
 	           select  name FK_name, schema_name(fk.schema_id) + '.' + object_name(fk.parent_object_id) + '.' +col_name(fk.parent_object_id,fkc.parent_column_id) InColName,  object_name(fk.referenced_object_id) refTable ,
 			 fk.is_disabled, fk.is_not_trusted, 
 			 fk.delete_referential_action_desc d_action, fk.update_referential_action_desc u_action 
 			 from sys.foreign_keys fk
 			 join sys.foreign_key_columns fkc on fk.object_id = fkc.constraint_object_id
 			 where --fk.is_disabled = 0 and 
-			 object_name(fk.referenced_object_id) = parsename(quotename('PayerProvider'),1)
+			 object_name(fk.referenced_object_id) = parsename(quotename('Exceptions'),1)
 			 union all
 			 select  name FK_name, schema_name(fk.schema_id) + '.' + object_name(fk.parent_object_id) + '.' +col_name(fk.parent_object_id,fkc.parent_column_id) InColName,  object_name(fk.referenced_object_id) refTable ,
 			 fk.is_disabled, fk.is_not_trusted, 
@@ -43,28 +16,33 @@ set nocount on
 			 from sys.foreign_keys fk
 			 join sys.foreign_key_columns fkc on fk.object_id = fkc.constraint_object_id
 			 where --fk.is_disabled = 0 and 
-			 object_name(fk.parent_object_id) = parsename(quotename('PayerProvider'),1)
+			 object_name(fk.parent_object_id) = parsename(quotename('Exceptions'),1)
 
-exec sp_SQLskills_helpindex @objname= PayerProvider
-exec sp_SQLskills_ListIndexForConsolidation @ObjName = PayerProvider, @expandGroup = 0
-exec sp_SQLskills_ListIndexForConsolidation @ObjName = PayerProvider,  @KeysFilter = '[ProviderId]', @expandGroup = 0
-exec sp_SQLskills_ListIndexForConsolidation @ObjName = PayerProvider,  @KeysFilter = '[DtOfDemandDeposit]', @expandGroup = 0
 
-exec sp_SQLskills_ListIndexForConsolidation @ObjName = PayerProvider, @indnameKey ='[IX_PayerProvider]' , @isShowSampleQuery = 1
+
+exec sp_SQLskills_ListIndexForConsolidation @ObjName = LockboxDocumentTracking, @expandGroup = 0
+exec sp_SQLskills_helpindex @objname= LockboxDocumentTracking
+exec sp_SQLskills_ListIndexForConsolidation @ObjName = LockboxDocumentTracking, @indnameKey ='[IX_LockboxDocumentTracking_GUIrecon_dteffective_paymentid_providerid_consolidated835filename_amtcheck_dd_MORE_inc_20220413]' , @isShowSampleQuery = 1
 
 --hist, index isssue, read/write
-EXEC dba_db.dbo.sp_BlitzIndex     @DatabaseName='MedRx', @SchemaName='dbo', @TableName='Payments'
--- check usage from sp_BlitzIndex in a table
-select index_id id, run_datetime whe, index_usage_summary, reads_per_write, index_op_stats, * from dbaDB.dbo.BlitzIndex
-where table_name = 'KFIWork' 
-and run_datetime <='2023-07-19 19:25:00.000'
-and index_id in(37,11,17,20)
-order by run_datetime desc, index_id desc
-	
+EXEC RmsAdmin.dbo.sp_BlitzIndex_new     @DatabaseName='MedRx', @SchemaName='dbo', @TableName='Payments'
 
-CREATE INDEX [IX_PayerProvider_Lbxid_inc_20220427] ON [dbo].[PayerProvider] ( [lbxId] ) INCLUDE ( [id]) WITH (FILLFACTOR=95, ONLINE=?, SORT_IN_TEMPDB=?, DATA_COMPRESSION=?);
+select index_id id, run_datetime whe, index_usage_summary, reads_per_write, index_op_stats, * from rmsadmin.dbo.BlitzIndex
+where table_name = 'Exceptions' 
+--and run_datetime <='2023-07-19 19:25:00.000'
+and index_id in(40,3)
+order by run_datetime desc, index_id desc
+
+--!!!Important!!!
+--1 create a solution index WITHOUT dropping or modifying (drop_existing=ON) an existing index
+--2 deploying an index if it doesn't work we can drop later it. as long as space is enough to create it
+--3 you can remove an index with rollback statement ready; then plan for putting it back, if a db client starts bugging down
+
+CREATE INDEX [IX_LockboxDocumentTracking_Lbxid_inc_20220427] ON [dbo].[LockboxDocumentTracking] ( [lbxId] ) 
+INCLUDE ( [id]) WITH (FILLFACTOR=95, ONLINE=ON, SORT_IN_TEMPDB=?, DATA_COMPRESSION=?);
 
 set transaction isolation level read uncommitted
 set nocount on
-exec sp_SQLskills_ListIndexForConsolidation @ObjName = PayerProvider, @indnameKey ='[IX_PayerProvider_depositdetailid_lbxid_id]' , @isShowSampleQuery = 1
+exec sp_SQLskills_ListIndexForConsolidation @ObjName = LockboxDocumentTracking, @indnameKey ='[IX_LockboxDocumentTracking_depositdetailid_lbxid_id]' , @isShowSampleQuery = 1
+
 
