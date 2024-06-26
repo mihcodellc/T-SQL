@@ -3,12 +3,12 @@ exec [RmsAdmin].[dbo].[sp_BlitzWho_test] @ExpertMode = 1 --cached_parameter_info
   --,@OutputDatabaseName = 'RmsAdmin' 
   --,@OutputSchemaName = 'dbo'  
   --,@OutputTableName = 'BlitzWho'
-  , @sortOrder= 'host_name' --database_name/*Monktar added elapsed_time desc*/
+  , @sortOrder= 'request_cpu_time' --database_name/*Monktar added elapsed_time desc*/
 						  --, request_cpu_time, elapsed_time, request_logical_reads,request_physical_reads, request_writes, grant_memory_kb kill 2620
 						  --, login_name, --- [blocking_session_id], host_name
 go
 
-create PROCEDURE [dbo].[sp_BlitzWho_Easy_Read] @Help TINYINT = 0
+create or ALTER PROCEDURE [dbo].[sp_BlitzWho_test] @Help TINYINT = 0
 	,@ShowSleepingSPIDs TINYINT = 0
 	,@ExpertMode BIT = 0
 	,@Debug BIT = 0
@@ -1061,7 +1061,7 @@ SELECT @StringToExecute = @StringToExecute + N'
 		SET @StringToExecute += N' ) ';
 	END
 
-	SET @StringToExecute += N' ORDER BY ' + CASE 
+	SET @StringToExecute += N' ORDER BY ' + CASE --- [blocking_session_id]
 			WHEN @SortOrder = 'host_name'
 				THEN '[host_name] ASC, [blocking_session_id] DESC'
 			WHEN @SortOrder = 'blocking_session_id'
