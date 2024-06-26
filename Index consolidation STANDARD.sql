@@ -37,6 +37,9 @@ order by run_datetime desc, index_id desc
 --1 create a solution index WITHOUT dropping or modifying (drop_existing=ON) an existing index
 --2 deploying an index if it doesn't work we can drop later it. as long as space is enough to create it
 --3 you can remove an index with rollback statement ready; then plan for putting it back, if a db client starts bugging down
+--4 no more 5 keys columns and 10 in includes
+--5 test your script is error free and a gain in performance before deploying whenever is possible
+	
 
 CREATE INDEX [IX_LockboxDocumentTracking_Lbxid_inc_20220427] ON [dbo].[LockboxDocumentTracking] ( [lbxId] ) 
 INCLUDE ( [id]) WITH (FILLFACTOR=95, ONLINE=ON, SORT_IN_TEMPDB=?, DATA_COMPRESSION=?);
