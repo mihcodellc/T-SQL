@@ -1,13 +1,8 @@
 status 12/10/2021
 We have the following set to COMPATIBILITY 2008(100) :
-ThinkHealth_YCOOKC
-ThinkHealth_Hope
-ThinkHealth_YCOTFC
-ThinkHealth_Archive_SWYF
-ThinkHealth_Archive_YCOWest
-ThinkHealth_Archive_YCOTFC
 
-Only ThinkHealth_Hope has Query Store enabled. We need to turn on  Query Store on the others.
+
+Only ?? db has Query Store enabled. We need to turn on  Query Store on the others.
 ALTER DATABASE <database_name>
 	SET QUERY_STORE = ON (OPERATION_MODE = READ_WRITE); -- (with cleanup policy well define)
 	
@@ -51,9 +46,16 @@ Process to apply the last to steps:
 
 
 suggestions to detect soon release issues:
-have important queries in QUERY STORE tracked in 3 or 4 dbs representing the main workloads types in Orion's Agencies
+have important queries in QUERY STORE tracked in 3 or 4 dbs representing the main workloads types in company's Agencies
 get run these screens using them just before and after a deployment 
 monitoring performance of these queries after the deployment using query store
+
+
+-- Select statement with a hint to use legacy cardinality estimation
+SELECT *
+FROM YourTable
+OPTION (USE HINT ('FORCE_LEGACY_CARDINALITY_ESTIMATION'));
+		
 
 
 
