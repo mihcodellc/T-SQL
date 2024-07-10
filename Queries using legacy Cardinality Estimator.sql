@@ -27,3 +27,8 @@ CROSS APPLY sys.dm_exec_sql_text(qs.sql_handle) AS st
 CROSS APPLY sys.dm_exec_query_plan(qs.plan_handle) AS qp
 WHERE query_plan.value('declare namespace p="http://schemas.microsoft.com/sqlserver/2004/07/showplan"; min(//p:StmtSimple/@CardinalityEstimationModelVersion)', 'int') < @v * 10
 OPTION (RECOMPILE) ;
+
+-- Select statement with a hint to use legacy cardinality estimation
+SELECT *
+FROM YourTable
+OPTION (USE HINT ('FORCE_LEGACY_CARDINALITY_ESTIMATION'));
