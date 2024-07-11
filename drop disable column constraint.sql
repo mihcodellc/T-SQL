@@ -51,6 +51,7 @@ ALTER TABLE YourTableName CHECK CONSTRAINT YourConstraint
 EXEC sp_msforeachtable "ALTER TABLE ? NOCHECK CONSTRAINT all"
 -- Enable all constraints for database
 EXEC sp_msforeachtable "ALTER TABLE ? WITH CHECK CHECK CONSTRAINT all"
+EXEC sp_msforeachtable "ALTER TABLE ? WITH NOCHECK CHECK CONSTRAINT all" --if previous failed 		
 
 
 --disable FK 
