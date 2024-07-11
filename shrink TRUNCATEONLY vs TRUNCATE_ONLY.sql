@@ -9,12 +9,23 @@
 -- thereby letting the DBA run a DBCC SHRINKFILE
 
 ----or
+-- ***DB size: 
+EXEC sp_helpdb;
 ---- https://docs.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-shrinkfile-transact-sql?redirectedfrom=MSDN&view=sql-server-ver16
 --SELECT file_id, name  
 --FROM sys.database_files;  
 --GO  
+-- DBCC SHRINKFILE reduces to the file creation size.
 --use TestBello
---DBCC SHRINKFILE (4, TRUNCATEONLY); 
+--DBCC SHRINKFILE (4, NOTRUNCATE); -- move pages but not returned to OS
+--DBCC SHRINKFILE (4, TRUNCATEONLY); ---- return to OS but not moving pages
+--DBCC SHRINKFILE (4, TRUNCATEONLY); ---- return to OS but not moving pages
+-- DBCC SHRINKFILE (data_fiel_name, <target_size>); --size in megabyte 
+
+CHECKPOINT 
+DBCC DROPCLEANBUFFERS
+DBCC FREEPROCCACHE
+
 
 
 -- No confusion with 
@@ -24,4 +35,4 @@
 
 --or
 --shrink log if not enough shrink data
---DBCC SHRINKFILE (MedRx_Log, 148736); 
+--DBCC SHRINKFILE (data_fiel_name, 148736);  --size in megabyte 
