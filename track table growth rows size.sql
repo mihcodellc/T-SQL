@@ -41,8 +41,12 @@
 
 
 
-create table #t (name_table nvarchar(128), rows nvarchar(128), reserved nvarchar(128), 
-data nvarchar(128), index_size nvarchar(128), unused nvarchar(128))
+--create table #t (name_table nvarchar(128), rows nvarchar(128), reserved nvarchar(128), 
+--data nvarchar(128), index_size nvarchar(128), unused nvarchar(128))
+CREATE TABLE #t (
+	[name_table] [nvarchar](128) NULL,	[rows] [bigint] NULL,[reserved] [bigint] NULL,
+	[data] [bigint] NULL,[index_size] [bigint] NULL,	[unused] [bigint] NULL
+)
 
 use UserDB
 declare @clause nvarchar(2000)
@@ -58,13 +62,22 @@ end catch
 
 Insert into DBA_DB.dbo.Tables_growth
 select name_table,
-convert(bigint,rows)  rows,
-convert(bigint,substring(reserved,0,CHARINDEX(' ', reserved)))/1024 reserved_MB,
-convert(bigint,substring(data,0,CHARINDEX(' ', data)))/1024 data_MB,
-convert(bigint,substring(index_size,0,CHARINDEX(' ', index_size)))/1024 index_size_MB,
-convert(bigint,substring(unused,0,CHARINDEX(' ', unused)))/1024 unused_MB, GETDATE(), DB_NAME() 
+  rows,
+reserved as reserved_MB,
+data as data_MB,
+index_size as index_size_MB,
+unused as unused_MB, GETDATE(), DB_NAME() 
  from #t
 where rows > 0 order by data_MB desc, name_table     
+    
+--select name_table,
+--convert(bigint,rows)  rows,
+--convert(bigint,substring(reserved,0,CHARINDEX(' ', reserved)))/1024 reserved_MB,
+--convert(bigint,substring(data,0,CHARINDEX(' ', data)))/1024 data_MB,
+----convert(bigint,substring(index_size,0,CHARINDEX(' ', index_size)))/1024 index_size_MB,
+--convert(bigint,substring(unused,0,CHARINDEX(' ', unused)))/1024 unused_MB, GETDATE(), DB_NAME() 
+-- from #t
+--where rows > 0 order by data_MB desc, name_table     
 
 if object_id('tempdb..#t') is not null
     drop table #t
