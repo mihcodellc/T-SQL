@@ -39,6 +39,7 @@ order by run_datetime desc, index_id desc
 --3 you can remove an index with rollback statement ready; then plan for putting it back, if a db client starts bugging down
 --4 no more 5 keys columns and 10 in includes
 --5 test your script is error free and a gain in performance before deploying whenever is possible
+--6 consider the cost/size of your new index versus the existing indexes having the columns needed by the query to optimize 
 	
 
 CREATE INDEX [IX_LockboxDocumentTracking_Lbxid_inc_20220427] ON [dbo].[LockboxDocumentTracking] ( [lbxId] ) 
