@@ -11,7 +11,9 @@ SELECT name,*
 FROM msdb..sysjobs
 WHERE owner_sid = SUSER_SID('mbello')
 
--- **********CLOSE ALL CONNECTIONS ON THE DATABASE  
+-- **********CLOSE ALL CONNECTIONS ON THE DATABASE 
+use master 
+go
 DECLARE @dbid INT, @KillStatement char(30), @SysProcId smallint
 --define the targeted database 
 SELECT @dbid = dbid FROM sys.sysdatabases WHERE name = 'MydataBase' 
