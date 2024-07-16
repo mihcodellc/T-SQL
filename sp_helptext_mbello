@@ -1,0 +1,23 @@
+USE [master]
+GO
+/****** Object:  StoredProcedure [sys].[sp_helptext_mbello]    Script Date: 8/21/2023 5:04:10 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+Create or ALTER   procedure [dbo].[sp_helptext_mbello]
+	@objname nvarchar(776) = NULL		-- object name we're after
+as
+-- created 7/16/2024 by Monktar Bello: added the content/definition/text of the object
+
+begin
+
+	SELECT OBJECT_DEFINITION (OBJECT_ID(@objname)) as itsContent -- instead of sp_helptext lacking to retun as-is; truncation happened
+
+	return (0) -- sp_help
+end
+
+go
+
+EXEC sys.sp_MS_marksystemobject 'sp_helptext_mbello';
+GO
