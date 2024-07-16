@@ -9,6 +9,7 @@ create or ALTER procedure dbo.[sp_help_user]
 	@objname nvarchar(776) = NULL		-- object name we're after
 as
 -- created 8/21/2023 from ms sp_help to use sqlskills and order table's columns
+-- 7/16/2024 by Monktar Bello: added the content/definition/text of the object
 begin
 	-- PRELIMINARY
 	set nocount on
@@ -237,6 +238,8 @@ begin
 		raiserror(15470,-1,-1,@objname) -- No foreign keys reference table '%ls'.
 		EXEC sys.sp_helpindex @objname
 	end
+	
+	SELECT OBJECT_DEFINITION (OBJECT_ID(@objname)) as itsContent -- instead of sp_help lacking to retun as-is; truncation happened
 
 	return (0) -- sp_help
 end
