@@ -1,3 +1,4 @@
+--give a try with https://github.com/spaghettidba/CodeSamples/tree/master/UsingWorkloadToolsToModernize
 CREATE EVENT SESSION [WorkloadCapture] ON SERVER 
 ADD EVENT sqlserver.attention(
     ACTION(package0.event_sequence,sqlserver.client_app_name,sqlserver.client_hostname,sqlserver.client_pid,sqlserver.database_id,sqlserver.database_name,sqlserver.is_system,sqlserver.nt_username,sqlserver.request_id,sqlserver.server_instance_name,sqlserver.server_principal_name,sqlserver.session_id)),
