@@ -1,0 +1,57 @@
+Performance Tips
+
+
+*** Fragmentation
+*** Index size
+*** Non covering index
+*** Functions on columns, non equality predicates
+Arithmetic operations
+*** Significant portion of the index needs to be read
+*** Like and leading wildcard
+***Inequality Conditions:** such as `<>`, `!=`, `NOT IN`, or `NOT EXISTS`
+*** OR conditions especially if no single index can cover
+*** Low Selectivity:** If the filter condition is not selective enough
+*** Joins on Non-Indexed Columns
+sorting or aggregating a large result set
+*** Missing Statistics
+*** Non indexes on columns frequently used in WHERE clauses, JOIN conditions, and ORDER BY clauses.
+*** put together all filters of a table instead spread out
+
+
+### 1. **Design Efficient Data Model**
+- **Star Schema vs. Snowflake Schema:** Choose the schema that best suits your performance needs. Star schemas typically provide better query performance.
+- **Fact Table Design:** Ensure that fact tables are properly indexed and partitioned.
+- **Dimension Table Design:** Keep dimension tables concise and relevant to the analysis.
+### 2. **Optimize Aggregations**
+- **Aggregation Design:** Use the Aggregation Design Wizard to create and manage aggregations. Aggregations pre-calculate and store summarized data to speed up queries.
+- **Usage-Based Optimization:** Use the Usage-Based Optimization Wizard to create aggregations based on actual query patterns, ensuring that the most frequently accessed data is pre-aggregated.
+### 3. **Partitioning**
+- **Partition Large Tables:** Partition large fact tables to improve processing time and query performance. Partitions allow parallel processing and querying of data.
+- **Incremental Processing:** Use incremental processing for partitions to update only the changed data, reducing processing time.
+### 4. **Hierarchies and Attribute Relationships**
+- **Define Hierarchies:** Properly define natural hierarchies in dimensions to enhance query performance.
+- **Attribute Relationships:** Establish attribute relationships in dimensions to optimize the storage and retrieval of data.
+### 5. **Compression and Storage Settings**
+- **Compression:** Use data compression techniques to reduce the storage footprint and improve query performance.
+- **Storage Modes:** Choose the appropriate storage mode (MOLAP, ROLAP, HOLAP) based on the performance requirements and data update frequency.
+• MOLAP: Fast query performance, higher storage requirements, slower updates.
+• ROLAP: Lower storage requirements, suitable for large datasets, slower query performance, quicker updates.
+• HOLAP: Balance between MOLAP and ROLAP, moderate storage and performance, suitable for mixed scenarios.
+### 6. **Caching and Memory Settings**
+- **Proactive Caching:** Configure proactive caching to balance the need for real-time data with query performance.
+- **Memory Configuration:** Optimize the memory settings in SSAS to ensure that sufficient memory is available for processing and querying operations.
+### 7. **Query Optimization**
+- **MDX Query Optimization:** Optimize MDX queries by using efficient query patterns, such as avoiding unnecessary calculations and using nonempty clauses.
+- **Calculated Members:** Optimize the use of calculated members by pre-calculating where possible and avoiding complex calculations at query time.
+### 8. **Processing Optimization**
+- **Process in Parallel:** Use parallel processing where possible to reduce the overall processing time.
+- **Process Priority:** Adjust the processing priority settings to balance between processing and query performance.
+### 9. **Monitoring and Performance Tuning**
+- **Profiler and Performance Counters:** Use SQL Server Profiler and performance counters to monitor and analyze the performance of the SSAS server.
+- **Identify Bottlenecks:** Identify and address bottlenecks in processing and querying operations.
+### 10. **Indexing and Defragmentation**
+- **Index Optimization:** Ensure that appropriate indexes are in place on the underlying relational database tables.
+- **Defragmentation:** Regularly defragment indexes to maintain optimal query performance.
+### Summary
+By implementing these optimization techniques, you can significantly improve the performance of your SSAS cubes, leading to faster query responses, efficient processing times, and better resource utilization. 
+The goal is to provide a seamless and efficient experience for end-users who rely on the cube data for their analytical needs.
