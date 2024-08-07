@@ -30,6 +30,15 @@ Drop login [mbello];
 --orphan in database ie user but no login
 exec sp_change_users_login @Action='Report'
 
+	--if the sp don't exist
+	SELECT dp.name AS OrphanedUser
+	FROM sys.database_principals AS dp
+	LEFT JOIN sys.server_principals AS sp
+	ON dp.sid = sp.sid
+	WHERE sp.sid IS NULL
+	AND dp.type IN ('S', 'U');
+
+
 ---- orphan user from all db on the instance' this can be error: 
 	--Cannot execute as the database principal because the principal, this type of principal cannot be impersonated, or you do not have permission.
 
