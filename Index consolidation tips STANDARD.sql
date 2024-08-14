@@ -36,7 +36,7 @@ order by run_datetime desc, index_id desc
 --!!!Important!!!
 --0 optimizer uses all stats of existing indexes(user, sys indexes) on the tables, even they are NOT marked as  seeked or scanned on you query plan
 --	hence, some create index OR query maybe quicker because of those stats
---	hence, never assume that the index is not mentioned as USED for your query, you can drop it without drawbacks. Test, test, test
+--	hence, never assume that the index is not mentioned as USED for your query looking at query plan, you can drop it without drawbacks. Test, test, test
 --1 create a solution index WITHOUT dropping or modifying (drop_existing=ON) an existing index
 --2 deploying an index if it doesn't work we can drop later it. as long as space is enough to create it
 --3 you can drop an index with rollback create statement ready; then plan for putting it back, if a db client starts bugging down
