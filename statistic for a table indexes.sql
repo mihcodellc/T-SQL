@@ -31,6 +31,28 @@ and
 auto_created = 0 -- keyColumns is not null
 order by 2 
 
+--stats' status
+SELECT name AS stats_name,   
+    STATS_DATE(object_id, stats_id) AS statistics_update_date  
+FROM sys.stats   
+WHERE object_id = OBJECT_ID('dbo.Payments') and name like 'IX%413' order by 1;  
+
+--create stats
+--CREATE STATISTICS Products ON Production.Product ([Name], ProductNumber)  WITH SAMPLE 50 PERCENT
+
+
+--Update Stats
+--EXEC sp_updatestats; all stats
+UPDATE STATISTICS Sales.SalesOrderDetail(Index_SalesOrderDetail_rowguid) WITH SAMPLE 1 PERCENT; 
+	--or
+	--UPDATE STATISTICS Sales.SalesOrderDetail; 
+	--UPDATE STATISTICS Sales.SalesOrderDetail Index_SalesOrderDetail_rowguid;  
+
+-- alter index to update stats
+ALTER INDEX [Index_SalesOrderDetail_rowguid] ON Sales.SalesOrderDetail rebuild with (ONLINE=ON)
+--ALTER INDEX IX_anIndex_name ON dbo.ordersTable REBUILD; -- >70/80
+--ALTER INDEX ALL ON dbo.ordersTable REORGANIZE; -- <30 and > 5 	
+
 
 
 -- ****** for the table +  fragmentation + full histogram per index
@@ -124,12 +146,6 @@ OPTION (querytraceon 9292,querytraceon 9204,querytraceon 3604)
 
 
 
-UPDATE STATISTICS Sales.SalesOrderDetail; 
-UPDATE STATISTICS Sales.SalesOrderDetail Index_SalesOrderDetail_rowguid;  
-
-ALTER INDEX [Index_SalesOrderDetail_rowguid] ON Sales.SalesOrderDetail rebuild with (ONLINE=ON)
---ALTER INDEX IX_anIndex_name ON dbo.ordersTable REBUILD; -- >70/80
---ALTER INDEX ALL ON dbo.ordersTable REORGANIZE; -- <30 and > 5 	
 
 
 
