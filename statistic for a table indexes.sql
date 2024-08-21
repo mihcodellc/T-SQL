@@ -91,12 +91,12 @@ BEGIN
 	--fragmentation
 	SELECT [object_id], [index_id], [partition_number], [avg_fragmentation_in_percent], 
 	[page_count], record_count, index_type_desc, alloc_unit_type_desc, avg_page_space_used_in_percent
-	FROM sys.dm_db_index_physical_stats (DB_ID(), object_id(@table), @@indexID, NULL, 'SAMPLED') nolock
+	FROM sys.dm_db_index_physical_stats (DB_ID(), object_id(@table), @indexID, NULL, 'SAMPLED') nolock
 
 	DBCC SHOW_STATISTICS (@table,@index) --with STAT_HEADER, DENSITY_VECTOR, HISTOGRAM         
 	   SELECT '********************************************************************************************************************************************'
 	   
-   FETCH NEXT FROM MyStats INTO @table, @index    
+   FETCH NEXT FROM MyStats INTO @table, @index, @indexID      
 END   
 CLOSE MyStats;  
 DEALLOCATE MyStats;  
