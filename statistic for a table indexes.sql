@@ -37,6 +37,8 @@ SELECT name AS stats_name,
 FROM sys.stats   
 WHERE object_id = OBJECT_ID('dbo.Payments') and name like 'IX%413' order by 1;  
 
+DBCC SHOW_STATISTICS (@table,@index)
+
 --fragmentation stat
 -- read before and after defragmentation 
 --select ObjectName, index_name, avg_fragmentation_in_percent, TimeChecked,page_count,alloc_unit_type_desc,Average_page_density, 
