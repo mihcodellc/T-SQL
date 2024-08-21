@@ -37,6 +37,15 @@ SELECT name AS stats_name,
 FROM sys.stats   
 WHERE object_id = OBJECT_ID('dbo.Payments') and name like 'IX%413' order by 1;  
 
+--fragmentation stat
+-- read before and after defragmentation 
+--select ObjectName, index_name, avg_fragmentation_in_percent, TimeChecked,page_count,alloc_unit_type_desc,Average_page_density, 
+--	   page_count * 8.0*0.00000095367432 as Size --1KB = 0.00000095367432 and a page = 8KB
+--	   , (select sum(row_count) from sys.dm_db_partition_stats st where st.object_id = object_id('schema.table') and st.index_id < 2) numberOfRows
+--from maintenance.dbo.indexFragmentation
+--where index_name in('ix_name') --and alloc_unit_type_desc = 'IN_ROW_DATA'
+--order by index_name, TimeChecked desc
+
 --create stats
 --CREATE STATISTICS Products ON Production.Product ([Name], ProductNumber)  WITH SAMPLE 50 PERCENT
 
