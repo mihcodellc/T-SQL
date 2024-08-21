@@ -14,6 +14,7 @@ Arithmetic operations
 *** Joins on Non-Indexed Columns
 sorting or aggregating a large result set : limit on col, top x rows, more conditions, ... 
 *** Missing Statistics
+update stats on sample 1% for example
 *** Non indexes on columns frequently used in WHERE clauses, JOIN conditions, and ORDER BY clauses.
 
 
