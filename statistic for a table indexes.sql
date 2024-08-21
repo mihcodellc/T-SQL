@@ -126,3 +126,6 @@ OPTION (querytraceon 9292,querytraceon 9204,querytraceon 3604)
 
 UPDATE STATISTICS Sales.SalesOrderDetail; 
 UPDATE STATISTICS Sales.SalesOrderDetail Index_SalesOrderDetail_rowguid;  
+
+ALTER INDEX [Index_SalesOrderDetail_rowguid] ON Sales.SalesOrderDetail rebuild with (ONLINE=ON)
+
