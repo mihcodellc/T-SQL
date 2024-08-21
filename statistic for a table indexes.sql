@@ -77,7 +77,7 @@ select @db = DB_NAME(), @searchTable = 'Mytable', @tableSchema = 'MySchema'
 DECLARE MyStats CURSOR FOR   
 	select distinct @tableSchema+'.'+OBJECT_NAME(st.object_id), ix.name, st.index_id --, st.* 
 	from sys.dm_db_index_usage_stats st
-	join sys.indexes ix on st.object_id = ix.object_id
+	join sys.indexes ix on st.object_id = ix.object_id and ix.index_id = st.index_id
 	where DB_NAME(database_id) = @db 
 	and OBJECT_NAME(st.object_id) = @searchTable
 	--and ix.name='x'
@@ -88,7 +88,7 @@ FETCH NEXT FROM MyStats INTO @table, @index, @indexID
   
 WHILE @@FETCH_STATUS = 0  
 BEGIN  
-	--fragmentation
+	--fragmentation -- can be commented out if take too long
 	SELECT [object_id], [index_id], [partition_number], [avg_fragmentation_in_percent], 
 	[page_count], record_count, index_type_desc, alloc_unit_type_desc, avg_page_space_used_in_percent
 	FROM sys.dm_db_index_physical_stats (DB_ID(), object_id(@table), @indexID, NULL, 'LIMITED') nolock
