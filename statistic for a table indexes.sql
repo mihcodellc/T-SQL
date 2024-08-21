@@ -128,4 +128,8 @@ UPDATE STATISTICS Sales.SalesOrderDetail;
 UPDATE STATISTICS Sales.SalesOrderDetail Index_SalesOrderDetail_rowguid;  
 
 ALTER INDEX [Index_SalesOrderDetail_rowguid] ON Sales.SalesOrderDetail rebuild with (ONLINE=ON)
+--ALTER INDEX IX_anIndex_name ON dbo.ordersTable REBUILD; -- >70/80
+--ALTER INDEX ALL ON dbo.ordersTable REORGANIZE; -- <30 and > 5 	
+
+
 
