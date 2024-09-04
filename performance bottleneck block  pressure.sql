@@ -92,7 +92,7 @@ https://app.slack.com/client/T1LTZ0BQV/C1MS1RA4B
 
 
 	
---CPU pressure & memory pressure: resmon, perfmon whether SQL or VM
+--****CPU pressure & memory pressure: resmon, perfmon whether SQL or VM
 -- https://learn.microsoft.com/en-us/troubleshoot/sql/database-engine/performance/troubleshoot-high-cpu-usage-issues
 	--also account for the frequently run queries with high CPU, their executions count can add up and be source of your problem
 	--history of blitzCache with its executions couts and CPU usage can help OR Blitz PowerBI file for history
@@ -105,6 +105,11 @@ https://app.slack.com/client/T1LTZ0BQV/C1MS1RA4B
 -- it using some of the queries here and written by elder in the field.
 --you should vet always
 -- https://docs.microsoft.com/en-us/troubleshoot/sql/performance/troubleshoot-high-cpu-usage-issues
+
+Performance and Resource Monitor (perfmon)
+	Counter: Process/%User Time, % Privileged Time
+	Instance: sqlservr
+	If % User Time is consistently greater than 90 percent, the SQL Server process is causing high CPU usage
 
 optimization: 
 	- query plan examined 
@@ -138,6 +143,8 @@ ORDER BY record_id DESC OPTION (RECOMPILE);
 
 	
 -- ********************************MEMORY PRESSURE 
+https://learn.microsoft.com/en-us/troubleshoot/sql/database-engine/performance/troubleshoot-memory-issues
+	
 select * from sys.dm_os_waiting_tasks 
 where wait_type in (N'PAGELATCH_XX')
 
