@@ -44,10 +44,14 @@ order by run_datetime desc, index_id desc
 --5 test your script is error free and a gain in performance before deploying whenever is possible
 --6 consider the cost/size of your new index versus the existing indexes having the columns needed by the query to optimize 
 --7 may need to use hint of new index to see that it performs better then the default cost effective chose by the engine; if so, you can drop it but monitoring afterward	
-	
 
-CREATE INDEX [IX_LockboxDocumentTracking_Lbxid_inc_20220427] ON [dbo].[LockboxDocumentTracking] ( [lbxId] ) 
-INCLUDE ( [id]) WITH (FILLFACTOR=95, ONLINE=ON, SORT_IN_TEMPDB=?, DATA_COMPRESSION=?);
+
+--!!!Driving queries !!!!
+	--use a tools to alert when the resources (CPU, Memmory ...) is under pressure
+	--when alert comes in, use dbo.sp_BlitzCache @MinutesBack = 5, @Top = 10, @sortOrder = 'cpu'
+	--then look for #executions - executions per minutes, total Resources(CPU, Memories) ..., warnings and queries' plan
+	--work plan/warnings in plan explorer on Pre production db ie same volume of data
+
 
 set transaction isolation level read uncommitted
 set nocount on
