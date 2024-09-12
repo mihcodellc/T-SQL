@@ -47,7 +47,7 @@ order by run_datetime desc, index_id desc
 
 
 --!!!Driving queries !!!!
-	--use a tools to alert when the resources (CPU, Memmory ...) is under pressure
+	--use a tool(eg. OS_CPU usagePressure.ps1) to alert when the resources (CPU, Memmory ...) is under pressure
 	--when alert comes in, use dbo.sp_BlitzCache @MinutesBack = 5, @Top = 10, @sortOrder = 'cpu'
 	--then look for #executions - executions per minutes, total Resources(CPU, Memories) ..., warnings and queries' plan
 	--work plan/warnings in plan explorer on Pre production db ie same volume of data
