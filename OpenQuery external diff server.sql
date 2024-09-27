@@ -25,3 +25,12 @@ SELECT column1, column2 FROM YourSQLServerTable;
 INSERT INTO YourSQLServerTable (Column1, Column2, Column3)
 SELECT Column1, Column2, Column3
 FROM OPENQUERY(POSTGRESQL, 'select Column1, Column2, Column3 FROM YourPostgreSQLTable');
+
+
+-- update postgres
+update namedTable_PG
+    set namedTable_PG.col1 = namedTable_SQL.col1
+from namedTable_SQL 
+    join OPENQUERY(POSTGRESQL, 'select Column1, Column2, Column3 FROM YourPostgreSQLTable') namedTable_PG 
+        on namedTable_PG.colid = namedTable_SQL.colid
+where namedTable_PG.colid  = X  
