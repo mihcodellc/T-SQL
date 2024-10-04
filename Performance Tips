@@ -20,6 +20,7 @@ Performance Tips
     WHERE: Filters a set of rows.
     GROUP BY: Aggregates rows into sets (groups).
     HAVING: Filters sets of rows after grouping.
+***use small batches or question the need of frequency, of data's age, usage vs impact on performance
 *** Missing Statistics
 update stats on sample 1% for example
 *** Non indexes on columns frequently used in WHERE clauses, JOIN conditions, and ORDER BY clauses.
