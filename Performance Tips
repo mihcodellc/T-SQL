@@ -1,18 +1,25 @@
 Performance Tips
 
 
-*** Fragmentation
+*** Fragmentation: mitigate with fillfactor
 *** Index size
 *** Non covering index
 *** Functions on columns, non equality predicates
-Arithmetic operations
+*** Arithmetic operations in WHERE/HAVING
 *** Significant portion of the index needs to be read
 *** Like and leading wildcard
 ***Inequality Conditions:** such as `<>`, `!=`, `NOT IN`, or `NOT EXISTS`
 *** OR conditions especially if no single index can cover
 *** Low Selectivity:** If the filter condition is not selective enough
 *** Joins on Non-Indexed Columns
-sorting or aggregating a large result set : limit on col, top x rows, more conditions, ... 
+***sorting or aggregating a large result set : limit on col, top x rows, more conditions, ... 
+***apply early filter in your query to reduce to be compared at each clause of the query
+    one solution: put/generate together distinct values(eg. dates) to be compared to in a #temptable then JOIN or used IN/EXISTS. 
+***Prefer set-based operation vs rows/rows
+    JOIN: Combines sets of rows from different tables.
+    WHERE: Filters a set of rows.
+    GROUP BY: Aggregates rows into sets (groups).
+    HAVING: Filters sets of rows after grouping.
 *** Missing Statistics
 update stats on sample 1% for example
 *** Non indexes on columns frequently used in WHERE clauses, JOIN conditions, and ORDER BY clauses.
