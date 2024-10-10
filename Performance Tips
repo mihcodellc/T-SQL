@@ -14,7 +14,8 @@ Performance Tips
 *** Joins on Non-Indexed Columns
 ***sorting or aggregating a large result set : limit on col, top x rows, more conditions, ... 
 ***apply early filter in your query to reduce to be compared at each clause of the query
-    one solution: put/generate together distinct values(eg. dates) to be compared to in a #temptable then JOIN or used IN/EXISTS. 
+    eg 1 : put/generate together distinct values(eg. dates) to be compared to in a #temptable then JOIN or used IN/EXISTS.
+    eg 2: subquery(apply where) the big table before Join to other 
 ***Prefer set-based operation vs rows/rows
     JOIN: Combines sets of rows from different tables.
     WHERE: Filters a set of rows.
