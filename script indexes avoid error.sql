@@ -20,7 +20,8 @@ create table
 )
  
 exec sp_msforeachtable 'insert into #temp exec [sp_SQLskills_helpindex_short] [?]'  
- 
+
+ -- don't forget: SET QUOTED_IDENTIFIER ON; -- to avoid error when building index
 --fix (-) = DESC in the index definition
  
 select 'insert into dba_db.dbo.trackIndex_rebuild (objname,index_name) select ''' + objname + ''','''+index_name+'''; ' +
