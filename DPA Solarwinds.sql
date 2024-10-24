@@ -6,3 +6,7 @@
 		what has been done, what left https://documentation.solarwinds.com/en_vers/success_center/dpa/2024-2/content/dpa-table-tuning-best-practices.htm?cshid=bestPracticesTableTuning
 attaches to it
 
+identify blockers
+	https://documentation.solarwinds.com/en_vers/success_center/dpa/2024-2/content/dpa-identify-locks-blocks.htm
+Investigate violations of table tuning best practices
+	https://documentation.solarwinds.com/en_vers/success_center/dpa/2024-2/content/dpa-table-tuning-best-practices.htm?cshid=bestPracticesTableTuning
