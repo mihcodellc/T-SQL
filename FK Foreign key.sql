@@ -1,3 +1,10 @@
+--found the table knowing FK name
+SELECT o.name, fk.name, fk.is_not_trusted, fk.is_disabled
+FROM sys.foreign_keys AS fk
+INNER JOIN sys.objects AS o ON fk.parent_object_id = o.object_id
+WHERE fk.name in ('FK_tablename_column') ;
+GO
+
 --replace MyTable
 
 select  name FK_name, object_name(fk.parent_object_id) tableColReferTo, schema_name(fk.schema_id) + '.' + object_name(fk.parent_object_id) + '.' +col_name(fk.parent_object_id,fkc.parent_column_id) InColName,  object_name(fk.referenced_object_id) referTable ,
