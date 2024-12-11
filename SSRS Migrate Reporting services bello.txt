@@ -91,6 +91,43 @@ same using T-SQL
 --GRANT SELECT ON dbo.sysjobs TO [RSExecRole];
 --GO
 
+--make sure your service account [domain\userReportSVC] has the right priv and member of administrator group on the server
+--			to avoid Could not load folder contents
+-- master
+USE [master]
+GO
+ 
+ALTER ROLE [RSExecRole] ADD MEMBER [domain\userReportSVC]
+GO
+ 
+-- msdb
+USE [msdb]
+GO
+ALTER ROLE [RSExecRole] ADD MEMBER [domain\userReportSVC]
+GO
+ALTER ROLE [SQLAgentOperatorRole] ADD MEMBER [domain\userReportSVC]
+GO
+ALTER ROLE [SQLAgentReaderRole] ADD MEMBER [domain\userReportSVC]
+GO
+ALTER ROLE [SQLAgentUserRole] ADD MEMBER [domain\userReportSVC]
+GO
+ 
+-- ReportServer
+USE [ReportServer]
+GO
+ALTER ROLE [db_owner] ADD MEMBER [domain\userReportSVC]
+GO
+ALTER ROLE [RSExecRole] ADD MEMBER [domain\userReportSVC]
+GO
+ 
+-- ReportServerTempDB
+USE [ReportServerTempDB]
+GO
+ALTER ROLE [db_owner] ADD MEMBER [domain\userReportSVC]
+GO
+ALTER ROLE [RSExecRole] ADD MEMBER [domain\userReportSVC]
+GO
+
 5. restore ReportServer, ReportServerTempDB
 6. make SA the owner of these 2 databases
 7. Run Reporting Services Configuration Manager On target server
@@ -99,6 +136,7 @@ same using T-SQL
 	Encryption Keys: restore with the same pass used to back it up from step 3	
 		Fully qualified file name of Encryption Key backup from the source server
 		till last apply/OK
+		DELETE [ReportServer].[dbo].[Keys]  WHERE InstanceName = 'SourceSsrsServerName'
 	Subscription settings: enter the domain account domain\userReportSVC 
 	Email settings: 
 		Sender: svc@domain.com
@@ -110,7 +148,8 @@ same using T-SQL
 			back to Web Service URL, on web service site identification, Added Host header after the server name(not IP) on port 80
 
 8. Restart SQL Service and Reporting Service(optional)
-9. In browser, type serverIP:80/Reports; eg: 172.153.12.147:80/reports
+9. **on local server, In browser, type urls from "Web service URL" ~ http://servername/ReportServer
+	**on remote, client machine, In browser, type serverIP:80/Reports; eg: 172.153.12.147:80/reports
 		
 		
 		
