@@ -36,7 +36,7 @@ select * from sys.user_token --included every role on the db
 select * from sys.login_token
 select SUSER_SNAME() as [SUSER_SNAME_from_sid_param], SUSER_NAME() as [SUSER_NAME_from_LogIdNumber_param],  USER_NAME() as UserNameDB_fromIDnum, SYSTEM_USER as [LOGIN], user as [DBuser]
 
-
+L131atpe?2024
 exec as login = [svc-datascientist]
 select * from fn_my_permissions(null,'database') 
 union all
@@ -95,10 +95,12 @@ alter server role read_server add member codonnell
 USE master
 grant VIEW SERVER STATE to read_server -- <> VIEW DATABASE STATE
 
-use MedRxAnalytics;
-grant VIEW DATABASE STATE to data_science
-grant SHOWPLAN to data_science
-grant VIEW DEFINITION to data_science
+use RMSOCR;
+create role devdba
+grant VIEW DATABASE STATE to devdba ---rshannon@rmsweb.com
+grant SHOWPLAN to devdba
+grant VIEW DEFINITION to devdba
+EXEC sp_addrolemember 'devdba', 'rshannon'
 
 
 
@@ -121,7 +123,7 @@ use Reconciliation;
 --create role billing_new
 CREATE USER jjoseph FOR LOGIN jjoseph
 EXEC sp_addrolemember 'db_datareader', 'jjoseph'
---EXEC sp_addrolemember 'devdba', 'sacquaye'
+--EXEC sp_addrolemember 'devdba', 'rshannon'
 
     alter role  db_datareader add member jjoseph --dev
     alter role  db_datawriter add member jjoseph --dev

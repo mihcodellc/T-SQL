@@ -1,0 +1,117 @@
+-- task definition 
+	Specific - (scope included)
+	Measurable - (layout b/a approved)
+	Achievable -
+	Relevant - 
+	Timely - analysis, testing, coding before and after
+	
+
+-- summary of my change
+
+-- testing steps
+	
+-- comment(s) for DBA
+
+
+1-Server/IP Address: 
+
+2-Database system:  -- a pulldown of (SQL Server or Postgres)
+
+3-Steps to replicate problem (provide login for DBA if needed to)  : (free form text field, large)
+
+4-Call stack/Traces containing error, plus a few lines before and after: (free form text field, large)
+
+5-Previous Attempts(actions) to resolve the issue (for DevOps)
+  Or
+  Previous database's changes (For Developers) 
+
+6-Priority Level: (Major, Medium, Low)  
+
+7-Due Date
+
+
+please don't take the following personal: please for next time, please make sure your test
+ cover all scenarii and use different values. If I don't see that I will mention 
+ that on the ticket and have the supervisor approve the deployment as is
+ 
+---->new developement
+Server:
+Database Name:
+-Steps to replicate issue/functionality
+-parameters and current output to test with then after the change parameters and expected output
+-Possible Apps or areas of business affected: 
+
+----> New changes to the databases
+Server:
+Database Name:
+Schema:
+Object Type(table, views, SP, trigger ...):
+Merge request:
+Previous database's changes (made in dev/prod databases):
+Many databases objects involved? if yes, what are there? and in which order are we deploy them?
+	a single file for db objects/queries will be appreciated
+Posssible Apps or areas of business affected:
+Summary of tests performed:
+Approval from supervisor
+
+
+--->  New issue from apps
+Server:
+Database Name:
+Application/program name:
+Object Type(table, views, SP, trigger ...):
+Steps to replicate issue/functionality:
+Call stack or/and Traces from apps experiencing the issue
+Query involved(included parameters if possible):
+Previous Attempts(actions) to resolve the issue:
+Many databases objects involved? if yes, what are there? and in which order are we deploy them?
+	a single file for db objects/queries will be appreciated
+Posssible Apps or areas of business affected:
+Summary of tests performed:
+Approval from supervisor:
+
+please put a context around it in just couples sentences so DBA the ins and outs of this request, what part of the business this impact and effects on others tables/queries. thanks
+
+---> Sisense
+Dashboard's name (if many, please them)
+screenshots and link to each of them:
+Steps to replicate issue: (so I can see what you are seeing)
+
+
+
+
+----> optimization
+please create an DBSUPPORT for dba to take look on how to speed up the routine. and in the description please tell us why it is needed, how long it took usually, mention app related, job related and any usefull info about it
+
+
+what this object is meant for
+what is its logic structure? ex. select ... then update ... convert ... 
+
+what are you going to change
+
+what impact/effect your change will have
+
+what are going to test + testing steps
+
+have you used at least 5 different input
+what are outputs you expect?
+
+layout+rows count+columns order
+
+
+
+
+@ offline. If URGENT, Please, Create a ticket with these REQUIRED information
+
+1-Server/IP Address:
+2-Database system: 
+3-Steps to replicate problem 
+4-Call stack/Traces 
+5-Previous Attempts(actions)
+6-Priority Level:
+7-Due Date
+THEN call my phone's number
+
+
+exec RmsAdmin.dbo.p_RMSSQLRestartControl  START
+exec RmsAdmin.dbo.p_RMSSQLRestartControl

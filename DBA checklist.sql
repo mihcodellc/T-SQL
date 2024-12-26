@@ -23,7 +23,7 @@ Your SQL Database Maintenance Checklist
 year – YOUR JOB DEPENDS ON IT!
 
 ***Monthly
-● Corruption checks – run DBCC CHECKDB in SQL Server
+● Corruption checks – run DBCC CHECKDB in SQL Server -- review how to solve this
 
 
 
@@ -73,12 +73,32 @@ This is a database reliability checklist. This applies to both PostgreSQL and MS
 Daily Checklist
 ****************************************
 
+Check/fix corruption ???
+
 Backups (MSSQL  | PostgreSQL)- Check your backups to validate that they were successfully created per your process.
 
 Nightly Processing - Review the nightly or early morning processes.
 
-SQL Server Error Log - Review the SQL Server error log for any errors or security issues (successful or failed logins) that are unexpected.
-
+SQL Server Error Log - Review the SQL Server/Agent/Services(SSIS, SSAS)/System log/logs for any message related 
+				to error/Severity/warning/Performance Hardware-network-driver/information 
+				or security issues (successful or failed logins) that are unexpected.
+				set up for those or custom script ot third-party log manegement tolls
+						***SQL log
+						Startup Messages
+						Database Issues: Errors during database startup, recovery, or consistency checks
+						Backups and Restores:
+						Deadlocks:
+						Login Failures: misconfiguration or potential security threat.
+						Replication or Availability Issues
+						***Agent Log
+						Job Failures
+						Alerts and Notifications
+						Agent Service Startup Issues:
+						***SSIS Logs
+						Package Execution Failures
+						Validation Issues
+						Performance Bottlenecks
+						Connection Errors
 Some of the hardware vendors write warnings to the Windows Event Log when they anticipate an error is going to occur, so this gives you the opportunity to be proactive and correct the problem during a scheduled down time, rather than having a mid day emergency.
 
 SQL Server Agent Jobs - Review for failed SQL Server Agent Jobs.
@@ -89,12 +109,27 @@ Performance Logs - Review the performance metrics to determine if your baseline 
 
 Security Logs - Review the security logs from a third party solution or from the SQL Server Error Logs to determine if you had a breach or a violation in one of your policies.
 
-Centralized error handling - If you have an application, per SQL Server or enterprise level logging, then review those logs for any unexpected errors.
+Centralized error handling - If you have an application, per SQL Server or enterprise level logging, then review those logs for any unexpected errors/warninf.
 
 Storage - Validate you have sufficient storage on your drives to support your databases, backups, batch processes, etc. in the short term.
 
 Service Broker - Check the transmission and user defined queues to make sure data is properly being processed in your applications.
 
+Windows Event viewer: what to look for 
+	SQL Server related in
+		Application Logs
+		System Logs
+		Security Logs - if you play IT role
+		
+Database Security	(Weekly security checklist some below) 
+	while installing, upgrading follow https://learn.microsoft.com/en-us/sql/sql-server/install/security-considerations-for-a-sql-server-installation?view=sql-server-ver16
+	Enhance physical security
+	Use firewalls: between server and internet
+	Isolate services: limited to permission needed 
+	Configure a secure file system: NTFS recommended
+	Disable NetBIOS and server message block: unnecessary protocols disabled
+	Installing SQL Server on a domain controller: not recommended
+	
 
 
 Weekly Checklist
@@ -138,7 +173,7 @@ Monitor Performance: CPU, memory, I/O, and storage usage.
 Database Statistics up to date
 3. Security Management
 User Management/Data Encryption at rest and in transit.
-Audit Logging: Enable and review audit logs to track changes or unauthorized access.
+Audit Logging: Enable and review audit logs to track changes or unauthorized access. how-to??
 Patching: Apply security patches and updates to database software to prevent vulnerabilities.
 4. Storage and Capacity Planning
 Monitor Disk Space/Growth Projections/Partitioning: Use table partitioning to manage large datasets and improve performance.
@@ -191,7 +226,7 @@ do we have indexes supporting the query? how often?
 reads, CPU, data size ... in pre-prod database
 
 
-search through database logs, run sp_BlitzWho(brentozar), custom queries, sql sentry explorer to examine the query plan looking for errors, waits stats, blocking/blocked sessions, scans vs seeks...
+run sp_BlitzWho(brentozar), custom queries, sql sentry explorer to examine the query plan looking for errors, waits stats, blocking/blocked sessions, scans vs seeks...
 
 rollback plan, patching 77 servers at least once a year with cumulative updates, assign priv on role-based access and least priv, testing my backups, enable transparent data encryption services,
 
