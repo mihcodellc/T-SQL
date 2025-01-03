@@ -20,7 +20,7 @@ CREATE CERTIFICATE ServerCertificate
 go
 
 -- symmetric key at server level
-    CREATE SYMMETRIC KEY KeyForAcolumn WITH ALGORITHM = AES_256  
+    CREATE SYMMETRIC KEY KeyForAnObject WITH ALGORITHM = AES_256  
 ENCRYPTION BY CERTIFICATE ServerCertificate; 
     
 USE AdventureWorks2016;
