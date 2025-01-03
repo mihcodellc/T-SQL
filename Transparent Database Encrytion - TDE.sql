@@ -7,17 +7,26 @@ GO
 CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'Passw0rd';
 --DROP MASTER KEY  
 GO
---certificate protected the master key
 
+---optional--create application to ensure that the certificat is specific for areas of the program   
+    create application role ccDecrypter with passowrd='dshblvdhv'
+    
+--certificate protected the master key    
 use master
-CREATE CERTIFICATE ServerCertificate WITH SUBJECT = 'Master Certificate';
+CREATE CERTIFICATE ServerCertificate 
+    AUTHORIZATION  ccDecrypter -- OPTIONAL
+    WITH SUBJECT = 'Master Certificate';
 -- DROP CERTIFICATE ServerCertificate  
 go
 
+-- symmetric key at server level
+    CREATE SYMMETRIC KEY KeyForAcolumn WITH ALGORITHM = AES_256  
+ENCRYPTION BY CERTIFICATE ServerCertificate; 
+    
 USE AdventureWorks2016;
 -- DB Encryption Key (DEK) for a DB
 CREATE DATABASE ENCRYPTION KEY
-WITH ALGORITHM = AES_128
+WITH ALGORITHM = AES_256
 ENCRYPTION BY SERVER CERTIFICATE ServerCertificate;
 go
 
