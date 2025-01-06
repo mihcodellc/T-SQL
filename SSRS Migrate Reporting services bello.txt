@@ -146,6 +146,7 @@ GO
 	Web Portal URL: Accept default by hitting "Apply"
 			in "Advanced.." Added Host header after the server name(not IP) on port 80
 			back to Web Service URL, on web service site identification, Added Host header after the server name(not IP) on port 80
+	you may have to remove unwanted her : SELECT * FROM [ReportServer].[dbo].[keys]
 
 8. Restart SQL Service and Reporting Service(optional)
 9. **on local server, In browser, type urls from "Web service URL" ~ http://servername/ReportServer
