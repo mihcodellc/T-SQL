@@ -34,7 +34,16 @@ ALTER DATABASE Test MODIFY FILE (NAME = belloTest, NEWNAME = Test);
 ALTER DATABASE Test MODIFY FILE (NAME = belloTest_log, NEWNAME = Test_log);
 --Take Database Offline EXCEPT FOR Tempdb ; no need because it gets created the next the server is restarted
 USE master --Important otherwise a failure
-ALTER DATABASE Test SET OFFLINE;
+ALTER DATABASE Test SET OFFLINE; 
+
+--if taking long check connection and kill them
+SELECT session_id
+	,login_name
+	,STATUS
+	,program_name
+	,host_name
+FROM sys.dm_exec_sessions
+WHERE database_id = DB_ID('MedRx');
 
 ---- IF ABOVE QUERY FAILS, RUN  BELOW QUERY
 --USE [master];
