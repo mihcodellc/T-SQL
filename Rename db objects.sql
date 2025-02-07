@@ -4,6 +4,8 @@ EXEC sp_rename 'dbo.MyTable', 'MyTable_OLD';
 
 EXEC sp_rename 'dbo.PK_MyTable', 'PK_MyTable_OLD';
 
+/****** rename table column ******/
+EXEC sp_rename 'dbo.MyTable.MyCOlumn', 'NewNameForMycolumn', 'COLUMN';
 
 /****** rename indexes ******/
 EXEC sp_rename N'dbo.MyTable_OLD.IX_MyTable_clid_statusid_processruleid_slid_procedurecode', N'IX_MyTable_clid_statusid_processruleid_slid_procedurecode_old', N'INDEX';   
