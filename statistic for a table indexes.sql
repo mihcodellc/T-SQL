@@ -1,3 +1,5 @@
+-- https://github.com/mcflyamorim/statisticsreview/tree/main/Presentation *** great resources
+
 
 -- Returning all statistics properties for a table without fragmentation or full histogram  
 SELECT sp.stats_id, name, filter_definition, last_updated, rows, rows_sampled, steps, unfiltered_rows, modification_counter
