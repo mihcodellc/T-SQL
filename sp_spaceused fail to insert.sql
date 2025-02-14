@@ -491,6 +491,7 @@ BEGIN
 	IF @ismemoryoptimizedtable = 1
 	BEGIN
 		SELECT 
+		@id as id,
 		OBJECT_NAME (@id) AS name,
 	CONVERT (char(20), SUM(rows)) AS rows,
 		NULL AS reserved,
@@ -504,6 +505,7 @@ BEGIN
 		 --return --debug
 		 --Insert into DBA.dbo.RMSTables_growth
 		SELECT
+		@id as id,
 		OBJECT_NAME (@id) AS name,
 		CONVERT (bigint, SUM(rows)) AS rows,
 		SUM (CAST (SUBSTRING(reserved, 1, CHARINDEX(' ', reserved)) AS bigint))/1024 AS reserved_MB, 
