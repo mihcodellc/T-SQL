@@ -22,6 +22,10 @@ GO
  -- 67108864KB  --64GB
  --1048576KB  --1024MB
 
+   SELECT 'DBCC SHRINKFILE (N''' + name +''', 65536 );' ,  is_percent_growth, physical_name 
+ FROM sys.database_files
+
+
 --***add datafile
 ALTER DATABASE [tempdb] ADD FILE ( NAME = N'tempdb_mssql_25', FILENAME = N'T:\MSSQL\tempdb_mssql_20.ndf' , SIZE = 100663296KB , FILEGROWTH = 1048576KB )
 GO
