@@ -47,6 +47,7 @@ WHERE r.command IN ( -- /* SELECT distinct r.command FROM sys.dm_exec_requests r
 		'BACKUP DATABASE'
 		,'RESTORE DATABASE'
 		,'BACKUP LOG'
+	        ,'CREATE INDEX'
 		)
 
 -- seems to track in auto running jobs. but percent_complete is not accurate
