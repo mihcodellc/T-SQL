@@ -14,6 +14,7 @@ where
 queryType not like '%DatabaseBackup%'
 and
 CheckDate between TODATETIMEOFFSET(dateadd(mi,-30, getdate()), '-06:00') and  TODATETIMEOFFSET(GETDATE(), '-06:00')
+CheckDate between '2025-02-26 08:28:00.0384127 -06:00' and  '2025-02-26 08:32:00.0384127 -06:00' -- compare to the same format in the col for performance  
 --and QueryText like '%xxx%' 
 order by averageCPU desc, averageReads desc, executionsPerMinute desc
 
