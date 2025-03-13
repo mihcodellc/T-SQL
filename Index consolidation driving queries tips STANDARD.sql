@@ -42,13 +42,16 @@ order by run_datetime desc, index_id desc
 --3 you can drop an index with rollback create statement ready; then plan for putting it back, if a db client starts bugging down
 --4 no more 5 keys columns and 10 in includes
 --5 test your script is error free and a gain in performance before deploying whenever is possible
+	make the index to be drop in not used as hint in generated script of the database
 --6 consider the cost/size of your new index versus the existing indexes having the columns needed by the query to optimize 
 --7 may need to use hint of new index to see that it performs better then the default cost effective chose by the engine; if so, you can drop it but monitoring afterward	
 
 
 --!!!Driving queries !!!!
 	--use a tool(eg. OS_CPU usagePressure.ps1) to alert when the resources (CPU, Memmory ...) is under pressure
-	--when alert comes in, use dbo.sp_BlitzCache @MinutesBack = 5, @Top = 10, @sortOrder = 'cpu'
+	--when alert comes in, use dbo.sp_BlitzCache @MinutesBack = 5, @Top = 10, @sortOrder = 'cpu' 
+		OR [SP_Complement_blitzWho] & 2-compareConnectionOvertime_query_everyXmin.sql
+		if i was set to run frequently enough ie every 10seconds
 	--then look for #executions - executions per minutes, total Resources(CPU, Memories) ..., warnings and queries' plan
 	--work plan/warnings in plan explorer on Pre production db ie same volume of data
 
