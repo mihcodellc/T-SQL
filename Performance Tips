@@ -6,6 +6,7 @@ Performance Tips
 *** Non covering index
     find by starting with missing index: run SELECT 1 FROM ... -- remove all columns in the select clause to allow optimizer to point to any missing index. Thanks to Greg Bugaj CIO at RMS LLC
      consider index hint, filter index, columnstore index
+     https://learn.microsoft.com/en-us/sql/t-sql/queries/hints-transact-sql-query?view=sql-server-ver16
 *** Functions on columns, non equality predicates
 *** Arithmetic operations in WHERE/HAVING
 *** Significant portion of the index needs to be read
