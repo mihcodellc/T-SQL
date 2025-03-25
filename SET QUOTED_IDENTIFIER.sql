@@ -1,4 +1,7 @@
- error: CREATE INDEX failed because the following SET options have incorrect settings: 'QUOTED_IDENTIFIER'. 
+--all set options
+https://learn.microsoft.com/en-us/sql/t-sql/statements/set-statements-transact-sql?view=sql-server-ver16
+
+error: CREATE INDEX failed because the following SET options have incorrect settings: 'QUOTED_IDENTIFIER'. 
 
 Fix: add "SET QUOTED_IDENTIFIER ON;" before run the query
 
