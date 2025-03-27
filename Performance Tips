@@ -1,6 +1,6 @@
 Performance Tips
 
-
+***bottleneck statement(by elimination) find it and/or read the query plan x times ratio estimates vs Actuals
 *** Fragmentation: mitigate with fillfactor
 *** Index size
 *** Non covering index
