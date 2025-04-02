@@ -6,6 +6,14 @@ SELECT IDENT_CURRENT('schema.mytable') AS LastIdentityValue;
 --select IDENT_CURRENT()
 --select @@IDENTITY
 
+-- https://learn.microsoft.com/en-us/sql/t-sql/functions/scope-identity-transact-sql?view=sql-server-ver16
+
+IDENT_CURRENT is not limited by scope and session; it is limited to a specified table. 
+  IDENT_CURRENT returns the value generated for a specific table in any session and any scope. For more information, see IDENT_CURRENT (Transact-SQL).
+
+SCOPE_IDENTITY and @@IDENTITY return the last identity values that are generated in any table in the current session. 
+  However, SCOPE_IDENTITY returns values inserted only within the current scope; @@IDENTITY is not limited to a specific scope.
+
 begin tran
 --SET IDENTITY_INSERT schema.mytable ON
 INSERT INTO schema.mytable (col1,col2, ...)
