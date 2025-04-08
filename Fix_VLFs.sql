@@ -1,3 +1,7 @@
+--https://github.com/Microsoft/tigertoolbox/tree/master/Fixing-VLFs
+--https://learn.microsoft.com/en-us/sql/relational-databases/sql-server-transaction-log-architecture-and-management-guide?view=sql-server-ver15#physical_arch
+https://www.mssqltips.com/sqlservertip/2107/performance-issue-with-large-number-of-virtual-log-files-in-sql-server-transaction-log/#:~:text=For%20optimal%20performance%20a%20database%20should%20have%20roughly,can%20degrade.%20You%20should%20try%20and%20avoid%20both.
+
 -- 2011-05-24 Pedro Lopes (Microsoft) pedro.lopes@microsoft.com (http://aka.ms/sqlinsights)
 --
 -- 2012-03-25 Added SQL 2012 support
