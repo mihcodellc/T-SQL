@@ -1,0 +1,43 @@
+CREATE FUNCTION dbo.StripInvalidXmlChars (@input NVARCHAR(MAX))
+RETURNS NVARCHAR(MAX)
+AS
+--chat.deepseek.com
+---- Usage:
+--SELECT 
+--    other_columns,
+--    dbo.StripInvalidXmlChars(event_info) AS event_info
+--FROM YourTable
+--FOR XML PATH('Query'), TYPE
+
+BEGIN
+    DECLARE @result NVARCHAR(MAX) = @input
+    
+    -- Remove null characters
+    SET @result = REPLACE(@result, CHAR(0), '')
+    SET @result = REPLACE(@result, NCHAR(0), '')
+    
+    -- Remove other invalid XML 1.0 characters
+    DECLARE @i INT = 1
+    WHILE @i <= LEN(@result)
+    BEGIN
+        DECLARE @c NCHAR(1) = SUBSTRING(@result, @i, 1)
+        IF UNICODE(@c) IN (0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8,
+                          0xB, 0xC, 0xE, 0xF, 0x10, 0x11, 0x12, 0x13, 0x14,
+                          0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C,
+                          0x1D, 0x1E, 0x1F)
+        BEGIN
+            SET @result = STUFF(@result, @i, 1, '')
+        END
+        ELSE SET @i = @i + 1
+    END
+    
+    RETURN @result
+END
+GO
+
+-- Usage:
+SELECT 
+    other_columns,
+    dbo.StripInvalidXmlChars(event_info) AS event_info
+FROM YourTable
+FOR XML PATH('Query'), TYPE
