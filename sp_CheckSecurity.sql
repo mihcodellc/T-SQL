@@ -1,4 +1,5 @@
 --https://github.com/Straight-Path-Solutions/sp_CheckSecurity/blob/main/sp_CheckSecurity.sql
+-- https://github.com/desertdba/Presentations  look for "Defending SQL Server Against Ransomware.pdf"
 IF OBJECT_ID('dbo.sp_CheckSecurity') IS NULL
   EXEC ('CREATE PROCEDURE dbo.sp_CheckSecurity AS RETURN 0;');
 GO
