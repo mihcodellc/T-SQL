@@ -1,25 +1,46 @@
-/****** rename table & PK ******/
+https://learn.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-rename-transact-sql?view=sql-server-ver16
+  
+Rename = COLUMN, 
+        DATABASE, 
+        INDEX, 
+        OBJECT ---- objects including constraints (CHECK, FOREIGN KEY, PRIMARY/UNIQUE KEY), user tables, columns, stored procedures, inline table-valued functions, table-valued functions, and rules
+        STATISTICS, 
+        USERDATATYPE
+  
+/****** rename table ******/
 
-EXEC sp_rename 'dbo.MyTable', 'MyTable_OLD';
-
-EXEC sp_rename 'dbo.PK_MyTable', 'PK_MyTable_OLD';
+EXEC sp_rename 'MySchema.MyTable', 'MyTable_OLD';
 
 /****** rename table column ******/
-EXEC sp_rename 'dbo.MyTable.MyCOlumn', 'NewNameForMycolumn', 'COLUMN';
+EXEC sp_rename 'dbo.MyTable.MyCOlumn', 'NewNameForMycolumn', 'COLUMN'; --
+
+
+-- Rename a foreign key constraint.
+EXEC sp_rename @objname = 'HumanResources.FK_Employee_Person_BusinessEntityID', 
+               @newname = 'FK_EmployeeID',
+               @objtype =  'OBJECT'; 
 
 /****** rename indexes ******/
 EXEC sp_rename N'dbo.MyTable_OLD.IX_MyTable_clid_statusid_processruleid_slid_procedurecode', N'IX_MyTable_clid_statusid_processruleid_slid_procedurecode_old', N'INDEX';   
 GO
 
-EXEC sp_rename N'dbo.MyTable_OLD.ix_MyTable_lbxid_procedurecode_statusid_20230215', N'ix_MyTable_lbxid_procedurecode_statusid_20230215_old', N'INDEX';   
+  -- Rename the primary key constraint.
+EXEC sp_rename 'MySchema.PK_Employee_BusinessEntityID', 'PK_EmployeeID','OBJECT';
 GO
 
-EXEC sp_rename N'dbo.MyTable_OLD.IX_MyTable_lbxid_slhisid_02152023', N'IX_MyTable_lbxid_slhisid_02152023_old', N'INDEX';   
+-- Rename a check constraint.
+EXEC sp_rename 'HumanResources.CK_Employee_BirthDate', 'CK_BirthDate', 'OBJECT';
 GO
 
-EXEC sp_rename N'dbo.MyTable_OLD.IX_MyTable_slid_processruleid', N'IX_MyTable_slid_processruleid_old', N'INDEX';   
+
+-- Return the current Primary Key, Foreign Key and Check constraints for the Employee table.
+SELECT name, SCHEMA_NAME(schema_id) AS schema_name, type_desc
+FROM sys.objects
+WHERE parent_object_id = (OBJECT_ID('HumanResources.Employee'))
+AND type IN ('C','F', 'PK');
 GO
 
+  
 /****** create new table ******/
 
 GO
