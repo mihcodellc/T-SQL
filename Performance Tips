@@ -2,6 +2,9 @@ Performance Tips
 
 ***bottleneck statement(by elimination) find it and/or read the query plan x times ratio estimates vs Actuals
 ***delay the retrieval of columns not covered by index in join of diff tables, use only the pk then later join back to main table to get those columns
+***query may be slow because it has a huge table has index for quick retrieval(pk, index) & known col value but 
+join to others with conditions > retrive first in temp table (smaller then join) = earlier filter and temp(stats available)
+    
 *** Fragmentation: mitigate with fillfactor
 *** Index size
 *** Non covering index
