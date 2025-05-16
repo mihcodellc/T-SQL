@@ -1,4 +1,11 @@
-create  PROCEDURE [dbo].[sp_BlitzWho_bello_plan_xml] @Help TINYINT = 0, @ShowSleepingSPIDs TINYINT = 0, @ExpertMode BIT = 0, @Debug BIT = 0,
+USE DBA_DB
+go
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER PROCEDURE [dbo].[sp_BlitzWho_bello_2] @Help TINYINT = 0, @ShowSleepingSPIDs TINYINT = 0, @ExpertMode BIT = 0, @Debug BIT = 0,
 @OutputDatabaseName NVARCHAR(256) = NULL, @OutputSchemaName NVARCHAR(256) = NULL, @OutputTableName NVARCHAR(256) = NULL, 
 @OutputTableRetentionDays TINYINT = 3, @MinElapsedSeconds INT = 0, @MinCPUTime INT = 0, @MinLogicalReads INT = 0, 
 @MinPhysicalReads INT = 0, @MinWrites INT = 0, @MinTempdbMB INT = 0, @MinRequestedMemoryKB INT = 0, @MinBlockingSeconds INT = 0, 
@@ -11,10 +18,10 @@ BEGIN
 
 	--Run example: 
 	/*
-	exec [dba_db].[dbo].[sp_BlitzWho_bello_plan_xml] 
+	exec [RmsAdmin].[dbo].[sp_BlitzWho_bello_2] 
 	@ExpertMode = 1 
    ,@Debug = 1 --the text of dynamic query  allowing the debug your change in message tab
-   ,@OutputDatabaseName = 'dba_db' 
+   ,@OutputDatabaseName = 'RmsAdmin' 
    ,@OutputSchemaName = 'dbo'  
    ,@OutputTableName = 'BlitzWho_bello'
    ,@OutputTableRetentionDays = 5
@@ -910,7 +917,7 @@ SOFTWARE.
         rp.name AS resource_pool_name,
         CONVERT(VARCHAR(128), r.context_info)  AS context_info,
         r.query_hash, r.query_plan_hash, r.sql_handle, r.plan_handle, 
-		case when len(ib.event_info)> 1 then (SELECT dba_db.dbo.StripInvalidXmlChars(ib.event_info) as event_info FOR XML PATH(''Query''), TYPE) else NULL end as query_involved,
+		(SELECT DBA_DB.dbo.StripInvalidXmlChars(ib.event_info) as event_info FOR XML PATH(''Query''), TYPE) as query_involved,
 		case when len(ib.event_info)> 0 then substring(ib.event_info, 1, 4000) else NULL end as query_involved_txt,
 		r.statement_start_offset, r.statement_end_offset '
 		END /* IF @ExpertMode = 1 */  
