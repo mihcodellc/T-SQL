@@ -19,6 +19,8 @@ https://events.microsoft.com/en-us/mvtd?startTime=08:00&endTime=17:00
 
 -- deprecated features limit.sql
 
+--Contention: refer to 	contention.sql
+
 --tsql refreance
 --https://learn.microsoft.com/en-us/sql/t-sql/language-reference?view=sql-server-ver15
 
