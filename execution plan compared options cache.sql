@@ -3,6 +3,8 @@
 
 -- https://statisticsparser.com/
 
+--ssms command windows: Tools.DiffFiles a.sql b.sql
+
 --https://www.mssqltips.com/sqlservertip/4318/sql-server-stored-procedure-runs-fast-in-ssms-and-slow-in-application/
 
 -- Get the full text of a long request
