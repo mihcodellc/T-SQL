@@ -53,7 +53,7 @@ declare @clause nvarchar(2000)
 EXEC sp_MSforeachtable ' 
 begin try
 if ''?'' <> ''[dbo].[SysProcesses]''
-insert into #t EXEC sp_spaceused @objname = ''?'' 
+insert into #t EXEC sp_spaceused_mbello @objname = ''?'' 
 end try
 begin catch
     select ''?'' as [Full Name]
