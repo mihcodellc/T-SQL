@@ -1,0 +1,6 @@
+facing a success growth, the database can get out of control due to its size.
+At earlier time, we should define
+each table, fact table, with its own period of retention of data and plan to recycle the IDs identity column if any
+group fact tables on shrinkable size on different datafile
+define table, index on specific one filegroup, avoiding spread to unlimited datafiles. 
+avoiding put users tables on primary filegroup
