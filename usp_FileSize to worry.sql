@@ -1,12 +1,18 @@
+begin
+ --3/11/2025 by Monktar Bello: added the actual size of the file
+ -- 1/2/2025 by Monktar Bello:  reduce the threshold alert from 97 to 95 and review the logic to remove the "noise" in datafiles list
+
  --6/11/2024: initial version: Monktar Bello 
  --Run Example: exec DBA_DB.dbo.usp_FileSize
 
 
-	declare @WorryThreshold_perc tinyint = 85 
-	declare @WorryThreshold_size_inMB int =  400000 --400GB
+	declare @WorryThreshold_perc tinyint = 95 -- 97 to close when the file get filled quickly 
+	declare @WorryThreshold_size_inMB int =  524288 --512GB is limit to create new file
 
-	declare @WorryFileList varchar(1000)= 'Size greater than ' + cast(@WorryThreshold_size_inMB as varchar(7)) 
-	+ 'MB and has consumed more than  ' + cast(@WorryThreshold_perc as varchar(7)) + '% of current size.' +char(10)+char(13) 
+
+
+	declare @WorryFileList varchar(1000)= 'Size greater than ' + SUBSTRING(cast(@WorryThreshold_size_inMB/1024 as varchar(15)),1,8) 
+	+ ' GB and has consumed more than  ' + cast(@WorryThreshold_perc as varchar(7)) + '% of current size.' +char(10)+char(13) 
 	+'Data files filling up, it can be an issue soon. DBA needs to worry about !!!' +char(10)+char(13)
 	+'The following files need your attention: '+char(10)+char(13)
 	declare @WorryFileList_Draft varchar(1000) =''
@@ -45,29 +51,26 @@
 
      SELECT @WorryFileList_Draft = STRING_AGG (CONVERT(VARCHAR(1000),physical_name), CHAR(13)+CHAR(10)) 
 	FROM(
-	select top 100 physical_name, logic_name from @fillUp
+	select top 100 physical_name + '  *** ' + SUBSTRING(CAST(size_MB/1024 as varchar(15)),1,8) + ' GB ' as physical_name, logic_name from @fillUp
 	where dateinsert > convert(datetime2,replace(convert(CHAR(10), GETDATE(), 112),'-',''))
-	and [HowCloseToSizeonDisk_perc] > @WorryThreshold_perc and size_MB > @WorryThreshold_size_inMB
-	and logic_name not in (
-	--the exceptions have already an additional datafile and likely unlimited
-    'Archive',
-    'MedRx_Data',
-    'MedRx_Data_2',
-    'MedRx_Data_3',
-    'MedRx_Data_4',
-    'LockBoxData_1'
-	    )
+	and ([HowCloseToSizeonDisk_perc] > @WorryThreshold_perc and size_MB/1024 > @WorryThreshold_size_inMB*@WorryThreshold_perc/100/1024)  --alert
+	and max_size_MB =-1-- 0
+	--and logic_name not in (
+	----the exceptions have already an additional datafile and likely unlimited
+	--    )
 	    order by logic_name
 	    ) ft
 
 
-	set @WorryFileList= @WorryFileList + @WorryFileList_Draft
+	set @WorryFileList= @WorryFileList + ISNULL(@WorryFileList_Draft,'')
 
 	--debug
 	--select @WorryFileList
 
 
 
+	if @WorryFileList_Draft IS NOT NULL
+	begin
 	---***e-mail
     DECLARE @ServerName VARCHAR(25);
     DECLARE @Email_Body VARCHAR(400);
@@ -80,11 +83,14 @@
 
     SET @Email_Body = @WorryFileList
 
-    EXEC msdb.dbo.sp_send_dbmail 
+      EXEC msdb.dbo.sp_send_dbmail 
 			  @body = @Email_Body
 			 ,@body_format = 'TEXT'
 			 ,@profile_name = N'AProfile'
 			 ,@recipients = N'db_maintenance@mih.com'
 			 --,@recipients = N'mbello@mih.com'
 			 ,@Subject = @Email_subject
-			 ,@importance = 'High' 
+			 ,@importance = 'High'  
+
+    end
+end
