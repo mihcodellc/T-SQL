@@ -7,6 +7,7 @@ join to others with conditions > retrive first in temp table (smaller then join)
     
 *** Fragmentation: mitigate with fillfactor
 *** Index size
+*** clean cache or restart SQL if index is dropped based on dupes to make sure SP are recompiled
 *** Non covering index
     find by starting with missing index: run SELECT 1 FROM ... -- remove all columns in the select clause to allow optimizer to point to any missing index. Thanks to Greg Bugaj CIO at RMS LLC
      consider index hint, filter index, columnstore index
