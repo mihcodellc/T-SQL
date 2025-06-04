@@ -73,6 +73,33 @@ ORDER BY [tablename] ASC;
 --Recreate foreign key constraints.
 --Drop the old table.
 
+--check who is using my partition scheme extractoutput_archive_PartitionScheme
+SELECT 
+    s.name AS SchemaName,
+    o.name AS ObjectName,
+    i.name AS IndexName,
+    i.type_desc AS IndexType,
+    ps.name AS PartitionSchemeName
+FROM 
+    sys.indexes i
+JOIN 
+    sys.partition_schemes ps ON i.data_space_id = ps.data_space_id
+JOIN 
+    sys.objects o ON i.object_id = o.object_id
+JOIN 
+    sys.schemas s ON o.schema_id = s.schema_id
+WHERE 
+    ps.name = 'extractoutput_archive_PartitionScheme';
+
+--DROP PARTITION order
+DROP INDEX ix_ExtractOutput_datecreated ON extractoutput
+GO
+drop PARTITION SCHEME extractoutput_PartitionScheme
+GO
+DROP PARTITION FUNCTION pf_extractoutput 
+
+
+
 --drop PARTITION FUNCTION pf_salesYearPartitions 
 create PARTITION FUNCTION pf_salesYearPartitions (int)
 AS RANGE RIGHT FOR VALUES ( '40000')
