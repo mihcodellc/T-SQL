@@ -19,4 +19,7 @@ exec xp_cmdshell 'C:\test.bat LOG';
 
 
 --on remote
-sqlcmd -U mbello -d MyDB -S MyAzure.database.windows.net -P "password" -i c:\DBA\maintenance\script.sql -o c:\DBA\maintenance\out.tmp  -h -1
+--***file
+sqlcmd -U mbello -d MyDB -S MyAzure.database.windows.net -P "password" -i c:\DBA\maintenance\script.sql -o c:\DBA\maintenance\out.tmp  -h -1 
+--***query
+sqlcmd -U mbello -d MyDB -S MyAzure.database.windows.net -P "password" -q 'select top 1 * from mystable' -o c:\DBA\maintenance\out.tmp  -h -1
