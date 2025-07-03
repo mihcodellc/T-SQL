@@ -9,7 +9,7 @@ Create    PROCEDURE [dbo].[LongRunningQueryAlert_DBA]
 AS
 BEGIN
 SET NOCOUNT ON
-
+-- a agent job runs it every 2min or 1 min defined how much to catch
 -- Last update: 5/9/2025 - Monktar Bello: adjust the @threshold to catch query (specially blitz queries) when over 10min; no need to wait 25min the current limit to avoid noises
 
 
