@@ -35,6 +35,8 @@ update stats on sample 1% for example
 *** Non indexes on columns frequently used in WHERE clauses, JOIN conditions, and ORDER BY clauses.
 
 
+Indexes maitenance:
+find query at least one in CRUD  on that table, then before and after on staging then track those in prod before and after with their IO 
 
 ### 1. **Design Efficient Data Model**
 - **Star Schema vs. Snowflake Schema:** Choose the schema that best suits your performance needs. Star schemas typically provide better query performance.
