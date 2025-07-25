@@ -365,7 +365,13 @@ set showplan_all on
 set showplan_text on
 set noexec on
 DBCC SHOW_STATISTICS ('atable','an_index') with STAT_HEADER -- 'DBCC for a table indexes.sql'
-DBCC DROPCLEANBUFFERS
+DBCC DROPCLEANBUFFERS;     -- Flush data cache or buffer pool
+DBCC FREEPROCCACHE;        -- Remove all execution plans/query plan cache
+
+CHECKPOINT;                -- Flush dirty pages
+DBCC FREESYSTEMCACHE ('ALL'); -- Releases all unused cache entries from all caches
+
+	
 	
 
 --stats on a table: statistic for a table indexes.sql
