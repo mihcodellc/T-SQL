@@ -21,6 +21,8 @@ https://events.microsoft.com/en-us/mvtd?startTime=08:00&endTime=17:00
 
 --Contention: refer to 	contention.sql
 
+--check antivirus tasks at OS level	
+
 --tsql refreance
 --https://learn.microsoft.com/en-us/sql/t-sql/language-reference?view=sql-server-ver15
 
@@ -424,4 +426,5 @@ BEGIN CATCH
 END CATCH
 
 SET XACT_ABORT OFF --auto rollback disabled
+
 
