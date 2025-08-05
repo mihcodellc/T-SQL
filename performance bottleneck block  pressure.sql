@@ -23,6 +23,8 @@ https://events.microsoft.com/en-us/mvtd?startTime=08:00&endTime=17:00
 
 --check antivirus tasks at OS level	
 
+--run check_instance.ps1
+
 --tsql refreance
 --https://learn.microsoft.com/en-us/sql/t-sql/language-reference?view=sql-server-ver15
 
@@ -158,7 +160,7 @@ where wait_type in (N'PAGELATCH_XX')
 
 --mesure pressure using powershell and log it over time on each server and ask why it is high if noted
 https://www.mssqltips.com/sqlservertip/5114/sql-server-performance-troubleshooting-system-health-checklist/
-
+output pushed in "check_instance.ps1"
 
 --https://docs.microsoft.com/en-us/sql/relational-databases/performance-monitor/monitor-memory-usage?view=sql-server-ver15#monitor-operating-system-memory
 
@@ -426,5 +428,6 @@ BEGIN CATCH
 END CATCH
 
 SET XACT_ABORT OFF --auto rollback disabled
+
 
 
