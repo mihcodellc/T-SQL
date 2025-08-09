@@ -25,6 +25,8 @@ https://events.microsoft.com/en-us/mvtd?startTime=08:00&endTime=17:00
 
 --run check_instance.ps1
 
+--identify query or other on host with perfmon
+
 --tsql refreance
 --https://learn.microsoft.com/en-us/sql/t-sql/language-reference?view=sql-server-ver15
 
@@ -428,6 +430,7 @@ BEGIN CATCH
 END CATCH
 
 SET XACT_ABORT OFF --auto rollback disabled
+
 
 
 
