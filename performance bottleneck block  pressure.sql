@@ -23,7 +23,7 @@ https://events.microsoft.com/en-us/mvtd?startTime=08:00&endTime=17:00
 
 --check antivirus tasks at OS level	
 
---run check_instance.ps1
+--run check_instance.ps1 & CPU_orOther.ps1
 
 --identify query or other on host with perfmon
 
@@ -430,6 +430,7 @@ BEGIN CATCH
 END CATCH
 
 SET XACT_ABORT OFF --auto rollback disabled
+
 
 
 
