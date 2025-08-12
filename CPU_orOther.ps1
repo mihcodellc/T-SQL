@@ -8,7 +8,14 @@
 #your antivirus software, other drivers, or another OS component on the computer is contributing to high CPU usage.
 
 #if execute from powershell windows adjust the "-MaxSamples 3"
-#on remote with admin priv & WinRM enabled, set on time: Enable-PSRemoting -Force then run step 2 OR
+#on remote with admin priv & WinRM enabled, set on time: Enable-PSRemoting -Force then run 
+
+			#	Invoke-Command -ComputerName RemotePCName `
+			#    -ScriptBlock { powershell.exe -ExecutionPolicy Bypass -File "C:\Temp\CPU_orOther.ps1" } `
+			#    -Credential (Get-Credential)
+
+			#OR
+
 			## Step 1: Copy script to remote
 			#$session = New-PSSession -ComputerName RemotePCName -Credential (Get-Credential)
 			#Copy-Item "G:\xfer\powershell\CPU_orOther.ps1" -Destination "C:\Temp\" -ToSession $session
