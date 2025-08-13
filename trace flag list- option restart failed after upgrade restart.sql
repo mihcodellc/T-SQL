@@ -3,6 +3,8 @@ trace flag list  & query hint
 --https://docs.microsoft.com/en-US/sql/t-sql/queries/hints-transact-sql-query?view=sql-server-ver15#examples
 --https://learn.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-traceon-trace-flags-transact-sql?view=sql-server-ver15
 
+  in services.msc, start the sql service an error should pop up with more details or continue reading the next step below:
+  
 -- server restart failed after patch/update
   --in cmd promt
   net start MSSQL$SQLEXPRESS /T902
@@ -27,3 +29,4 @@ OPTION (QUERYTRACEON 8606, QUERYTRACEON 3604);
 
 --display input tree passed to the optimizer using trace flag 8606
 --redirect the output of some DBCC  to the result window using trace flag TF 3604
+
