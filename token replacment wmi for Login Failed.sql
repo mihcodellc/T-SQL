@@ -26,7 +26,7 @@ DECLARE @cmd NVARCHAR(MAX) = N'DECLARE @msg NVARCHAR(MAX) = '
    + '$(ESCAPE_SQUOTE(WMI(TextData)))'';
 
  EXEC msdb.dbo.sp_send_dbmail
-  @recipients = ''mbello@revmansolutions.com'',
+  @recipients = ''mbello@mih.com'',
   @profile_name = ''DataServicesProfile'',
   @body = @msg,
   @subject = ''There was a login failed event '
@@ -65,4 +65,5 @@ EXEC msdb.dbo.sp_add_alert
    @category_name = N'[Uncategorized]',
    @wmi_namespace = @namespace,
    @wmi_query = N'SELECT * FROM AUDIT_LOGIN_FAILED WHERE State = 5',
+
    @job_id = @job_id;
