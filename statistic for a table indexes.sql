@@ -57,6 +57,7 @@ DBCC SHOW_STATISTICS (@table,@index)
 --Update Stats
 --EXEC sp_updatestats; all stats
 UPDATE STATISTICS Sales.SalesOrderDetail(Index_SalesOrderDetail_rowguid) WITH SAMPLE 1 PERCENT; 
+UPDATE STATISTICS Sales.SalesOrderDetail(Index_SalesOrderDetail_rowguid) WITH FULLSCAN;
 	--or
 	--UPDATE STATISTICS Sales.SalesOrderDetail; 
 	--UPDATE STATISTICS Sales.SalesOrderDetail Index_SalesOrderDetail_rowguid;  
@@ -156,6 +157,7 @@ SELECT
 FROM [AdventureWorks2012].[Person].[Person] as p
 JOIN [AdventureWorks2012].[Person].[EmailAddress] as e on p.BusinessEntityID = e.BusinessEntityID
 OPTION (querytraceon 9292,querytraceon 9204,querytraceon 3604)
+
 
 
 
