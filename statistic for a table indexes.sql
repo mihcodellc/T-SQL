@@ -50,6 +50,8 @@ DBCC SHOW_STATISTICS (@table,@index)
 --where index_name in('ix_name') --and alloc_unit_type_desc = 'IN_ROW_DATA'
 --order by index_name, TimeChecked desc
 
+
+	
 --create stats
 --CREATE STATISTICS Products ON Production.Product ([Name], ProductNumber)  WITH SAMPLE 50 PERCENT
 
@@ -59,7 +61,7 @@ DBCC SHOW_STATISTICS (@table,@index)
 UPDATE STATISTICS Sales.SalesOrderDetail(Index_SalesOrderDetail_rowguid) WITH SAMPLE 1 PERCENT; 
 UPDATE STATISTICS Sales.SalesOrderDetail(Index_SalesOrderDetail_rowguid) WITH FULLSCAN;
 	--or
-	--UPDATE STATISTICS Sales.SalesOrderDetail; 
+	--UPDATE STATISTICS Sales.SalesOrderDetail WITH FULLSCAN; 
 	--UPDATE STATISTICS Sales.SalesOrderDetail Index_SalesOrderDetail_rowguid;  
 
 -- alter index to update stats
@@ -157,6 +159,7 @@ SELECT
 FROM [AdventureWorks2012].[Person].[Person] as p
 JOIN [AdventureWorks2012].[Person].[EmailAddress] as e on p.BusinessEntityID = e.BusinessEntityID
 OPTION (querytraceon 9292,querytraceon 9204,querytraceon 3604)
+
 
 
 
