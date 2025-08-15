@@ -41,3 +41,7 @@ case when is_primary = 1 then 'CREATE UNIQUE CLUSTERED INDEX ' + index_name + ' 
 else '' end saveAndRebuilt -- Filegroup's name = FG_MedRx_Data
 from #temp where is_primary = 1
 
+
+ error: CREATE INDEX failed because the following SET options have incorrect settings: 'QUOTED_IDENTIFIER'. 
+
+Fix: add "SET QUOTED_IDENTIFIER ON;" before run the query
